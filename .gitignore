@@ -1,0 +1,17 @@
+# Executable
+*.exe
+
+# User config (contains personal paths)
+config.json
+
+# PyInstaller build artifacts
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
