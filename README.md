@@ -90,4 +90,24 @@ Pull Requests are welcome! If you find unmapped fields or bugs:
 
 ## 📄 License
 
-MIT — do whatever you want with it.
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+### ✔ Permissions
+
+* Commercial use
+* Modification
+* Distribution
+* Private use
+
+### ❗ Conditions
+
+* Must disclose source code
+* Must include license and copyright
+* Same license (GPL-3.0) must be used
+
+### 🚫 Limitations
+
+* No liability
+* No warranty
+
+👉 See the full license here: https://www.gnu.org/licenses/gpl-3.0.html
