@@ -1,91 +1,47 @@
-# PrusaToOrcaSlicer
+PrusaToOrcaSlicer
+<p align="center"> <img src="logo.png" width="120" alt="Logo"/> </p> <p align="center"> <b>PrusaSlicer → OrcaSlicer Profile Converter</b><br/> Drag and drop your <code>.ini</code> PrusaSlicer file and get a ready-to-use <code>.orca_printer</code>. </p>
+✨ Features
+🖱️ Drag & Drop — drop your .ini directly into the app
+🗂️ Folder mode — convert all profiles in a folder at once
+📊 Conversion report — stats by section (mapped / approximated / ignored)
+🔍 Advanced report — field-by-field details with CSV export
+🌙 Dark / Light theme
+🌍 4 languages — French, English, German, Spanish
+📦 Download
 
-<p align="center">
-  <img src="logo.png" width="120" alt="Logo"/>
-</p>
+👉 Latest version (Releases)
+ — download PrusaToOrca.exe, no Python installation required.
 
-<p align="center">
-  <b>Convertisseur de profils PrusaSlicer → OrcaSlicer</b><br/>
-  Glisse-dépose ton fichier <code>.ini</code> PrusaSlicer et obtiens un <code>.orca_printer</code> prêt à l'emploi.
-</p>
-
----
-
-## ✨ Fonctionnalités
-
-- 🖱️ **Drag & Drop** — glisse ton `.ini` directement dans l'app
-- 🗂️ **Mode dossier** — convertis tous les profils d'un dossier en une fois
-- 📊 **Rapport de conversion** — stats par section (mappés / approx / ignorés)
-- 🔍 **Rapport avancé** — détail champ par champ avec export CSV
-- 🌙 **Thème sombre / clair**
-- 🌍 **4 langues** — Français, English, Deutsch, Español
-
-## 📦 Télécharger
-
-👉 [Dernière version (Releases)](../../releases/latest) — télécharge `PrusaToOrca.exe`, pas besoin d'installer Python.
-
----
-
-## 🛠️ Lancer depuis le code source
-
-### Prérequis
-
-- Python 3.10+
-- Installer les dépendances :
-
-```bash
+🛠️ Run from source
+Requirements
+Python 3.10+
+Install dependencies:
 pip install -r requirements.txt
-```
-
-### Lancer l'app
-
-```bash
+Run the app
 python app.py
-```
-
-### Construire l'exe
-
-```bash
+Build the executable
 pyinstaller --onefile --windowed --name "PrusaToOrca" --icon "logo.ico" --add-data "convert.py;." --add-data "logo.png;." --add-data "logo.ico;." app.py
-```
 
-L'exe se trouve dans `dist/PrusaToOrca.exe`.
+The executable will be located at dist/PrusaToOrca.exe.
 
----
-
-## 🔧 Utilisation en ligne de commande
-
-```bash
-python convert.py profils.ini
-python convert.py profils.ini --output ./output/
-```
-
----
-
-## 📁 Structure du projet
-
-```
+🔧 Command-line usage
+python convert.py profiles.ini
+python convert.py profiles.ini --output ./output/
+📁 Project structure
 .
-├── app.py          # Interface graphique (tkinter + tkinterdnd2)
-├── convert.py      # Moteur de conversion PrusaSlicer → OrcaSlicer
-├── logo.png        # Logo de l'application
-├── logo.ico        # Icône Windows
+├── app.py          # GUI (tkinter + tkinterdnd2)
+├── convert.py      # PrusaSlicer → OrcaSlicer conversion engine
+├── logo.png        # Application logo
+├── logo.ico        # Windows icon
 └── requirements.txt
-```
+🤝 Contributing
 
----
+Pull Requests are welcome! If you find unmapped fields or bugs:
 
-## 🤝 Contribuer
+Fork the repository
+Create a branch (git checkout -b feature/my-improvement)
+Commit your changes (git commit -m 'Add ...')
+Push and open a Pull Request
+📄 License
 
-Les PRs sont les bienvenues ! Si tu trouves des champs non mappés ou des bugs :
-
-1. Fork le repo
-2. Crée une branche (`git checkout -b feature/mon-amélioration`)
-3. Commit tes changements (`git commit -m 'Ajout de ...'`)
-4. Push et ouvre une Pull Request
-
----
-
-## 📄 Licence
-
-MIT — fais-en ce que tu veux.
+MIT — do whatever you want with it.
