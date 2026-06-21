@@ -58,6 +58,35 @@ class SafeImportTests(unittest.TestCase):
                     self.assertEqual(data['compatible_printers'], [PRINTER_NAME])
                     self.assertEqual(data['compatible_printers_condition'], '')
 
+    def test_strict_compatibility_includes_all_imported_printers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ini_path = Path(tmp) / 'multi_printer.ini'
+            ini_path.write_text(
+                '\n'.join([
+                    '[printer:Printer A]',
+                    'nozzle_diameter = 0.4',
+                    '',
+                    '[printer:Printer B]',
+                    'nozzle_diameter = 0.6',
+                    '',
+                    '[filament:Shared PLA]',
+                    'filament_type = PLA',
+                    'temperature = 210',
+                    '',
+                    '[print:Shared Process]',
+                    'layer_height = 0.2',
+                ]),
+                encoding='utf-8',
+            )
+            bundle_path = convert_ini_to_orca(ini_path, Path(tmp) / 'out')
+            bundle = read_bundle(bundle_path)
+
+            expected = ['PrusaToOrca - Printer A', 'PrusaToOrca - Printer B']
+            for name, data in bundle.items():
+                if name.startswith(('filament/', 'process/')):
+                    self.assertEqual(data['compatible_printers'], expected)
+                    self.assertEqual(data['compatible_printers_condition'], '')
+
     def test_loose_compatibility_leaves_filament_and_process_global(self):
         with tempfile.TemporaryDirectory() as tmp:
             bundle_path = convert_ini_to_orca(FIXTURE, Path(tmp), compatibility='loose')

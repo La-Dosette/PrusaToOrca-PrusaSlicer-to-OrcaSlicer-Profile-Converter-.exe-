@@ -1007,6 +1007,9 @@ def convert_ini_to_orca(
     else:
         printer_name = list(printer_sections.keys())[0]
     safe_printer_name = prefixed_name(printer_name, prefix_profiles)
+    compatible_printer_names = [
+        prefixed_name(name, prefix_profiles) for name in printer_sections
+    ] or [safe_printer_name]
 
     if output_path is None:
         output_path = ini_path.parent / f'{safe_zip_name(safe_printer_name)}.orca_printer'
@@ -1034,7 +1037,7 @@ def convert_ini_to_orca(
         filament_files.append(fname)
         sl = log.new_section(name, 'filament') if log else None
         converted[fname] = convert_filament_profile(out_name, data, sl)
-        converted[fname]['compatible_printers'] = [safe_printer_name] if compatibility == 'strict' else []
+        converted[fname]['compatible_printers'] = compatible_printer_names if compatibility == 'strict' else []
         converted[fname]['compatible_printers_condition'] = ''
 
     for name, data in print_sections.items():
@@ -1043,7 +1046,7 @@ def convert_ini_to_orca(
         process_files.append(fname)
         sl = log.new_section(name, 'process') if log else None
         converted[fname] = convert_print_profile(out_name, data, sl)
-        converted[fname]['compatible_printers'] = [safe_printer_name] if compatibility == 'strict' else []
+        converted[fname]['compatible_printers'] = compatible_printer_names if compatibility == 'strict' else []
         converted[fname]['compatible_printers_condition'] = ''
 
     bundle = create_bundle_structure(safe_printer_name, filament_files, process_files, printer_files)
