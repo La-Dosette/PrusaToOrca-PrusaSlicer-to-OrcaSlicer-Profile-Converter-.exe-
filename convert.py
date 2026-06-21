@@ -9,7 +9,11 @@ import zipfile
 import sys
 import argparse
 import datetime
+import hashlib
+import re
 from pathlib import Path
+
+PROFILE_PREFIX = 'PrusaToOrca - '
 
 # =================== CONVERSION LOG ===================
 
@@ -230,7 +234,7 @@ def parse_ini(ini_path):
     current_section = None
     current_data = {}
 
-    with open(ini_path, 'r', encoding='utf-8') as f:
+    with open(ini_path, 'r', encoding='utf-8-sig') as f:
         for line in f:
             line = line.rstrip('\n')
             if not line or line.startswith('#'):
@@ -261,6 +265,38 @@ def clean_gcode(val):
     val = val.strip('"')
     val = val.replace('\\n', '\n')
     return val
+
+def prefixed_name(name, enabled=True):
+    if not enabled or name.startswith(PROFILE_PREFIX):
+        return name
+    return f'{PROFILE_PREFIX}{name}'
+
+def bundled_profile_name(printer_name, profile_name, enabled=True):
+    if not enabled:
+        return profile_name
+    base = prefixed_name(printer_name, enabled=True)
+    if profile_name.startswith(f'{base} - '):
+        return profile_name
+    return f'{base} - {profile_name}'
+
+def safe_zip_name(name):
+    name = re.sub(r'[\\/:*?\x00-\x1f\x7f]+', '_', name)
+    name = re.sub(r'\s+', ' ', name).strip()
+    return name or 'profile'
+
+def unique_zip_path(category, profile_name, used_paths):
+    base = safe_zip_name(profile_name)
+    candidate = f'{category}/{base}.json'
+    if candidate not in used_paths:
+        used_paths.add(candidate)
+        return candidate
+    index = 2
+    while True:
+        candidate = f'{category}/{base} ({index}).json'
+        if candidate not in used_paths:
+            used_paths.add(candidate)
+            return candidate
+        index += 1
 
 def set_if_v(out, key, val):
     if val is not None:
@@ -929,7 +965,9 @@ def convert_printer_profile(name, data, sl=None):
 
 def create_bundle_structure(printer_name, filament_files, process_files, printer_files):
     ts = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    bundle_id = f'{abs(hash(printer_name)) % 10000000000}_{printer_name}_{ts}'
+    digest_input = '\n'.join([printer_name, *filament_files, *process_files, *printer_files])
+    digest = hashlib.sha1(digest_input.encode('utf-8')).hexdigest()[:10]
+    bundle_id = f'{digest}_{safe_zip_name(printer_name)}_{ts}'
     return {
         'bundle_id':          bundle_id,
         'bundle_type':        'printer config bundle',
@@ -943,10 +981,19 @@ def create_bundle_structure(printer_name, filament_files, process_files, printer
 
 # =================== MAIN CONVERTER ===================
 
-def convert_ini_to_orca(ini_path, output_path=None, log=None):
+def convert_ini_to_orca(
+    ini_path,
+    output_path=None,
+    log=None,
+    dry_run=False,
+    compatibility='strict',
+    prefix_profiles=True,
+):
     ini_path = Path(ini_path)
     if not ini_path.exists():
         raise FileNotFoundError(f'Fichier introuvable : {ini_path}')
+    if compatibility not in ('strict', 'loose'):
+        raise ValueError("compatibility must be 'strict' or 'loose'")
 
     sections = parse_ini(ini_path)
 
@@ -959,35 +1006,56 @@ def convert_ini_to_orca(ini_path, output_path=None, log=None):
         printer_name = ini_path.stem
     else:
         printer_name = list(printer_sections.keys())[0]
+    safe_printer_name = prefixed_name(printer_name, prefix_profiles)
 
     if output_path is None:
-        output_path = ini_path.parent / f'{printer_name}.orca_printer'
-    output_path = Path(output_path)
+        output_path = ini_path.parent / f'{safe_zip_name(safe_printer_name)}.orca_printer'
+    else:
+        output_path = Path(output_path)
+        if output_path.suffix.lower() != '.orca_printer':
+            output_path = output_path / f'{safe_zip_name(safe_printer_name)}.orca_printer'
 
     printer_files = []
     filament_files = []
     process_files = []
     converted = {}
+    used_paths = set()
 
     for name, data in printer_sections.items():
-        fname = f'printer/{name}.json'
+        out_name = prefixed_name(name, prefix_profiles)
+        fname = unique_zip_path('printer', out_name, used_paths)
         printer_files.append(fname)
         sl = log.new_section(name, 'printer') if log else None
-        converted[fname] = convert_printer_profile(name, data, sl)
+        converted[fname] = convert_printer_profile(out_name, data, sl)
 
     for name, data in filament_sections.items():
-        fname = f'filament/{name}.json'
+        out_name = bundled_profile_name(printer_name, name, prefix_profiles)
+        fname = unique_zip_path('filament', out_name, used_paths)
         filament_files.append(fname)
         sl = log.new_section(name, 'filament') if log else None
-        converted[fname] = convert_filament_profile(name, data, sl)
+        converted[fname] = convert_filament_profile(out_name, data, sl)
+        converted[fname]['compatible_printers'] = [safe_printer_name] if compatibility == 'strict' else []
+        converted[fname]['compatible_printers_condition'] = ''
 
     for name, data in print_sections.items():
-        fname = f'process/{name}.json'
+        out_name = bundled_profile_name(printer_name, name, prefix_profiles)
+        fname = unique_zip_path('process', out_name, used_paths)
         process_files.append(fname)
         sl = log.new_section(name, 'process') if log else None
-        converted[fname] = convert_print_profile(name, data, sl)
+        converted[fname] = convert_print_profile(out_name, data, sl)
+        converted[fname]['compatible_printers'] = [safe_printer_name] if compatibility == 'strict' else []
+        converted[fname]['compatible_printers_condition'] = ''
 
-    bundle = create_bundle_structure(printer_name, filament_files, process_files, printer_files)
+    bundle = create_bundle_structure(safe_printer_name, filament_files, process_files, printer_files)
+    preview = {
+        'output_path': output_path,
+        'bundle': bundle,
+        'files': converted,
+    }
+    if dry_run:
+        return preview
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         zf.writestr('bundle_structure.json',
@@ -1006,9 +1074,29 @@ def main():
     )
     parser.add_argument('input')
     parser.add_argument('-o', '--output', default=None)
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Show the generated bundle structure without writing an .orca_printer file')
+    parser.add_argument('--compatibility', choices=('strict', 'loose'), default='strict',
+                        help='strict limits generated filament/process profiles to the converted printer')
+    parser.add_argument('--no-prefix', action='store_true',
+                        help='Do not prefix generated profile names; this can collide with existing Orca profiles')
     args = parser.parse_args()
-    result = convert_ini_to_orca(args.input, args.output)
-    print(f'✅  {result}')
+    result = convert_ini_to_orca(
+        args.input,
+        args.output,
+        dry_run=args.dry_run,
+        compatibility=args.compatibility,
+        prefix_profiles=not args.no_prefix,
+    )
+    if args.dry_run:
+        preview = {
+            'output_path': str(result['output_path']),
+            'bundle': result['bundle'],
+            'files': sorted(result['files'].keys()),
+        }
+        print(json.dumps(preview, indent=2, ensure_ascii=False))
+    else:
+        print(f'OK  {result}')
 
 if __name__ == '__main__':
     main()

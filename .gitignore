@@ -12,6 +12,12 @@ __pycache__/
 *.pyc
 *.pyo
 
+# Local conversion/test artifacts
+backups/
+test_output/
+test_output_real/
+*.orca_printer
+
 # OS
 .DS_Store
 Thumbs.db
