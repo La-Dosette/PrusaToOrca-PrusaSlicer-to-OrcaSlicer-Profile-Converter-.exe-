@@ -1,113 +1,98 @@
-# PrusaToOrcaSlicer
+# PrusaToOrca
 
-<p align="center">
-  <img src="logo.png" width="120" alt="Logo"/>
-</p>
+PrusaToOrca converts PrusaSlicer config bundle `.ini` files into OrcaSlicer
+`.orca_printer` bundles.
 
-<p align="center">
-  <b>PrusaSlicer → OrcaSlicer Profile Converter</b><br/>
-  Drag and drop your <code>.ini</code> PrusaSlicer file and get a ready-to-use <code>.orca_printer</code>.
-</p>
+The app is designed around a safe import flow: preview first, generate second.
+Generated presets are prefixed by default so existing OrcaSlicer profiles are
+not overwritten by matching names.
 
----
+## Features
 
-## ✨ Features
+- Desktop GUI with drag-and-drop support when `tkinterdnd2` is installed.
+- Safe import preview before writing any bundle.
+- Prefixes generated presets with `PrusaToOrca -` by default.
+- Adds explicit OrcaSlicer compatibility metadata for generated filament and
+  process presets.
+- Supports strict or loose compatibility modes.
+- CLI mode for automation and testing.
+- Conversion report with mapped, approximate, and ignored fields.
 
-* 🖱️ **Drag & Drop** — drop your `.ini` directly into the app
-* 🗂️ **Folder mode** — convert all profiles in a folder at once
-* 📊 **Conversion report** — stats by section (mapped / approximated / ignored)
-* 🔍 **Advanced report** — field-by-field details with CSV export
-* 🌙 **Dark / Light theme**
-* 🌍 **4 languages** — French, English, German, Spanish
+## Install
 
----
-
-## 📦 Download
-
-👉 [Latest version (Releases)](../../releases/latest) — download `PrusaToOrca.exe`, no Python installation required.
-
----
-
-## 🛠️ Run from source
-
-### Requirements
-
-* Python 3.10+
-* Install dependencies:
+Python 3.10+ is recommended.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Run the app
+`tkinterdnd2` enables drag-and-drop. If it is missing, the app still works with
+the file picker.
+
+## Run The App
 
 ```bash
 python app.py
 ```
 
-### Build the executable
+Workflow:
+
+1. Drop or choose a PrusaSlicer `.ini` config bundle.
+2. Review the safe import preview.
+3. Choose strict or loose compatibility.
+4. Generate the `.orca_printer` bundle.
+5. Import the generated bundle in OrcaSlicer.
+
+## CLI Usage
+
+```bash
+python convert.py profiles.ini
+python convert.py profiles.ini --output ./output/
+python convert.py profiles.ini --dry-run
+python convert.py profiles.ini --compatibility strict
+python convert.py profiles.ini --compatibility loose
+python convert.py profiles.ini --no-prefix
+```
+
+Default behavior is intentionally conservative:
+
+- `--compatibility strict`
+- profile prefix enabled
+- output name based on the generated printer preset
+
+Use `--no-prefix` only if you are sure the generated preset names cannot collide
+with existing OrcaSlicer presets.
+
+## Build A Windows Executable
 
 ```bash
 pyinstaller --onefile --windowed --name "PrusaToOrca" --icon "logo.ico" --add-data "convert.py;." --add-data "logo.png;." --add-data "logo.ico;." app.py
 ```
 
-The executable will be located at `dist/PrusaToOrca.exe`.
+The executable will be created in `dist/`.
 
----
-
-## 🔧 Command-line usage
+## Tests
 
 ```bash
-python convert.py profiles.ini
-python convert.py profiles.ini --output ./output/
+python -m unittest discover -s tests -v
 ```
 
----
+The test suite covers safe import behavior, filename sanitizing, strict/loose
+compatibility, multi-printer bundles, dry-run behavior, and UTF-8 BOM parsing.
 
-## 📁 Project structure
+## Project Structure
 
-```
+```text
 .
-├── app.py          # GUI (tkinter + tkinterdnd2)
-├── convert.py      # PrusaSlicer → OrcaSlicer conversion engine
-├── logo.png        # Application logo
-├── logo.ico        # Windows icon
-└── requirements.txt
+|-- app.py
+|-- convert.py
+|-- tests/
+|-- logo.png
+|-- logo.ico
+|-- requirements.txt
+`-- README.md
 ```
 
----
+## License
 
-## 🤝 Contributing
-
-Pull Requests are welcome! If you find unmapped fields or bugs:
-
-1. Fork the repository
-2. Create a branch (`git checkout -b feature/my-improvement`)
-3. Commit your changes (`git commit -m 'Add ...'`)
-4. Push and open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
-
-### ✔ Permissions
-
-* Commercial use
-* Modification
-* Distribution
-* Private use
-
-### ❗ Conditions
-
-* Must disclose source code
-* Must include license and copyright
-* Same license (GPL-3.0) must be used
-
-### 🚫 Limitations
-
-* No liability
-* No warranty
-
-👉 See the full license here: https://www.gnu.org/licenses/gpl-3.0.html
+See `LICENSE`.
