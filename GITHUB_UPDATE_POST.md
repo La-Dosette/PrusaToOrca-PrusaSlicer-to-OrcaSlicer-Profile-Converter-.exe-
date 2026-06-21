@@ -8,17 +8,17 @@ Windows GUI tool to convert PrusaSlicer `.ini` config bundles into safer OrcaSli
 
 # PrusaToOrca
 
-🖨️ **PrusaSlicer to OrcaSlicer profile converter**
+**PrusaSlicer to OrcaSlicer profile converter**
 
 PrusaToOrca is a Windows desktop app that converts PrusaSlicer config bundles (`.ini`) into OrcaSlicer import bundles (`.orca_printer`).
 
 The app is designed around a safer workflow:
 
-**Preview first → Generate second → Import manually into OrcaSlicer**
+**Preview first -> Generate second -> Import manually into OrcaSlicer**
 
 PrusaToOrca does not directly edit existing OrcaSlicer preset files. It generates a new bundle that you can review before importing.
 
-⚠️ Always back up your OrcaSlicer profiles before importing converted profiles.
+Always back up your OrcaSlicer profiles before importing converted profiles.
 
 ## GitHub Release Title
 
@@ -123,4 +123,3 @@ Main additions:
 - 🪟 improved Windows layout and centering
 
 Backups are still recommended before importing converted profiles.
-
