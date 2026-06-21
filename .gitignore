@@ -4,6 +4,7 @@
 # User config (contains personal paths)
 config.json
 conversion_history.json
+settings.json
 bug_reports/
 
 # PyInstaller build artifacts

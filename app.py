@@ -26,6 +26,7 @@ from convert import ConversionLog, convert_ini_to_orca
 
 APP_VERSION = "0.2.0"
 APP_NAME = "PrusaToOrca"
+SETTINGS_FILE = "settings.json"
 
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -34,18 +35,77 @@ except Exception:  # pragma: no cover - optional desktop enhancement
     TkinterDnD = None
 
 
-APP_BG = "#f3f0e9"
-PANEL_BG = "#f3f0e9"
-PANEL_TINT = "#ece6da"
-INK = "#2b2825"
-MUTED = "#6f6862"
-LINE = "#2b2825"
-TEAL = "#009aa6"
-TEAL_DARK = "#00737d"
-ORANGE = "#ff8a00"
-ORANGE_DARK = "#de5f00"
-RED_ORANGE = "#f04412"
-CREAM = APP_BG
+THEMES = {
+    "day": {
+        "APP_BG": "#f3f0e9",
+        "PANEL_BG": "#f3f0e9",
+        "PANEL_TINT": "#ece6da",
+        "INK": "#2b2825",
+        "MUTED": "#6f6862",
+        "LINE": "#2b2825",
+        "HEADER_BG": "#2b2825",
+        "HEADER_FG": "#f3f0e9",
+        "TEAL": "#009aa6",
+        "TEAL_DARK": "#00737d",
+        "ORANGE": "#ff8a00",
+        "ORANGE_DARK": "#de5f00",
+        "RED_ORANGE": "#f04412",
+        "ADV_PROGRESS_BG": "#d8d2ca",
+    },
+    "night": {
+        "APP_BG": "#0f1117",
+        "PANEL_BG": "#151821",
+        "PANEL_TINT": "#202634",
+        "INK": "#f6efe4",
+        "MUTED": "#b9afa3",
+        "LINE": "#343947",
+        "HEADER_BG": "#201d22",
+        "HEADER_FG": "#f6efe4",
+        "TEAL": "#00a6b2",
+        "TEAL_DARK": "#20c8d2",
+        "ORANGE": "#ff8a00",
+        "ORANGE_DARK": "#ffb14f",
+        "RED_ORANGE": "#ff5a2a",
+        "ADV_PROGRESS_BG": "#2d3444",
+    },
+}
+
+APP_BG = PANEL_BG = PANEL_TINT = INK = MUTED = LINE = ""
+HEADER_BG = HEADER_FG = TEAL = TEAL_DARK = ORANGE = ORANGE_DARK = RED_ORANGE = CREAM = ""
+ADV_PROGRESS_BG = ""
+
+
+def apply_theme(mode):
+    global APP_BG, PANEL_BG, PANEL_TINT, INK, MUTED, LINE, HEADER_BG, HEADER_FG
+    global TEAL, TEAL_DARK, ORANGE, ORANGE_DARK, RED_ORANGE, CREAM, ADV_PROGRESS_BG
+    global ADV_BG, ADV_PANEL, ADV_PANEL_ALT, ADV_LINE, ADV_TEXT, ADV_MUTED, ADV_GREEN, ADV_RED, ADV_BLUE
+
+    palette = THEMES.get(mode, THEMES["day"])
+    APP_BG = palette["APP_BG"]
+    PANEL_BG = palette["PANEL_BG"]
+    PANEL_TINT = palette["PANEL_TINT"]
+    INK = palette["INK"]
+    MUTED = palette["MUTED"]
+    LINE = palette["LINE"]
+    HEADER_BG = palette["HEADER_BG"]
+    HEADER_FG = palette["HEADER_FG"]
+    TEAL = palette["TEAL"]
+    TEAL_DARK = palette["TEAL_DARK"]
+    ORANGE = palette["ORANGE"]
+    ORANGE_DARK = palette["ORANGE_DARK"]
+    RED_ORANGE = palette["RED_ORANGE"]
+    ADV_PROGRESS_BG = palette["ADV_PROGRESS_BG"]
+    CREAM = APP_BG
+
+    ADV_BG = APP_BG
+    ADV_PANEL = PANEL_BG
+    ADV_PANEL_ALT = PANEL_TINT
+    ADV_LINE = LINE
+    ADV_TEXT = INK
+    ADV_MUTED = MUTED
+    ADV_GREEN = TEAL_DARK
+    ADV_RED = RED_ORANGE
+    ADV_BLUE = TEAL
 
 UI_FONT = ("Space Mono", 10)
 UI_FONT_BOLD = ("Space Mono", 10, "bold")
@@ -57,16 +117,7 @@ TRIANGLE = "\u25b3"
 CROSS = "\u00d7"
 CHECK = "\u2611"
 
-ADV_BG = APP_BG
-ADV_PANEL = PANEL_BG
-ADV_PANEL_ALT = PANEL_TINT
-ADV_LINE = INK
-ADV_TEXT = INK
-ADV_MUTED = MUTED
-ADV_GREEN = TEAL_DARK
-ADV_RED = RED_ORANGE
-ADV_BLUE = TEAL
-ADV_PROGRESS_BG = "#d8d2ca"
+apply_theme("day")
 ADV_FONT = ("Segoe UI", 9)
 ADV_FONT_BOLD = ("Segoe UI", 9, "bold")
 ADV_TITLE_FONT = ("Segoe UI", 15, "bold")
@@ -90,6 +141,31 @@ def app_file(name):
     return app_root() / name
 
 
+def load_settings():
+    path = app_file(SETTINGS_FILE)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def save_settings(settings):
+    path = app_file(SETTINGS_FILE)
+    path.write_text(json.dumps(settings, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def load_theme_preference():
+    return load_settings().get("theme", "day")
+
+
+def save_theme_preference(mode):
+    settings = load_settings()
+    settings["theme"] = mode
+    save_settings(settings)
+
+
 def load_embedded_fonts():
     if sys.platform != "win32":
         return
@@ -110,6 +186,8 @@ class PrusaToOrcaApp:
         self.root.title("PrusaToOrca")
         self.root.geometry("1120x720")
         self.root.minsize(960, 620)
+        self.theme_mode = tk.StringVar(value=load_theme_preference())
+        apply_theme(self.theme_mode.get())
         self.root.configure(bg=APP_BG)
         try:
             self.root.iconbitmap(resource_path("logo.ico"))
@@ -200,12 +278,13 @@ class PrusaToOrcaApp:
         quick_actions = tk.Frame(top, bg=APP_BG)
         quick_actions.grid(row=0, column=1, sticky="e")
         for key, text, command in [
-            ("safe", "SAFE MODE", self.show_safety_info),
+            ("safe", "SAFE", self.show_safety_info),
             ("prefix", "PREFIX ON", self.toggle_prefix),
             ("compat", "STRICT", self.toggle_compatibility),
-            ("advanced", "ADVANCED REPORT", self.open_advanced_report),
+            ("theme", "NIGHT", self.toggle_theme),
+            ("advanced", "REPORT", self.open_advanced_report),
             ("history", "HISTORY", self.open_history),
-            ("debug", "DEBUG INFO", self.copy_debug_info),
+            ("debug", "DEBUG", self.copy_debug_info),
         ]:
             btn = self._top_button(quick_actions, text, command)
             btn.pack(side="left", padx=(8, 0))
@@ -221,12 +300,12 @@ class PrusaToOrcaApp:
     def _panel(self, parent, title, subtitle=None):
         frame = tk.Frame(parent, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1)
         frame.pack(fill="x", pady=(0, 14))
-        header = tk.Frame(frame, bg=INK)
+        header = tk.Frame(frame, bg=HEADER_BG)
         header.pack(fill="x")
         tk.Frame(header, bg=ORANGE, width=6).pack(side="left", fill="y")
-        tk.Label(header, text=title, font=SECTION_FONT, bg=INK, fg=PANEL_BG, padx=14, pady=9).pack(side="left")
+        tk.Label(header, text=title, font=SECTION_FONT, bg=HEADER_BG, fg=HEADER_FG, padx=14, pady=9).pack(side="left")
         if subtitle:
-            tk.Label(header, text=subtitle, font=UI_FONT, bg=INK, fg="#d8d2ca", padx=12).pack(side="right")
+            tk.Label(header, text=subtitle, font=UI_FONT, bg=HEADER_BG, fg=MUTED, padx=12).pack(side="right")
         content = tk.Frame(frame, bg=PANEL_BG, padx=14, pady=14)
         content.pack(fill="both", expand=True)
         return content
@@ -393,17 +472,15 @@ class PrusaToOrcaApp:
         self.advanced_tab.grid(row=1, column=0, sticky="nsew")
         self.advanced_tab.grid_remove()
 
-        self.set_report_views(
-            {
-                "Summary": (
-                    "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
-                    "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
-                ),
-                "Bundle files": "No bundle preview yet.\n",
-                "Advanced report": "No advanced report yet.\n",
-            },
-            [],
-        )
+        default_views = {
+            "Summary": (
+                "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
+                "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
+            ),
+            "Bundle files": "No bundle preview yet.\n",
+            "Advanced report": "No advanced report yet.\n",
+        }
+        self.set_report_views(self.report_views or default_views, self.report_rows, self.advanced_model)
         self.report.configure(state="disabled")
 
     def _button(self, parent, text, command, variant="primary", width=None):
@@ -440,13 +517,13 @@ class PrusaToOrcaApp:
             font=UI_FONT_BOLD,
             bg=PANEL_BG,
             fg=INK,
-            activebackground=INK,
-            activeforeground=PANEL_BG,
+            activebackground=HEADER_BG,
+            activeforeground=HEADER_FG,
             relief="flat",
             borderwidth=0,
             highlightbackground=LINE,
             highlightthickness=1,
-            padx=12,
+            padx=10,
             pady=8,
             cursor="hand2",
         )
@@ -498,14 +575,48 @@ class PrusaToOrcaApp:
         self.update_quick_actions()
         self.refresh_preview_if_ready()
 
+    def toggle_theme(self):
+        next_mode = "night" if self.theme_mode.get() == "day" else "day"
+        self.theme_mode.set(next_mode)
+        save_theme_preference(next_mode)
+        apply_theme(next_mode)
+        self.rebuild_ui()
+
+    def rebuild_ui(self):
+        for job in self.advanced_tab_counter_jobs:
+            try:
+                self.root.after_cancel(job)
+            except Exception:
+                pass
+        self.advanced_tab_counter_jobs = []
+        reopen_advanced = bool(self.advanced_window and self.advanced_window.winfo_exists())
+        if reopen_advanced:
+            self.advanced_window.destroy()
+        self.advanced_window = None
+        self.advanced_body = None
+        self.advanced_sidebar = None
+        self.advanced_search = None
+        self.advanced_tab = None
+        self.advanced_tab_bars = []
+        self.tab_buttons = {}
+        self.quick_buttons = {}
+        self.logo_image = None
+        self.root.configure(bg=APP_BG)
+        for child in self.root.winfo_children():
+            child.destroy()
+        self._build()
+        self._wire_drag_drop()
+        if reopen_advanced and self.advanced_model and self.advanced_model.get("sections"):
+            self.open_advanced_report()
+
     def update_quick_actions(self):
         prefix = "PREFIX ON" if self.prefix_profiles.get() else "PREFIX OFF"
         compat = self.compatibility.get().upper()
         if "prefix" in self.quick_buttons:
             self.quick_buttons["prefix"].configure(
                 text=prefix,
-                bg=INK if self.prefix_profiles.get() else PANEL_BG,
-                fg=PANEL_BG if self.prefix_profiles.get() else INK,
+                bg=HEADER_BG if self.prefix_profiles.get() else PANEL_BG,
+                fg=HEADER_FG if self.prefix_profiles.get() else INK,
             )
         if "compat" in self.quick_buttons:
             self.quick_buttons["compat"].configure(
@@ -517,6 +628,15 @@ class PrusaToOrcaApp:
             self.quick_buttons["safe"].configure(bg=PANEL_BG, fg=INK)
         if "advanced" in self.quick_buttons:
             self.quick_buttons["advanced"].configure(bg=PANEL_BG, fg=INK)
+        if "theme" in self.quick_buttons:
+            night = self.theme_mode.get() == "night"
+            self.quick_buttons["theme"].configure(
+                text="DAY" if night else "NIGHT",
+                bg=HEADER_BG if night else PANEL_BG,
+                fg=HEADER_FG if night else INK,
+                activebackground=TEAL,
+                activeforeground=PANEL_BG,
+            )
 
     def _wire_drag_drop(self):
         if not DND_FILES or not hasattr(self.drop_zone, "drop_target_register"):
@@ -1517,10 +1637,10 @@ class PrusaToOrcaApp:
             text="Open detailed view",
             command=self.open_advanced_report,
             font=UI_FONT_BOLD,
-            bg=INK,
-            fg=PANEL_BG,
+            bg=HEADER_BG,
+            fg=HEADER_FG,
             activebackground=TEAL,
-            activeforeground=PANEL_BG,
+            activeforeground=HEADER_FG,
             relief="flat",
             borderwidth=0,
             padx=12,
