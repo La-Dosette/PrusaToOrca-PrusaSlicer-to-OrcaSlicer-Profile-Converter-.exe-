@@ -41,6 +41,17 @@ UI_FONT_BOLD = ("Space Mono", 10, "bold")
 TITLE_FONT = ("Archivo Black", 28)
 SECTION_FONT = ("Space Mono", 12, "bold")
 
+STAR = "\u2605"
+TRIANGLE = "\u25b3"
+CROSS = "\u00d7"
+
+ADV_BG = "#0f0d1d"
+ADV_PANEL = "#191730"
+ADV_PANEL_ALT = "#22203e"
+ADV_LINE = "#343154"
+ADV_TEXT = "#f6f2ff"
+ADV_MUTED = "#aaa3c9"
+
 
 def resource_path(name):
     base = getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)
@@ -81,6 +92,11 @@ class PrusaToOrcaApp:
         self.last_preview = None
         self.report_views = {}
         self.report_rows = []
+        self.advanced_model = None
+        self.advanced_window = None
+        self.advanced_body = None
+        self.advanced_sidebar = None
+        self.advanced_search = None
         self.current_report_tab = "Summary"
         self.tab_buttons = {}
         self.quick_buttons = {}
@@ -147,7 +163,7 @@ class PrusaToOrcaApp:
             ("safe", "SAFE MODE", self.show_safety_info),
             ("prefix", "PREFIX ON", self.toggle_prefix),
             ("compat", "STRICT", self.toggle_compatibility),
-            ("advanced", "ADVANCED REPORT", lambda: self.show_report_tab("Advanced report")),
+            ("advanced", "ADVANCED REPORT", self.open_advanced_report),
         ]:
             btn = self._top_button(quick_actions, text, command)
             btn.pack(side="left", padx=(8, 0))
@@ -480,6 +496,7 @@ class PrusaToOrcaApp:
         self.input_path.set("")
         self.source_mode.set("file")
         self.last_preview = None
+        self.advanced_model = None
         self.set_report_views(
             {
                 "Summary": "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n",
@@ -525,9 +542,9 @@ class PrusaToOrcaApp:
                 previews.append((preview, log))
             if not previews:
                 raise FileNotFoundError("No .ini files found in the selected folder.")
-            views, rows = self.build_report_views(previews, done=False)
+            views, rows, advanced_model = self.build_report_views(previews, done=False)
             self.last_preview = previews
-            self.root.after(0, lambda: self.set_report_views(views, rows))
+            self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Preview failed", str(exc)))
         finally:
@@ -569,9 +586,9 @@ class PrusaToOrcaApp:
                 results.append((preview, log))
             if not results:
                 raise FileNotFoundError("No .ini files found in the selected folder.")
-            views, rows = self.build_report_views(results, done=True)
+            views, rows, advanced_model = self.build_report_views(results, done=True)
             self.last_preview = results
-            self.root.after(0, lambda: self.set_report_views(views, rows))
+            self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
             self.root.after(0, lambda: messagebox.showinfo("Done", f"Generated {len(results)} bundle(s)."))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
@@ -615,9 +632,25 @@ class PrusaToOrcaApp:
         total_mapped = sum(log.total_mapped for _, log in entries)
         total_approx = sum(log.total_approx for _, log in entries)
         total_ignored = sum(log.total_skipped for _, log in entries)
+        advanced_model = {
+            "done": done,
+            "source": self.input_path.get(),
+            "output": self.output_path.get(),
+            "mode": self.compatibility.get(),
+            "prefix": self.prefix_profiles.get(),
+            "totals": {
+                "converted": total_mapped,
+                "approx": total_approx,
+                "ignored": total_ignored,
+            },
+            "preset_totals": {"printer": 0, "filament": 0, "process": 0},
+            "sections": [],
+            "ignored": [],
+            "warnings": [],
+        }
         advanced_lines.extend(
             [
-                f"★ {total_mapped} converted    △ {total_approx} approximate    × {total_ignored} ignored",
+                f"{STAR} {total_mapped} converted    {TRIANGLE} {total_approx} approximate    {CROSS} {total_ignored} ignored",
                 "",
             ]
         )
@@ -630,11 +663,15 @@ class PrusaToOrcaApp:
             total_printers += len(printers)
             total_filaments += len(filaments)
             total_processes += len(processes)
+            advanced_model["preset_totals"]["printer"] += len(printers)
+            advanced_model["preset_totals"]["filament"] += len(filaments)
+            advanced_model["preset_totals"]["process"] += len(processes)
 
             source = preview.get("source_path", "")
+            source_name = Path(source).name if source else "bundle"
             summary.extend(
                 [
-                    f"  {index}. {Path(source).name if source else 'bundle'}",
+                    f"  {index}. {source_name}",
                     f"     output: {preview['output_path']}",
                     f"     presets: {len(printers)} printer / {len(filaments)} filament / {len(processes)} process",
                 ]
@@ -642,7 +679,7 @@ class PrusaToOrcaApp:
 
             bundle_lines.extend(
                 [
-                    f"Bundle {index}: {Path(source).name if source else 'bundle'}",
+                    f"Bundle {index}: {source_name}",
                     f"Output: {preview['output_path']}",
                     f"Bundle id: {preview['bundle']['bundle_id']}",
                     "",
@@ -653,30 +690,60 @@ class PrusaToOrcaApp:
 
             advanced_lines.extend(
                 [
-                    f"Bundle {index}: {Path(source).name if source else 'bundle'}",
-                    f"★ {log.total_mapped} converted | △ {log.total_approx} approximate | × {log.total_skipped} ignored",
+                    f"Bundle {index}: {source_name}",
+                    f"{STAR} {log.total_mapped} converted | {TRIANGLE} {log.total_approx} approximate | {CROSS} {log.total_skipped} ignored",
                 ]
             )
             if log.warnings:
                 advanced_lines.append("Warnings:")
                 advanced_lines.extend(f"  {warning}" for warning in log.warnings)
+                advanced_model["warnings"].extend(
+                    {"bundle": index, "source": str(source), "warning": warning}
+                    for warning in log.warnings
+                )
             for section in log.sections:
                 coverage = 0
                 total = section.n_mapped + section.n_skipped
                 if total:
                     coverage = int(round(section.n_mapped / total * 100))
+                section_model = {
+                    "bundle": index,
+                    "source": str(source),
+                    "source_name": source_name,
+                    "type": section.type,
+                    "name": section.name,
+                    "converted": section.n_mapped,
+                    "approx": section.n_approx,
+                    "ignored": section.n_skipped,
+                    "coverage": coverage,
+                    "mapped": list(section.mapped),
+                    "skipped": list(section.skipped),
+                }
+                advanced_model["sections"].append(section_model)
+                advanced_model["ignored"].extend(
+                    {
+                        "bundle": index,
+                        "source": str(source),
+                        "source_name": source_name,
+                        "section_type": section.type,
+                        "section_name": section.name,
+                        "key": prusa_key,
+                        "value": value,
+                    }
+                    for prusa_key, value in section.skipped
+                )
                 advanced_lines.append(
                     f"  [{section.type}] {section.name} "
-                    f"★ {section.n_mapped} △ {section.n_approx} × {section.n_skipped} | {coverage}% coverage"
+                    f"{STAR} {section.n_mapped} {TRIANGLE} {section.n_approx} {CROSS} {section.n_skipped} | {coverage}% coverage"
                 )
                 for prusa_key, orca_key, value, note, approx in section.mapped[:8]:
-                    marker = "△" if approx else "★"
+                    marker = TRIANGLE if approx else STAR
                     suffix = f" ({note})" if note else ""
                     advanced_lines.append(f"      {marker} {prusa_key} -> {orca_key}: {value}{suffix}")
                 if len(section.mapped) > 8:
                     advanced_lines.append(f"      ... {len(section.mapped) - 8} more converted fields")
                 for prusa_key, value in section.skipped[:5]:
-                    advanced_lines.append(f"      × {prusa_key}: {value}")
+                    advanced_lines.append(f"      {CROSS} {prusa_key}: {value}")
                 if len(section.skipped) > 5:
                     advanced_lines.append(f"      ... {len(section.skipped) - 5} more ignored fields")
                 rows.append(
@@ -749,6 +816,7 @@ class PrusaToOrcaApp:
                 "Advanced report": "\n".join(advanced_lines).strip() + "\n",
             },
             rows,
+            advanced_model,
         )
 
     def format_log_lines(self, log):
@@ -771,10 +839,424 @@ class PrusaToOrcaApp:
             )
         return lines
 
-    def set_report_views(self, views, rows):
+    def open_advanced_report(self):
+        if not self.advanced_model or not self.advanced_model.get("sections"):
+            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before opening the advanced report.")
+            return
+        if self.advanced_window and self.advanced_window.winfo_exists():
+            self.advanced_window.lift()
+            self.advanced_window.focus_force()
+            return
+
+        source = Path(self.advanced_model.get("source") or "bundle").name
+        self.advanced_window = tk.Toplevel(self.root)
+        self.advanced_window.title(f"Rapport avanc\u00e9 - {source}")
+        self.advanced_window.geometry("1120x720")
+        self.advanced_window.minsize(920, 600)
+        self.advanced_window.configure(bg=ADV_BG)
+        try:
+            self.advanced_window.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
+        shell = tk.Frame(self.advanced_window, bg=ADV_BG, padx=16, pady=14)
+        shell.pack(fill="both", expand=True)
+        shell.grid_columnconfigure(1, weight=1)
+        shell.grid_rowconfigure(1, weight=1)
+
+        header = tk.Frame(shell, bg=ADV_BG)
+        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 12))
+        header.grid_columnconfigure(1, weight=1)
+        tk.Label(
+            header,
+            text="Rapport avanc\u00e9",
+            font=("Archivo Black", 18),
+            bg=ADV_BG,
+            fg=ADV_TEXT,
+        ).grid(row=0, column=0, sticky="w")
+
+        stats = tk.Frame(header, bg=ADV_BG)
+        stats.grid(row=0, column=2, sticky="e")
+        totals = self.advanced_model["totals"]
+        self._advanced_stat(stats, f"{CROSS} {totals['ignored']} ignor\u00e9s", "#ff4b4b")
+        self._advanced_stat(stats, f"{TRIANGLE} {totals['approx']} approx", ORANGE)
+        self._advanced_stat(stats, f"{STAR} {totals['converted']} convertis", "#00e08a")
+
+        sidebar_shell = tk.Frame(shell, bg=ADV_PANEL, highlightbackground=ADV_LINE, highlightthickness=1)
+        sidebar_shell.grid(row=1, column=0, sticky="nsew", padx=(0, 12))
+        sidebar_shell.grid_rowconfigure(1, weight=1)
+        tk.Label(
+            sidebar_shell,
+            text="Sections",
+            font=UI_FONT_BOLD,
+            bg=ADV_PANEL,
+            fg=ADV_MUTED,
+            pady=10,
+        ).grid(row=0, column=0, sticky="ew")
+
+        side_canvas = tk.Canvas(sidebar_shell, bg=ADV_PANEL, highlightthickness=0, width=230)
+        side_scroll = tk.Scrollbar(sidebar_shell, orient="vertical", command=side_canvas.yview)
+        self.advanced_sidebar = tk.Frame(side_canvas, bg=ADV_PANEL)
+        side_window = side_canvas.create_window((0, 0), window=self.advanced_sidebar, anchor="nw")
+        side_canvas.configure(yscrollcommand=side_scroll.set)
+        side_canvas.grid(row=1, column=0, sticky="nsew")
+        side_scroll.grid(row=1, column=1, sticky="ns")
+        self.advanced_sidebar.bind(
+            "<Configure>",
+            lambda _event: side_canvas.configure(scrollregion=side_canvas.bbox("all")),
+        )
+        side_canvas.bind("<Configure>", lambda event: side_canvas.itemconfigure(side_window, width=event.width))
+
+        main = tk.Frame(shell, bg=ADV_BG)
+        main.grid(row=1, column=1, sticky="nsew")
+        main.grid_columnconfigure(0, weight=1)
+        main.grid_rowconfigure(1, weight=1)
+
+        search_row = tk.Frame(main, bg=ADV_BG)
+        search_row.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        search_row.grid_columnconfigure(1, weight=1)
+        tk.Label(search_row, text="Search", font=UI_FONT_BOLD, bg=ADV_BG, fg=ADV_MUTED).grid(row=0, column=0, padx=(0, 8))
+        self.advanced_search = tk.StringVar()
+        search = tk.Entry(
+            search_row,
+            textvariable=self.advanced_search,
+            font=UI_FONT,
+            bg=ADV_PANEL_ALT,
+            fg=ADV_TEXT,
+            insertbackground=ADV_TEXT,
+            relief="flat",
+            highlightbackground=ADV_LINE,
+            highlightthickness=1,
+        )
+        search.grid(row=0, column=1, sticky="ew")
+        self.advanced_search.trace_add("write", lambda *_args: self._advanced_render_summary())
+
+        content = tk.Frame(main, bg=ADV_PANEL, highlightbackground=ADV_LINE, highlightthickness=1)
+        content.grid(row=1, column=0, sticky="nsew")
+        content.grid_columnconfigure(0, weight=1)
+        content.grid_rowconfigure(0, weight=1)
+        canvas = tk.Canvas(content, bg=ADV_PANEL, highlightthickness=0)
+        scrollbar = tk.Scrollbar(content, orient="vertical", command=canvas.yview)
+        self.advanced_body = tk.Frame(canvas, bg=ADV_PANEL, padx=16, pady=16)
+        body_window = canvas.create_window((0, 0), window=self.advanced_body, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        self.advanced_body.bind(
+            "<Configure>",
+            lambda _event: canvas.configure(scrollregion=canvas.bbox("all")),
+        )
+        canvas.bind("<Configure>", lambda event: canvas.itemconfigure(body_window, width=event.width))
+
+        footer = tk.Frame(shell, bg=ADV_BG)
+        footer.grid(row=2, column=1, sticky="e", pady=(12, 0))
+        tk.Button(
+            footer,
+            text="Fermer",
+            command=self.advanced_window.destroy,
+            font=UI_FONT,
+            bg=ADV_BG,
+            fg=ADV_MUTED,
+            activebackground=ADV_PANEL_ALT,
+            activeforeground=ADV_TEXT,
+            relief="flat",
+            borderwidth=0,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        ).pack(side="left", padx=(0, 8))
+        tk.Button(
+            footer,
+            text="Exporter CSV",
+            command=self.export_csv,
+            font=UI_FONT_BOLD,
+            bg="#6c5cff",
+            fg=ADV_TEXT,
+            activebackground=TEAL,
+            activeforeground=ADV_TEXT,
+            relief="flat",
+            borderwidth=0,
+            padx=16,
+            pady=8,
+            cursor="hand2",
+        ).pack(side="left")
+
+        self._advanced_render_sidebar()
+        self._advanced_render_summary()
+
+    def _advanced_stat(self, parent, text, color):
+        tk.Label(
+            parent,
+            text=text,
+            font=UI_FONT_BOLD,
+            bg=ADV_PANEL_ALT,
+            fg=color,
+            padx=12,
+            pady=7,
+        ).pack(side="left", padx=(8, 0))
+
+    def _advanced_icon(self, section_type):
+        return {
+            "printer": "\u25a3",
+            "filament": "\u25d2",
+            "process": "\u2699",
+        }.get(section_type, "\u25a1")
+
+    def _advanced_clear(self, frame):
+        for child in frame.winfo_children():
+            child.destroy()
+
+    def _advanced_render_sidebar(self):
+        if not self.advanced_sidebar:
+            return
+        self._advanced_clear(self.advanced_sidebar)
+        self._advanced_side_button("R\u00e9sum\u00e9 global", self._advanced_render_summary, active=True)
+        for section in self.advanced_model.get("sections", []):
+            label = f"{self._advanced_icon(section['type'])} {section['name']}"
+            self._advanced_side_button(label, lambda s=section: self._advanced_render_detail(s))
+        ignored_count = len(self.advanced_model.get("ignored", []))
+        self._advanced_side_button(f"{TRIANGLE} Ignor\u00e9s ({ignored_count})", self._advanced_render_ignored)
+
+    def _advanced_side_button(self, text, command, active=False):
+        btn = tk.Button(
+            self.advanced_sidebar,
+            text=text,
+            command=command,
+            font=UI_FONT_BOLD if active else UI_FONT,
+            bg=ADV_PANEL_ALT if active else ADV_PANEL,
+            fg=ADV_TEXT,
+            activebackground=ADV_PANEL_ALT,
+            activeforeground=ADV_TEXT,
+            relief="flat",
+            borderwidth=0,
+            anchor="w",
+            padx=12,
+            pady=8,
+            wraplength=190,
+            cursor="hand2",
+        )
+        btn.pack(fill="x")
+
+    def _advanced_query(self):
+        if not self.advanced_search:
+            return ""
+        return self.advanced_search.get().strip().lower()
+
+    def _advanced_filter_sections(self):
+        query = self._advanced_query()
+        sections = self.advanced_model.get("sections", [])
+        if not query:
+            return sections
+        filtered = []
+        for section in sections:
+            haystack = " ".join(
+                [
+                    section["type"],
+                    section["name"],
+                    section["source_name"],
+                    " ".join(str(item) for item in section["mapped"][:20]),
+                    " ".join(str(item) for item in section["skipped"][:20]),
+                ]
+            ).lower()
+            if query in haystack:
+                filtered.append(section)
+        return filtered
+
+    def _advanced_render_summary(self):
+        if not self.advanced_body:
+            return
+        self._advanced_clear(self.advanced_body)
+        sections = self._advanced_filter_sections()
+        title = "R\u00e9sum\u00e9 par section"
+        if self._advanced_query():
+            title += f" - {len(sections)} r\u00e9sultat(s)"
+        tk.Label(
+            self.advanced_body,
+            text=title,
+            font=("Archivo Black", 16),
+            bg=ADV_PANEL,
+            fg=ADV_TEXT,
+        ).pack(anchor="w", pady=(0, 14))
+
+        if not sections:
+            tk.Label(
+                self.advanced_body,
+                text="Aucune section ne correspond \u00e0 la recherche.",
+                font=UI_FONT,
+                bg=ADV_PANEL,
+                fg=ADV_MUTED,
+            ).pack(anchor="w")
+            return
+
+        for section in sections:
+            self._advanced_section_card(section)
+
+    def _advanced_section_card(self, section):
+        card = tk.Frame(self.advanced_body, bg=ADV_PANEL_ALT, highlightbackground=ADV_LINE, highlightthickness=1, padx=14, pady=12)
+        card.pack(fill="x", pady=(0, 10))
+        card.grid_columnconfigure(0, weight=1)
+
+        top = tk.Frame(card, bg=ADV_PANEL_ALT)
+        top.grid(row=0, column=0, sticky="ew")
+        top.grid_columnconfigure(0, weight=1)
+        title = f"{self._advanced_icon(section['type'])}  {section['name']}"
+        tk.Label(top, text=title, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=ADV_TEXT).grid(row=0, column=0, sticky="w")
+        stats = tk.Frame(top, bg=ADV_PANEL_ALT)
+        stats.grid(row=0, column=1, sticky="e")
+        for text, color in [
+            (f"{STAR} {section['converted']}", "#00e08a"),
+            (f"{TRIANGLE} {section['approx']}", ORANGE),
+            (f"{CROSS} {section['ignored']}", "#ff4b4b"),
+            (f"{section['coverage']}% couverture", "#7d75ff"),
+        ]:
+            tk.Label(stats, text=text, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=8).pack(side="left")
+
+        bar = tk.Frame(card, bg="#2f2c4d", height=7)
+        bar.grid(row=1, column=0, sticky="ew", pady=(12, 0))
+        bar.grid_propagate(False)
+        fill = tk.Frame(bar, bg=TEAL)
+        fill.place(relx=0, rely=0, relwidth=max(0.01, section["coverage"] / 100), relheight=1)
+        if section["coverage"] < 100:
+            warn = tk.Frame(bar, bg=ORANGE)
+            warn.place(relx=0, rely=0, relwidth=max(0.01, (100 - section["coverage"]) / 100), relheight=1)
+            fill.lift()
+
+        for widget in (card, top, bar):
+            widget.bind("<Button-1>", lambda _event, s=section: self._advanced_render_detail(s))
+            widget.configure(cursor="hand2")
+
+    def _advanced_render_detail(self, section):
+        if not self.advanced_body:
+            return
+        self._advanced_clear(self.advanced_body)
+        tk.Label(
+            self.advanced_body,
+            text=f"{self._advanced_icon(section['type'])} {section['name']}",
+            font=("Archivo Black", 16),
+            bg=ADV_PANEL,
+            fg=ADV_TEXT,
+        ).pack(anchor="w")
+        tk.Label(
+            self.advanced_body,
+            text=f"{section['source_name']} / {section['type']} / {section['coverage']}% couverture",
+            font=UI_FONT,
+            bg=ADV_PANEL,
+            fg=ADV_MUTED,
+        ).pack(anchor="w", pady=(4, 12))
+
+        stats = tk.Frame(self.advanced_body, bg=ADV_PANEL)
+        stats.pack(anchor="w", pady=(0, 16))
+        for text, color in [
+            (f"{STAR} {section['converted']} convertis", "#00e08a"),
+            (f"{TRIANGLE} {section['approx']} approx", ORANGE),
+            (f"{CROSS} {section['ignored']} ignor\u00e9s", "#ff4b4b"),
+        ]:
+            tk.Label(stats, text=text, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=10, pady=6).pack(side="left", padx=(0, 8))
+
+        self._advanced_table_header(["status", "PrusaSlicer", "OrcaSlicer", "value / note"])
+        for prusa_key, orca_key, value, note, approx in section["mapped"]:
+            marker = TRIANGLE if approx else STAR
+            status = f"{marker} approx" if approx else f"{STAR} ok"
+            detail = value + (f" / {note}" if note else "")
+            self._advanced_table_row([status, prusa_key, orca_key, detail], approx=approx)
+        for prusa_key, value in section["skipped"]:
+            self._advanced_table_row([f"{CROSS} ignor\u00e9", prusa_key, "-", value], ignored=True)
+
+    def _advanced_render_ignored(self):
+        if not self.advanced_body:
+            return
+        self._advanced_clear(self.advanced_body)
+        ignored = self.advanced_model.get("ignored", [])
+        query = self._advanced_query()
+        if query:
+            ignored = [
+                row
+                for row in ignored
+                if query
+                in " ".join(
+                    [
+                        row["source_name"],
+                        row["section_type"],
+                        row["section_name"],
+                        row["key"],
+                        row["value"],
+                    ]
+                ).lower()
+            ]
+        tk.Label(
+            self.advanced_body,
+            text=f"Ignor\u00e9s ({len(ignored)})",
+            font=("Archivo Black", 16),
+            bg=ADV_PANEL,
+            fg=ADV_TEXT,
+        ).pack(anchor="w", pady=(0, 14))
+        if not ignored:
+            tk.Label(
+                self.advanced_body,
+                text="Aucun champ ignor\u00e9 pour ce filtre.",
+                font=UI_FONT,
+                bg=ADV_PANEL,
+                fg=ADV_MUTED,
+            ).pack(anchor="w")
+            return
+        self._advanced_table_header(["bundle", "section", "PrusaSlicer key", "value"])
+        for row in ignored:
+            self._advanced_table_row(
+                [
+                    row["source_name"],
+                    f"{row['section_type']} / {row['section_name']}",
+                    row["key"],
+                    row["value"],
+                ],
+                ignored=True,
+            )
+
+    def _advanced_table_header(self, columns):
+        row = tk.Frame(self.advanced_body, bg=ADV_BG)
+        row.pack(fill="x", pady=(0, 2))
+        widths = [15, 28, 28, 44]
+        for index, text in enumerate(columns):
+            tk.Label(
+                row,
+                text=text,
+                font=UI_FONT_BOLD,
+                bg=ADV_BG,
+                fg=ADV_TEXT,
+                anchor="w",
+                padx=8,
+                pady=7,
+                width=widths[index] if index < len(widths) else 20,
+            ).pack(side="left", fill="x", expand=index == len(columns) - 1)
+
+    def _advanced_table_row(self, columns, approx=False, ignored=False):
+        row_bg = "#17152a" if ignored else ADV_PANEL_ALT
+        status_color = "#ff4b4b" if ignored else ORANGE if approx else "#00e08a"
+        row = tk.Frame(self.advanced_body, bg=row_bg, highlightbackground=ADV_LINE, highlightthickness=1)
+        row.pack(fill="x", pady=(0, 2))
+        widths = [15, 28, 28, 44]
+        for index, text in enumerate(columns):
+            tk.Label(
+                row,
+                text=str(text),
+                font=UI_FONT,
+                bg=row_bg,
+                fg=status_color if index == 0 else ADV_TEXT if not ignored else ADV_MUTED,
+                anchor="w",
+                padx=8,
+                pady=6,
+                width=widths[index] if index < len(widths) else 20,
+                wraplength=420 if index == len(columns) - 1 else 240,
+                justify="left",
+            ).pack(side="left", fill="x", expand=index == len(columns) - 1)
+
+    def set_report_views(self, views, rows, advanced_model=None):
         self.report_views = views
         self.report_rows = rows
+        self.advanced_model = advanced_model
         self.show_report_tab(self.current_report_tab if self.current_report_tab in views else "Summary")
+        if self.advanced_window and self.advanced_window.winfo_exists():
+            self._advanced_render_sidebar()
+            self._advanced_render_summary()
 
     def show_report_tab(self, name):
         self.current_report_tab = name
