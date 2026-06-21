@@ -26,6 +26,10 @@ without removing core functionality.
   the Preview, Generate, or Output controls.
 - Completed translation key coverage for supported languages to avoid accidental
   English fallbacks in visible controls and messages.
+- Added a new Info/Help tab in the report area to explain the safe import flow,
+  prefix behavior, strict/loose compatibility, report tabs, and Mapping editor.
+- Reworked the source panel buttons into a two-row adaptive layout so translated
+  labels such as "Choisir dossier" and "Effacer" do not get clipped.
 
 ### Tools Window
 
@@ -49,4 +53,5 @@ without removing core functionality.
 - Translation key coverage check passed for FR, EN, DE, ES, IT, PT, NL, and PL.
 - Tkinter smoke test passed for Simple Summary, Import Assistant, and Tools.
 - Tkinter window smoke test passed for main and child window sizing/centering.
+- Tkinter smoke test passed for the new Info/Help tab.
 - Windows executable was rebuilt successfully.

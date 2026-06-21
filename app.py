@@ -117,13 +117,14 @@ TRANSLATIONS = {
         "copy_debug_info": "Copy debug info",
         "csv": "CSV",
         "day": "DAY",
-        "drop_subtitle": "preview before writing anything",
+        "drop_subtitle": "preview before writing",
         "drop_title": "DROP .INI HERE",
         "export_html": "HTML",
         "export_pdf": "PDF",
         "folder": "Folder",
         "generate": "Generate .orca_printer",
         "history": "History",
+        "info_tab": "Info",
         "ignored": "Ignored",
         "ignored_detail": "not converted",
         "language": "Language",
@@ -144,6 +145,7 @@ TRANSLATIONS = {
         "safe": "SAFE",
         "simple_empty": "Choose a PrusaSlicer bundle to get a plain-language import summary.",
         "simple_summary_empty": "Choose a bundle to see a non-technical import summary.",
+        "summary_empty": "Choose a PrusaSlicer config bundle or folder to preview the safe Orca import.\n\nPreview writes no files.\nExisting Orca presets are not touched by this app.",
         "simple_tab": "Simple",
         "source_subtitle": ".ini file or folder",
         "source_title": "01 // source",
@@ -177,13 +179,14 @@ TRANSLATIONS = {
         "copy_debug_info": "Copier infos debug",
         "csv": "CSV",
         "day": "JOUR",
-        "drop_subtitle": "prévisualise avant d’écrire quoi que ce soit",
+        "drop_subtitle": "aperçu avant écriture",
         "drop_title": "DÉPOSE LE .INI ICI",
         "export_html": "HTML",
         "export_pdf": "PDF",
         "folder": "Dossier",
         "generate": "Générer .orca_printer",
         "history": "Historique",
+        "info_tab": "Aide",
         "ignored": "Ignorés",
         "ignored_detail": "non convertis",
         "language": "Langue",
@@ -204,6 +207,7 @@ TRANSLATIONS = {
         "safe": "SAFE",
         "simple_empty": "Choisis un bundle PrusaSlicer pour obtenir un résumé en langage simple.",
         "simple_summary_empty": "Choisis un bundle pour voir un résumé non technique.",
+        "summary_empty": "Choisis un bundle PrusaSlicer ou un dossier pour prévisualiser l’import Orca sécurisé.\n\nL’aperçu n’écrit aucun fichier.\nLes profils Orca existants ne sont pas touchés par cette app.",
         "simple_tab": "Simple",
         "source_subtitle": "fichier .ini ou dossier",
         "source_title": "01 // source",
@@ -292,6 +296,20 @@ TRANSLATIONS["en"].update({
     "open_orca_guide": "Open Orca guide",
     "open_output_folder": "Open output folder",
     "orca_target_key": "OrcaSlicer target key",
+    "info_title": "How to read this screen",
+    "info_intro": "This app never imports directly into OrcaSlicer. It prepares a safe bundle, then you import that bundle yourself in Orca.",
+    "info_flow_title": "Recommended flow",
+    "info_flow_body": "Choose a .ini file or folder, run Preview, read Simple or Advanced, then Generate the .orca_printer bundle.",
+    "info_safe_title": "Safe mode",
+    "info_safe_body": "Preview writes nothing. Generate only writes new bundle files in the output folder. Existing OrcaSlicer presets are not edited.",
+    "info_prefix_title": "Prefix",
+    "info_prefix_body": "Prefix ON adds PrusaToOrca to generated preset names. Keep it on to reduce name collision risk.",
+    "info_compat_title": "Strict / loose",
+    "info_compat_body": "Strict keeps imported filament and process presets tied to imported printers. Loose makes them easier to reuse, but less isolated.",
+    "info_reports_title": "Reports",
+    "info_reports_body": "Simple is for normal users. Technical shows generated bundles. Advanced shows exact, approximate, and ignored fields.",
+    "info_mapping_title": "Mapping editor",
+    "info_mapping_body": "If a key is ignored and matters to you, map it to an OrcaSlicer key, then preview again before generating.",
     "preview_again": "Preview again",
     "remove": "Remove",
     "save_mapping": "Save mapping",
@@ -332,6 +350,20 @@ TRANSLATIONS["fr"].update({
     "open_orca_guide": "Ouvrir le guide Orca",
     "open_output_folder": "Ouvrir le dossier de sortie",
     "orca_target_key": "Clé cible OrcaSlicer",
+    "info_title": "Comprendre cet écran",
+    "info_intro": "L’app n’importe jamais directement dans OrcaSlicer. Elle prépare un bundle sûr, puis tu l’importes toi-même dans Orca.",
+    "info_flow_title": "Flux recommandé",
+    "info_flow_body": "Choisis un fichier .ini ou un dossier, lance l’aperçu, lis Simple ou Avancé, puis génère le bundle .orca_printer.",
+    "info_safe_title": "Mode safe",
+    "info_safe_body": "L’aperçu n’écrit rien. La génération écrit uniquement de nouveaux bundles dans le dossier de sortie. Les profils Orca existants ne sont pas modifiés.",
+    "info_prefix_title": "Préfixe",
+    "info_prefix_body": "Préfixe ON ajoute PrusaToOrca aux noms générés. Garde-le activé pour réduire le risque de collision de noms.",
+    "info_compat_title": "Strict / souple",
+    "info_compat_body": "Strict lie les filaments et process importés aux imprimantes importées. Souple les rend plus réutilisables, mais moins isolés.",
+    "info_reports_title": "Rapports",
+    "info_reports_body": "Simple sert aux utilisateurs normaux. Technique montre les bundles générés. Avancé montre les champs exacts, approximatifs et ignorés.",
+    "info_mapping_title": "Éditeur de mapping",
+    "info_mapping_body": "Si une clé ignorée est importante, associe-la à une clé OrcaSlicer, puis relance l’aperçu avant de générer.",
     "preview_again": "Relancer l’aperçu",
     "remove": "Retirer",
     "save_mapping": "Sauver mapping",
@@ -400,6 +432,7 @@ TRANSLATIONS["de"].update({
     "select_ignored": "Wähle einen ignorierten Schlüssel.",
     "simple_empty": "Wähle ein PrusaSlicer-Bundle für eine verständliche Import-Zusammenfassung.",
     "simple_summary_empty": "Wähle ein Bundle für eine nicht technische Zusammenfassung.",
+    "summary_empty": "Wähle ein PrusaSlicer-Bundle oder einen Ordner, um den sicheren Orca-Import vorzuschauen.\n\nDie Vorschau schreibt keine Dateien.\nBestehende Orca-Profile werden nicht berührt.",
     "source_subtitle": ".ini-Datei oder Ordner",
     "source_title": "01 // Quelle",
     "store_as_list": "Wert als Orca-Liste speichern",
@@ -458,6 +491,7 @@ TRANSLATIONS["es"].update({
     "select_ignored": "Selecciona una clave ignorada.",
     "simple_empty": "Elige un bundle PrusaSlicer para obtener un resumen claro de importación.",
     "simple_summary_empty": "Elige un bundle para ver un resumen no técnico.",
+    "summary_empty": "Elige un bundle PrusaSlicer o una carpeta para previsualizar la importación segura a Orca.\n\nLa vista previa no escribe archivos.\nLos perfiles Orca existentes no se modifican.",
     "source_subtitle": "archivo .ini o carpeta",
     "source_title": "01 // origen",
     "store_as_list": "Guardar valor como lista Orca",
@@ -516,6 +550,7 @@ TRANSLATIONS["it"].update({
     "select_ignored": "Seleziona una chiave ignorata.",
     "simple_empty": "Scegli un bundle PrusaSlicer per ottenere un riepilogo semplice dell'import.",
     "simple_summary_empty": "Scegli un bundle per vedere un riepilogo non tecnico.",
+    "summary_empty": "Scegli un bundle PrusaSlicer o una cartella per visualizzare l'anteprima dell'import sicuro in Orca.\n\nL'anteprima non scrive file.\nI profili Orca esistenti non vengono toccati.",
     "source_subtitle": "file .ini o cartella",
     "source_title": "01 // sorgente",
     "store_as_list": "Salva valore come lista Orca",
@@ -574,6 +609,7 @@ TRANSLATIONS["pt"].update({
     "select_ignored": "Seleciona uma chave ignorada.",
     "simple_empty": "Escolhe um bundle PrusaSlicer para obter um resumo simples da importação.",
     "simple_summary_empty": "Escolhe um bundle para ver um resumo não técnico.",
+    "summary_empty": "Escolhe um bundle PrusaSlicer ou uma pasta para pré-visualizar a importação segura para o Orca.\n\nA pré-visualização não escreve ficheiros.\nOs perfis Orca existentes não são alterados.",
     "source_subtitle": "ficheiro .ini ou pasta",
     "source_title": "01 // origem",
     "store_as_list": "Guardar valor como lista Orca",
@@ -632,6 +668,7 @@ TRANSLATIONS["nl"].update({
     "select_ignored": "Selecteer een genegeerde sleutel.",
     "simple_empty": "Kies een PrusaSlicer-bundel voor een duidelijke importsamenvatting.",
     "simple_summary_empty": "Kies een bundel voor een niet-technische samenvatting.",
+    "summary_empty": "Kies een PrusaSlicer-bundel of map om de veilige Orca-import te bekijken.\n\nVoorbeeld schrijft geen bestanden.\nBestaande Orca-profielen worden niet aangepast.",
     "source_subtitle": ".ini-bestand of map",
     "source_title": "01 // bron",
     "store_as_list": "Waarde opslaan als Orca-lijst",
@@ -690,6 +727,7 @@ TRANSLATIONS["pl"].update({
     "select_ignored": "Wybierz pominięty klucz.",
     "simple_empty": "Wybierz pakiet PrusaSlicer, aby zobaczyć prosty opis importu.",
     "simple_summary_empty": "Wybierz pakiet, aby zobaczyć nietechniczne podsumowanie.",
+    "summary_empty": "Wybierz pakiet PrusaSlicer lub folder, aby podejrzeć bezpieczny import do Orca.\n\nPodgląd nie zapisuje plików.\nIstniejące profile Orca nie są zmieniane.",
     "source_subtitle": "plik .ini lub folder",
     "source_title": "01 // źródło",
     "store_as_list": "Zapisz wartość jako listę Orca",
@@ -703,6 +741,21 @@ TRANSLATIONS["de"].update({
     "mapping_saved": "Mapping gespeichert. Starte die Vorschau erneut, um es anzuwenden.",
     "bug_report_need_preview": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle, bevor du einen Fehlerbericht erstellst.",
     "history_no_snapshot": "Dieser ältere Verlaufseintrag hat keinen gespeicherten Bericht.",
+    "info_tab": "Info",
+    "info_title": "Diesen Bildschirm verstehen",
+    "info_intro": "Die App importiert nie direkt in OrcaSlicer. Sie erstellt ein sicheres Bundle, das du danach selbst in Orca importierst.",
+    "info_flow_title": "Empfohlener Ablauf",
+    "info_flow_body": "Wähle eine .ini-Datei oder einen Ordner, starte die Vorschau, lies Einfach oder Erweitert und erzeuge dann das .orca_printer-Bundle.",
+    "info_safe_title": "Sicherer Modus",
+    "info_safe_body": "Die Vorschau schreibt nichts. Erzeugen schreibt nur neue Bundle-Dateien in den Ausgabeordner. Bestehende Orca-Profile werden nicht geändert.",
+    "info_prefix_title": "Präfix",
+    "info_prefix_body": "Präfix AN ergänzt PrusaToOrca in generierten Profilnamen. Lass es aktiv, um Namenskollisionen zu reduzieren.",
+    "info_compat_title": "Streng / locker",
+    "info_compat_body": "Streng bindet importierte Filament- und Prozessprofile an importierte Drucker. Locker macht sie wiederverwendbarer, aber weniger isoliert.",
+    "info_reports_title": "Berichte",
+    "info_reports_body": "Einfach ist für normale Nutzer. Technisch zeigt erzeugte Bundles. Erweitert zeigt exakte, ungefähre und ignorierte Felder.",
+    "info_mapping_title": "Mapping-Editor",
+    "info_mapping_body": "Wenn ein ignorierter Schlüssel wichtig ist, ordne ihn einem OrcaSlicer-Schlüssel zu und starte vor dem Erzeugen erneut die Vorschau.",
     "reopen_report": "Bericht erneut öffnen",
     "refresh": "Aktualisieren",
 })
@@ -714,6 +767,21 @@ TRANSLATIONS["es"].update({
     "mapping_saved": "Mapeo guardado. Vuelve a previsualizar para aplicarlo.",
     "bug_report_need_preview": "Previsualiza o genera un bundle antes de crear un informe de error.",
     "history_no_snapshot": "Este elemento antiguo del historial no tiene informe guardado.",
+    "info_tab": "Ayuda",
+    "info_title": "Entender esta pantalla",
+    "info_intro": "La app nunca importa directamente en OrcaSlicer. Prepara un bundle seguro y luego lo importas tú en Orca.",
+    "info_flow_title": "Flujo recomendado",
+    "info_flow_body": "Elige un archivo .ini o una carpeta, ejecuta la vista previa, lee Simple o Avanzado y genera el bundle .orca_printer.",
+    "info_safe_title": "Modo seguro",
+    "info_safe_body": "La vista previa no escribe nada. Generar solo escribe nuevos bundles en la carpeta de salida. Los perfiles Orca existentes no se modifican.",
+    "info_prefix_title": "Prefijo",
+    "info_prefix_body": "Prefijo ON añade PrusaToOrca a los nombres generados. Déjalo activado para reducir colisiones de nombres.",
+    "info_compat_title": "Estricto / flexible",
+    "info_compat_body": "Estricto vincula filamentos y procesos importados a las impresoras importadas. Flexible los hace más reutilizables, pero menos aislados.",
+    "info_reports_title": "Informes",
+    "info_reports_body": "Simple es para usuarios normales. Técnico muestra bundles generados. Avanzado muestra campos exactos, aproximados e ignorados.",
+    "info_mapping_title": "Editor de mapeo",
+    "info_mapping_body": "Si una clave ignorada importa, asígnala a una clave OrcaSlicer y vuelve a previsualizar antes de generar.",
     "reopen_report": "Reabrir informe",
     "refresh": "Actualizar",
 })
@@ -725,6 +793,21 @@ TRANSLATIONS["it"].update({
     "mapping_saved": "Mapping salvato. Rilancia l'anteprima per applicarlo.",
     "bug_report_need_preview": "Visualizza l'anteprima o genera un bundle prima di creare una segnalazione bug.",
     "history_no_snapshot": "Questo elemento storico non ha un rapporto salvato.",
+    "info_tab": "Aiuto",
+    "info_title": "Capire questa schermata",
+    "info_intro": "L'app non importa mai direttamente in OrcaSlicer. Prepara un bundle sicuro, poi lo importi tu in Orca.",
+    "info_flow_title": "Flusso consigliato",
+    "info_flow_body": "Scegli un file .ini o una cartella, avvia l'anteprima, leggi Semplice o Avanzato e genera il bundle .orca_printer.",
+    "info_safe_title": "Modalità sicura",
+    "info_safe_body": "L'anteprima non scrive nulla. Genera scrive solo nuovi bundle nella cartella output. I profili Orca esistenti non vengono modificati.",
+    "info_prefix_title": "Prefisso",
+    "info_prefix_body": "Prefisso ON aggiunge PrusaToOrca ai nomi generati. Tienilo attivo per ridurre il rischio di collisioni.",
+    "info_compat_title": "Rigido / flessibile",
+    "info_compat_body": "Rigido lega filamenti e processi importati alle stampanti importate. Flessibile li rende più riutilizzabili, ma meno isolati.",
+    "info_reports_title": "Rapporti",
+    "info_reports_body": "Semplice è per utenti normali. Tecnico mostra i bundle generati. Avanzato mostra campi esatti, approssimati e ignorati.",
+    "info_mapping_title": "Editor mapping",
+    "info_mapping_body": "Se una chiave ignorata è importante, associala a una chiave OrcaSlicer e rilancia l'anteprima prima di generare.",
     "reopen_report": "Riapri rapporto",
     "refresh": "Aggiorna",
 })
@@ -736,6 +819,21 @@ TRANSLATIONS["pt"].update({
     "mapping_saved": "Mapeamento guardado. Volta a pré-visualizar para o aplicar.",
     "bug_report_need_preview": "Pré-visualiza ou gera um bundle antes de criar um relatório de erro.",
     "history_no_snapshot": "Este item antigo do histórico não tem relatório guardado.",
+    "info_tab": "Ajuda",
+    "info_title": "Compreender este ecrã",
+    "info_intro": "A app nunca importa diretamente no OrcaSlicer. Prepara um bundle seguro e depois importas esse bundle no Orca.",
+    "info_flow_title": "Fluxo recomendado",
+    "info_flow_body": "Escolhe um ficheiro .ini ou uma pasta, executa a pré-visualização, lê Simples ou Avançado e gera o bundle .orca_printer.",
+    "info_safe_title": "Modo seguro",
+    "info_safe_body": "A pré-visualização não escreve nada. Gerar só escreve novos bundles na pasta de saída. Os perfis Orca existentes não são modificados.",
+    "info_prefix_title": "Prefixo",
+    "info_prefix_body": "Prefixo ON adiciona PrusaToOrca aos nomes gerados. Mantém ativo para reduzir colisões de nomes.",
+    "info_compat_title": "Estrito / flexível",
+    "info_compat_body": "Estrito liga filamentos e processos importados às impressoras importadas. Flexível torna-os mais reutilizáveis, mas menos isolados.",
+    "info_reports_title": "Relatórios",
+    "info_reports_body": "Simples é para utilizadores normais. Técnico mostra bundles gerados. Avançado mostra campos exatos, aproximados e ignorados.",
+    "info_mapping_title": "Editor de mapeamento",
+    "info_mapping_body": "Se uma chave ignorada for importante, associa-a a uma chave OrcaSlicer e volta a pré-visualizar antes de gerar.",
     "reopen_report": "Reabrir relatório",
     "refresh": "Atualizar",
 })
@@ -747,6 +845,21 @@ TRANSLATIONS["nl"].update({
     "mapping_saved": "Mapping opgeslagen. Bekijk opnieuw een voorbeeld om dit toe te passen.",
     "bug_report_need_preview": "Bekijk of genereer eerst een bundel voordat je een bugrapport maakt.",
     "history_no_snapshot": "Dit oudere geschiedenisitem heeft geen opgeslagen rapport.",
+    "info_tab": "Info",
+    "info_title": "Dit scherm begrijpen",
+    "info_intro": "De app importeert nooit rechtstreeks in OrcaSlicer. Hij maakt een veilige bundel die je daarna zelf in Orca importeert.",
+    "info_flow_title": "Aanbevolen workflow",
+    "info_flow_body": "Kies een .ini-bestand of map, draai Voorbeeld, lees Simpel of Geavanceerd en maak daarna de .orca_printer-bundel.",
+    "info_safe_title": "Veilige modus",
+    "info_safe_body": "Voorbeeld schrijft niets. Genereren schrijft alleen nieuwe bundels in de uitvoermap. Bestaande Orca-profielen worden niet gewijzigd.",
+    "info_prefix_title": "Prefix",
+    "info_prefix_body": "Prefix AAN voegt PrusaToOrca toe aan gegenereerde profielnamen. Laat dit aan om naamconflicten te beperken.",
+    "info_compat_title": "Strikt / soepel",
+    "info_compat_body": "Strikt koppelt geïmporteerde filament- en procesprofielen aan geïmporteerde printers. Soepel maakt ze herbruikbaarder, maar minder geïsoleerd.",
+    "info_reports_title": "Rapporten",
+    "info_reports_body": "Simpel is voor normale gebruikers. Technisch toont gegenereerde bundels. Geavanceerd toont exacte, benaderde en genegeerde velden.",
+    "info_mapping_title": "Mapping-editor",
+    "info_mapping_body": "Als een genegeerde sleutel belangrijk is, koppel die aan een OrcaSlicer-sleutel en bekijk opnieuw een voorbeeld voor het genereren.",
     "reopen_report": "Rapport opnieuw openen",
     "refresh": "Vernieuwen",
 })
@@ -758,6 +871,21 @@ TRANSLATIONS["pl"].update({
     "mapping_saved": "Mapowanie zapisane. Uruchom podgląd ponownie, aby je zastosować.",
     "bug_report_need_preview": "Podejrzyj lub wygeneruj pakiet przed utworzeniem raportu błędu.",
     "history_no_snapshot": "Ten starszy wpis historii nie ma zapisanego raportu.",
+    "info_tab": "Pomoc",
+    "info_title": "Jak czytać ten ekran",
+    "info_intro": "Aplikacja nigdy nie importuje bezpośrednio do OrcaSlicer. Przygotowuje bezpieczny pakiet, który potem importujesz samodzielnie w Orca.",
+    "info_flow_title": "Zalecany przepływ",
+    "info_flow_body": "Wybierz plik .ini lub folder, uruchom podgląd, przeczytaj Prosty lub Zaawansowany, a potem wygeneruj pakiet .orca_printer.",
+    "info_safe_title": "Tryb bezpieczny",
+    "info_safe_body": "Podgląd niczego nie zapisuje. Generowanie zapisuje tylko nowe pakiety w folderze wyjściowym. Istniejące profile Orca nie są zmieniane.",
+    "info_prefix_title": "Prefiks",
+    "info_prefix_body": "Prefiks ON dodaje PrusaToOrca do nazw generowanych profili. Zostaw go włączonego, aby ograniczyć kolizje nazw.",
+    "info_compat_title": "Ścisły / luźny",
+    "info_compat_body": "Ścisły wiąże importowane filamenty i procesy z importowanymi drukarkami. Luźny ułatwia ponowne użycie, ale daje mniejszą izolację.",
+    "info_reports_title": "Raporty",
+    "info_reports_body": "Prosty jest dla zwykłych użytkowników. Techniczny pokazuje wygenerowane pakiety. Zaawansowany pokazuje pola dokładne, przybliżone i pominięte.",
+    "info_mapping_title": "Edytor mapowania",
+    "info_mapping_body": "Jeśli pominięty klucz jest ważny, przypisz go do klucza OrcaSlicer i uruchom podgląd ponownie przed generowaniem.",
     "reopen_report": "Otwórz raport ponownie",
     "refresh": "Odśwież",
 })
@@ -1138,7 +1266,9 @@ class PrusaToOrcaApp:
             font=UI_FONT_BOLD,
             bg=PANEL_TINT,
             fg=ORANGE_DARK,
-        ).pack(anchor="center", pady=(0, 12))
+            wraplength=280,
+            justify="center",
+        ).pack(anchor="center", pady=(0, 12), padx=8)
         tk.Label(
             panel,
             textvariable=self.input_path,
@@ -1151,9 +1281,17 @@ class PrusaToOrcaApp:
 
         row = tk.Frame(panel, bg=PANEL_BG)
         row.pack(fill="x")
-        self._button(row, self.tr("choose_file"), self.choose_input, variant="secondary").pack(side="left")
-        self._button(row, self.tr("choose_folder"), self.choose_folder, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(row, self.tr("clear"), self.clear_input, variant="ghost").pack(side="left", padx=(8, 0))
+        row.grid_columnconfigure(0, weight=1, uniform="source_actions")
+        row.grid_columnconfigure(1, weight=1, uniform="source_actions")
+        choose_file_btn = self._button(row, self.tr("choose_file"), self.choose_input, variant="secondary")
+        choose_file_btn.configure(padx=8, pady=8)
+        choose_file_btn.grid(row=0, column=0, sticky="ew", padx=(0, 6))
+        choose_folder_btn = self._button(row, self.tr("choose_folder"), self.choose_folder, variant="secondary")
+        choose_folder_btn.configure(padx=8, pady=8)
+        choose_folder_btn.grid(row=0, column=1, sticky="ew", padx=(6, 0))
+        clear_btn = self._button(row, self.tr("clear"), self.clear_input, variant="ghost")
+        clear_btn.configure(padx=8, pady=7)
+        clear_btn.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
 
     def _build_options_panel(self, parent):
         panel = self._panel(parent, "02 // output", self.tr("output_subtitle"))
@@ -1210,12 +1348,13 @@ class PrusaToOrcaApp:
 
         tabs = tk.Frame(frame, bg=PANEL_BG)
         tabs.grid(row=0, column=0, sticky="ew")
-        tabs.grid_columnconfigure(4, weight=1)
+        tabs.grid_columnconfigure(5, weight=1)
         for label, name in [
             (self.tr("simple_tab"), "Simple summary"),
             (self.tr("technical_tab"), "Summary"),
             (self.tr("bundle_files_tab"), "Bundle files"),
             (self.tr("advanced_report"), "Advanced report"),
+            (self.tr("info_tab"), "Info"),
         ]:
             btn = tk.Button(
                 tabs,
@@ -1263,12 +1402,10 @@ class PrusaToOrcaApp:
 
         default_views = {
             "Simple summary": self.tr("simple_summary_empty") + "\n",
-            "Summary": (
-                "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
-                "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
-            ),
+            "Summary": self.tr("summary_empty") + "\n",
             "Bundle files": self.tr("bundle_files_empty") + "\n",
             "Advanced report": self.tr("advanced_report_empty") + "\n",
+            "Info": self.build_info_text(),
         }
         self.set_report_views(self.report_views or default_views, self.report_rows, self.advanced_model)
         self.report.configure(state="disabled")
@@ -1517,9 +1654,7 @@ class PrusaToOrcaApp:
         self.set_report_views(
             {
                 "Simple summary": self.tr("simple_summary_empty") + "\n",
-                "Summary": (
-                    "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n"
-                ),
+                "Summary": self.tr("summary_empty") + "\n",
                 "Bundle files": self.tr("bundle_files_empty") + "\n",
                 "Advanced report": self.tr("advanced_report_empty") + "\n",
             },
@@ -2554,7 +2689,34 @@ class PrusaToOrcaApp:
                 justify="left",
             ).grid(row=0, column=index, sticky="ew")
 
+    def build_info_text(self):
+        sections = [
+            ("info_flow_title", "info_flow_body"),
+            ("info_safe_title", "info_safe_body"),
+            ("info_prefix_title", "info_prefix_body"),
+            ("info_compat_title", "info_compat_body"),
+            ("info_reports_title", "info_reports_body"),
+            ("info_mapping_title", "info_mapping_body"),
+        ]
+        lines = [
+            self.tr("info_title").upper(),
+            "",
+            self.tr("info_intro"),
+            "",
+        ]
+        for index, (title_key, body_key) in enumerate(sections, 1):
+            lines.extend(
+                [
+                    f"{index:02d} // {self.tr(title_key)}",
+                    self.tr(body_key),
+                    "",
+                ]
+            )
+        return "\n".join(lines).rstrip() + "\n"
+
     def set_report_views(self, views, rows, advanced_model=None):
+        views = dict(views)
+        views["Info"] = self.build_info_text()
         self.report_views = views
         self.report_rows = rows
         self.advanced_model = advanced_model

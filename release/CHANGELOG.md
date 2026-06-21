@@ -31,3 +31,6 @@
 - Added shared window sizing and centering for the main app and secondary windows.
 - Added a scrollable left workflow column for smaller screen heights.
 - Completed translation key coverage for all supported languages to avoid English fallbacks.
+- Added an Info/Help report tab explaining the workflow, safe mode, prefix, compatibility,
+  reports, and mapping editor.
+- Fixed the source panel action buttons so long translated labels no longer clip.

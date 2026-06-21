@@ -22,6 +22,8 @@ not overwritten by matching names.
 - Language selector stored locally with FR, EN, DE, ES, IT, PT, NL, and PL labels.
 - Scrollable workflow panel for smaller screen heights.
 - Non-technical Simple Summary tab with import readiness, risk, and next steps.
+- Info/Help tab explaining safe mode, prefix, strict/loose compatibility, report
+  tabs, and mapping.
 - OrcaSlicer import assistant after generation with copy-path and open-folder
   actions.
 - Mapping editor for ignored PrusaSlicer keys that should be copied to a
