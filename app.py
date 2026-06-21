@@ -10,6 +10,7 @@ import threading
 import tkinter as tk
 import sys
 import ctypes
+import csv
 from pathlib import Path
 from tkinter import filedialog, messagebox
 
@@ -76,7 +77,12 @@ class PrusaToOrcaApp:
         self.output_path = tk.StringVar(value=str(Path.home() / "Desktop"))
         self.compatibility = tk.StringVar(value="strict")
         self.prefix_profiles = tk.BooleanVar(value=True)
+        self.source_mode = tk.StringVar(value="file")
         self.last_preview = None
+        self.report_views = {}
+        self.report_rows = []
+        self.current_report_tab = "Summary"
+        self.tab_buttons = {}
         self.logo_image = None
 
         self._build()
@@ -166,7 +172,7 @@ class PrusaToOrcaApp:
         return content
 
     def _build_import_panel(self, parent):
-        panel = self._panel(parent, "01 // source", "config bundle .ini")
+        panel = self._panel(parent, "01 // source", ".ini file or folder")
 
         self.drop_zone = tk.Frame(panel, bg=PANEL_TINT, highlightbackground=ORANGE, highlightthickness=2, height=128)
         self.drop_zone.pack(fill="x")
@@ -202,6 +208,7 @@ class PrusaToOrcaApp:
         row = tk.Frame(panel, bg=PANEL_BG)
         row.pack(fill="x")
         self._button(row, "Choose file", self.choose_input, variant="secondary").pack(side="left")
+        self._button(row, "Choose folder", self.choose_folder, variant="secondary").pack(side="left", padx=(8, 0))
         self._button(row, "Clear", self.clear_input, variant="ghost").pack(side="left", padx=(8, 0))
 
     def _build_options_panel(self, parent):
@@ -273,18 +280,27 @@ class PrusaToOrcaApp:
 
         tabs = tk.Frame(frame, bg=PANEL_BG)
         tabs.grid(row=0, column=0, sticky="ew")
-        for text, active in [("Summary", True), ("Bundle files", False), ("Conversion log", False)]:
-            tk.Label(
+        tabs.grid_columnconfigure(3, weight=1)
+        for text in ["Summary", "Bundle files", "Conversion log"]:
+            btn = tk.Button(
                 tabs,
                 text=text,
-                font=UI_FONT_BOLD if active else UI_FONT,
-                bg=TEAL_DARK if active else PANEL_BG,
-                fg=PANEL_BG if active else MUTED,
+                command=lambda name=text: self.show_report_tab(name),
+                font=UI_FONT_BOLD,
+                bg=TEAL_DARK if text == self.current_report_tab else PANEL_BG,
+                fg=PANEL_BG if text == self.current_report_tab else MUTED,
                 padx=14,
                 pady=9,
+                relief="flat",
+                borderwidth=0,
                 highlightbackground=LINE,
                 highlightthickness=1,
-            ).pack(side="left")
+                cursor="hand2",
+            )
+            btn.pack(side="left")
+            self.tab_buttons[text] = btn
+        self.export_btn = self._button(tabs, "Export CSV", self.export_csv, variant="secondary")
+        self.export_btn.pack(side="right", padx=(8, 0))
 
         self.report = tk.Text(
             frame,
@@ -299,10 +315,16 @@ class PrusaToOrcaApp:
             pady=16,
         )
         self.report.grid(row=1, column=0, sticky="nsew")
-        self.report.insert(
-            "1.0",
-            "Choose a PrusaSlicer config bundle to preview the safe Orca import.\n\n"
-            "No file is written during preview.\nExisting Orca presets are not touched by this app.\n",
+        self.set_report_views(
+            {
+                "Summary": (
+                    "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
+                    "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
+                ),
+                "Bundle files": "No bundle preview yet.\n",
+                "Conversion log": "No conversion log yet.\n",
+            },
+            [],
         )
         self.report.configure(state="disabled")
 
@@ -358,8 +380,12 @@ class PrusaToOrcaApp:
     def _wire_drag_drop(self):
         if not DND_FILES or not hasattr(self.drop_zone, "drop_target_register"):
             return
-        self.drop_zone.drop_target_register(DND_FILES)
-        self.drop_zone.dnd_bind("<<Drop>>", self._on_drop)
+        try:
+            self.drop_zone.drop_target_register(DND_FILES)
+            self.drop_zone.dnd_bind("<<Drop>>", self._on_drop)
+        except tk.TclError:
+            # Drag-and-drop is an enhancement; the file/folder pickers remain available.
+            return
 
     def _on_drop(self, event):
         paths = self.root.tk.splitlist(event.data)
@@ -374,14 +400,29 @@ class PrusaToOrcaApp:
         if path:
             self.set_input(path)
 
+    def choose_folder(self):
+        path = filedialog.askdirectory(title="Choose folder containing PrusaSlicer .ini files")
+        if path:
+            self.set_input(path)
+
     def set_input(self, path):
-        self.input_path.set(str(Path(path)))
+        source = Path(path)
+        self.source_mode.set("folder" if source.is_dir() else "file")
+        self.input_path.set(str(source))
         self.preview()
 
     def clear_input(self):
         self.input_path.set("")
+        self.source_mode.set("file")
         self.last_preview = None
-        self.write_report("Choose a PrusaSlicer config bundle to preview the safe Orca import.\n")
+        self.set_report_views(
+            {
+                "Summary": "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n",
+                "Bundle files": "No bundle preview yet.\n",
+                "Conversion log": "No conversion log yet.\n",
+            },
+            [],
+        )
 
     def choose_output(self):
         path = filedialog.askdirectory(title="Choose output folder")
@@ -395,25 +436,33 @@ class PrusaToOrcaApp:
 
     def preview(self):
         if not self.input_path.get():
-            messagebox.showinfo("PrusaToOrca", "Choose a .ini file first.")
+            messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
             return
         self.set_busy(True)
         threading.Thread(target=self._preview_worker, daemon=True).start()
 
     def _preview_worker(self):
         try:
-            log = ConversionLog()
-            preview = convert_ini_to_orca(
-                self.input_path.get(),
-                self.output_path.get(),
-                log=log,
-                dry_run=True,
-                compatibility=self.compatibility.get(),
-                prefix_profiles=self.prefix_profiles.get(),
-            )
-            text = self.format_preview(preview, log)
-            self.last_preview = preview
-            self.root.after(0, lambda: self.write_report(text))
+            previews = []
+            used_outputs = set()
+            for ini_path in self.source_files():
+                log = ConversionLog()
+                preview = convert_ini_to_orca(
+                    ini_path,
+                    self.output_path.get(),
+                    log=log,
+                    dry_run=True,
+                    compatibility=self.compatibility.get(),
+                    prefix_profiles=self.prefix_profiles.get(),
+                )
+                preview["source_path"] = ini_path
+                preview["output_path"] = self.unique_output_path(preview["output_path"], used_outputs)
+                previews.append((preview, log))
+            if not previews:
+                raise FileNotFoundError("No .ini files found in the selected folder.")
+            views, rows = self.build_report_views(previews, done=False)
+            self.last_preview = previews
+            self.root.after(0, lambda: self.set_report_views(views, rows))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Preview failed", str(exc)))
         finally:
@@ -421,72 +470,198 @@ class PrusaToOrcaApp:
 
     def convert(self):
         if not self.input_path.get():
-            messagebox.showinfo("PrusaToOrca", "Choose a .ini file first.")
+            messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
             return
         self.set_busy(True)
         threading.Thread(target=self._convert_worker, daemon=True).start()
 
     def _convert_worker(self):
         try:
-            log = ConversionLog()
-            result = convert_ini_to_orca(
-                self.input_path.get(),
-                self.output_path.get(),
-                log=log,
-                dry_run=False,
-                compatibility=self.compatibility.get(),
-                prefix_profiles=self.prefix_profiles.get(),
-            )
-            text = self.format_done(result, log)
-            self.root.after(0, lambda: self.write_report(text))
-            self.root.after(0, lambda: messagebox.showinfo("Done", f"Bundle generated:\n{result}"))
+            results = []
+            used_outputs = set()
+            for ini_path in self.source_files():
+                dry_log = ConversionLog()
+                preview = convert_ini_to_orca(
+                    ini_path,
+                    self.output_path.get(),
+                    log=dry_log,
+                    dry_run=True,
+                    compatibility=self.compatibility.get(),
+                    prefix_profiles=self.prefix_profiles.get(),
+                )
+                target = self.unique_output_path(preview["output_path"], used_outputs)
+                log = ConversionLog()
+                result = convert_ini_to_orca(
+                    ini_path,
+                    target,
+                    log=log,
+                    dry_run=False,
+                    compatibility=self.compatibility.get(),
+                    prefix_profiles=self.prefix_profiles.get(),
+                )
+                preview["source_path"] = ini_path
+                preview["output_path"] = result
+                results.append((preview, log))
+            if not results:
+                raise FileNotFoundError("No .ini files found in the selected folder.")
+            views, rows = self.build_report_views(results, done=True)
+            self.last_preview = results
+            self.root.after(0, lambda: self.set_report_views(views, rows))
+            self.root.after(0, lambda: messagebox.showinfo("Done", f"Generated {len(results)} bundle(s)."))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
         finally:
             self.root.after(0, lambda: self.set_busy(False))
 
-    def format_preview(self, preview, log):
-        bundle = preview["bundle"]
-        files = preview["files"]
-        printers = [n for n in files if n.startswith("printer/")]
-        filaments = [n for n in files if n.startswith("filament/")]
-        processes = [n for n in files if n.startswith("process/")]
+    def source_files(self):
+        source = Path(self.input_path.get())
+        if source.is_dir():
+            return sorted(path for path in source.rglob("*.ini") if path.is_file())
+        return [source]
 
-        lines = [
-            "SAFE IMPORT PREVIEW",
+    def unique_output_path(self, output_path, used_outputs):
+        output_path = Path(output_path)
+        candidate = output_path
+        index = 2
+        while str(candidate).lower() in used_outputs:
+            candidate = output_path.with_name(f"{output_path.stem} ({index}){output_path.suffix}")
+            index += 1
+        used_outputs.add(str(candidate).lower())
+        return candidate
+
+    def build_report_views(self, entries, done=False):
+        total_printers = total_filaments = total_processes = 0
+        rows = []
+        summary = [
+            "BUNDLE GENERATED" if done else "SAFE IMPORT PREVIEW",
             "",
-            f"Output: {preview['output_path']}",
+            f"Source mode: {self.source_mode.get()}",
+            f"Input: {self.input_path.get()}",
+            f"Output folder: {self.output_path.get()}",
             f"Mode: compatibility={self.compatibility.get()} / prefix={'on' if self.prefix_profiles.get() else 'off'}",
             "",
-            "Will add:",
-            f"  {len(printers)} printer preset(s)",
-            f"  {len(filaments)} filament preset(s)",
-            f"  {len(processes)} process preset(s)",
-            "",
-            "Safety checks:",
-            "  OK generated names are prefixed" if self.prefix_profiles.get() else "  WARNING prefix disabled",
-            "  OK existing Orca preset files are not modified by this converter",
-            "  OK preview did not write a bundle",
-            "",
-            "Bundle files:",
+            f"{'Generated' if done else 'Will generate'} {len(entries)} bundle(s):",
         ]
-        lines.extend(f"  {name}" for name in sorted(files))
-        lines.extend(["", "Bundle id:", f"  {bundle['bundle_id']}", ""])
-        lines.extend(self.format_log_lines(log))
-        return "\n".join(lines)
+        bundle_lines = []
+        log_lines = [
+            "Conversion log",
+            "",
+        ]
 
-    def format_done(self, result, log):
-        lines = [
-            "BUNDLE GENERATED",
-            "",
-            str(result),
-            "",
-            "Next step in OrcaSlicer:",
-            "  File > Import > Import Config Bundle",
-            "",
-        ]
-        lines.extend(self.format_log_lines(log))
-        return "\n".join(lines)
+        for index, (preview, log) in enumerate(entries, 1):
+            files = preview["files"]
+            printers = [n for n in files if n.startswith("printer/")]
+            filaments = [n for n in files if n.startswith("filament/")]
+            processes = [n for n in files if n.startswith("process/")]
+            total_printers += len(printers)
+            total_filaments += len(filaments)
+            total_processes += len(processes)
+
+            source = preview.get("source_path", "")
+            summary.extend(
+                [
+                    f"  {index}. {Path(source).name if source else 'bundle'}",
+                    f"     output: {preview['output_path']}",
+                    f"     presets: {len(printers)} printer / {len(filaments)} filament / {len(processes)} process",
+                ]
+            )
+
+            bundle_lines.extend(
+                [
+                    f"Bundle {index}: {Path(source).name if source else 'bundle'}",
+                    f"Output: {preview['output_path']}",
+                    f"Bundle id: {preview['bundle']['bundle_id']}",
+                    "",
+                ]
+            )
+            bundle_lines.extend(f"  {name}" for name in sorted(files))
+            bundle_lines.append("")
+
+            log_lines.extend(
+                [
+                    f"Bundle {index}: {Path(source).name if source else 'bundle'}",
+                    f"Converted: {log.total_mapped} | Approx: {log.total_approx} | Ignored: {log.total_skipped}",
+                ]
+            )
+            if log.warnings:
+                log_lines.append("Warnings:")
+                log_lines.extend(f"  {warning}" for warning in log.warnings)
+            for section in log.sections:
+                log_lines.append(
+                    f"  [{section.type}] {section.name} "
+                    f"ok={section.n_mapped} approx={section.n_approx} ignored={section.n_skipped}"
+                )
+                rows.append(
+                    {
+                        "bundle": index,
+                        "source": str(source),
+                        "section_type": section.type,
+                        "section_name": section.name,
+                        "status": "summary",
+                        "prusa_key": "",
+                        "orca_key": "",
+                        "value": "",
+                        "note": f"ok={section.n_mapped}; approx={section.n_approx}; ignored={section.n_skipped}",
+                        "approx": "",
+                    }
+                )
+                for prusa_key, orca_key, value, note, approx in section.mapped:
+                    rows.append(
+                        {
+                            "bundle": index,
+                            "source": str(source),
+                            "section_type": section.type,
+                            "section_name": section.name,
+                            "status": "mapped",
+                            "prusa_key": prusa_key,
+                            "orca_key": orca_key,
+                            "value": value,
+                            "note": note,
+                            "approx": str(bool(approx)),
+                        }
+                    )
+                for prusa_key, value in section.skipped:
+                    rows.append(
+                        {
+                            "bundle": index,
+                            "source": str(source),
+                            "section_type": section.type,
+                            "section_name": section.name,
+                            "status": "ignored",
+                            "prusa_key": prusa_key,
+                            "orca_key": "",
+                            "value": value,
+                            "note": "",
+                            "approx": "False",
+                        }
+                    )
+            log_lines.append("")
+
+        summary.extend(
+            [
+                "",
+                "Total presets:",
+                f"  {total_printers} printer preset(s)",
+                f"  {total_filaments} filament preset(s)",
+                f"  {total_processes} process preset(s)",
+                "",
+                "Safety checks:",
+                "  OK generated names are prefixed" if self.prefix_profiles.get() else "  WARNING prefix disabled",
+                "  OK existing Orca preset files are not modified by this converter",
+                "  OK preview does not write a bundle" if not done else "  OK only generated bundle files were written",
+            ]
+        )
+        if done:
+            summary.extend(["", "Next step in OrcaSlicer:", "  File > Import > Import Config Bundle"])
+
+        return (
+            {
+                "Summary": "\n".join(summary),
+                "Bundle files": "\n".join(bundle_lines).strip() + "\n",
+                "Conversion log": "\n".join(log_lines).strip() + "\n",
+            },
+            rows,
+        )
 
     def format_log_lines(self, log):
         lines = [
@@ -507,6 +682,51 @@ class PrusaToOrcaApp:
                 f"ok={section.n_mapped} approx={section.n_approx} ignored={section.n_skipped}"
             )
         return lines
+
+    def set_report_views(self, views, rows):
+        self.report_views = views
+        self.report_rows = rows
+        self.show_report_tab(self.current_report_tab if self.current_report_tab in views else "Summary")
+
+    def show_report_tab(self, name):
+        self.current_report_tab = name
+        for tab_name, btn in self.tab_buttons.items():
+            active = tab_name == name
+            btn.configure(
+                bg=TEAL_DARK if active else PANEL_BG,
+                fg=PANEL_BG if active else MUTED,
+                font=UI_FONT_BOLD if active else UI_FONT,
+            )
+        self.write_report(self.report_views.get(name, "No report yet.\n"))
+
+    def export_csv(self):
+        if not self.report_rows:
+            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting CSV.")
+            return
+        path = filedialog.asksaveasfilename(
+            title="Export conversion report",
+            defaultextension=".csv",
+            filetypes=[("CSV report", "*.csv"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        fields = [
+            "bundle",
+            "source",
+            "section_type",
+            "section_name",
+            "status",
+            "prusa_key",
+            "orca_key",
+            "value",
+            "note",
+            "approx",
+        ]
+        with open(path, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.DictWriter(f, fieldnames=fields)
+            writer.writeheader()
+            writer.writerows(self.report_rows)
+        messagebox.showinfo("PrusaToOrca", f"CSV report exported:\n{path}")
 
     def write_report(self, text):
         self.report.configure(state="normal")

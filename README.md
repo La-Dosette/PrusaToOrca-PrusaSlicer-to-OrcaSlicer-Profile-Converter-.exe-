@@ -10,13 +10,15 @@ not overwritten by matching names.
 ## Features
 
 - Desktop GUI with drag-and-drop support when `tkinterdnd2` is installed.
+- File mode and folder mode for batch conversion of `.ini` bundles.
 - Safe import preview before writing any bundle.
 - Prefixes generated presets with `PrusaToOrca -` by default.
 - Adds explicit OrcaSlicer compatibility metadata for generated filament and
   process presets.
 - Supports strict or loose compatibility modes.
 - CLI mode for automation and testing.
-- Conversion report with mapped, approximate, and ignored fields.
+- Conversion report with summary, bundle file list, advanced field details, and
+  CSV export.
 
 ## Install
 
@@ -37,11 +39,12 @@ python app.py
 
 Workflow:
 
-1. Drop or choose a PrusaSlicer `.ini` config bundle.
+1. Drop or choose a PrusaSlicer `.ini` config bundle, or choose a folder.
 2. Review the safe import preview.
 3. Choose strict or loose compatibility.
 4. Generate the `.orca_printer` bundle.
-5. Import the generated bundle in OrcaSlicer.
+5. Export the CSV report if needed.
+6. Import the generated bundle in OrcaSlicer.
 
 ## CLI Usage
 
