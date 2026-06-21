@@ -298,6 +298,14 @@ TRANSLATIONS["en"].update({
     "saved_mappings": "Saved mappings",
     "select_ignored": "Select an ignored key.",
     "store_as_list": "Store value as Orca list",
+    "mapping_need_preview": "Preview a bundle before editing ignored-key mappings.",
+    "mapping_no_ignored": "No ignored keys in the current report.",
+    "mapping_need_target": "Select an ignored key and enter an Orca target key.",
+    "mapping_saved": "Mapping saved. Run Preview again to apply it.",
+    "bug_report_need_preview": "Preview or convert a bundle before generating a bug report.",
+    "history_no_snapshot": "This older history item has no saved report snapshot.",
+    "reopen_report": "Reopen report",
+    "refresh": "Refresh",
 })
 
 TRANSLATIONS["fr"].update({
@@ -330,6 +338,428 @@ TRANSLATIONS["fr"].update({
     "saved_mappings": "Mappings sauvegardés",
     "select_ignored": "Sélectionne une clé ignorée.",
     "store_as_list": "Stocker la valeur comme liste Orca",
+    "mapping_need_preview": "Prévisualise un bundle avant de modifier les mappings de clés ignorées.",
+    "mapping_no_ignored": "Aucune clé ignorée dans le rapport actuel.",
+    "mapping_need_target": "Sélectionne une clé ignorée et indique une clé Orca cible.",
+    "mapping_saved": "Mapping sauvegardé. Relance l’aperçu pour l’appliquer.",
+    "bug_report_need_preview": "Prévisualise ou génère un bundle avant de créer un rapport de bug.",
+    "history_no_snapshot": "Cet ancien historique n’a pas de rapport sauvegardé.",
+    "reopen_report": "Rouvrir rapport",
+    "refresh": "Actualiser",
+})
+
+TRANSLATIONS["de"].update({
+    "advanced_no_section": "Kein Bereich für diesen Filter.",
+    "advanced_report_empty": "Zeige eine Vorschau an, um den animierten erweiterten Bericht zu sehen.",
+    "advanced_report_open_first": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle.",
+    "advanced_report_title": "Erweiterter Bericht",
+    "approx_detail": "ungefähre Felder",
+    "bug_report": "Fehlerbericht",
+    "bug_report_exported": "Fehlerbericht erstellt:\n{path}",
+    "bundle_files_empty": "Noch keine Bundle-Vorschau.",
+    "check_updates": "Nach Updates suchen",
+    "choose_file_first": "Wähle zuerst eine .ini-Datei oder einen Ordner.",
+    "choose_output_folder": "Ausgabeordner wählen",
+    "compat_loose": "LOCKER",
+    "compat_strict": "STRENG",
+    "converted_detail": "zugeordnete Felder",
+    "copy_debug_info": "Debug-Infos kopieren",
+    "copy_file_path": "Dateipfad kopieren",
+    "debug_copied": "Debug-Infos wurden in die Zwischenablage kopiert.",
+    "drop_subtitle": "Vorschau, bevor etwas geschrieben wird",
+    "export_before_csv": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle.",
+    "export_before_html": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle.",
+    "export_before_pdf": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle.",
+    "export_csv_done": "CSV-Bericht exportiert:\n{path}",
+    "export_html_done": "HTML-Bericht exportiert:\n{path}",
+    "export_pdf_done": "PDF-Bericht exportiert:\n{path}",
+    "generated_bundle_file": "Erzeugte Bundle-Datei",
+    "generated_bundle_paths": "Pfad(e) zum erzeugten Bundle",
+    "history_select_first": "Wähle zuerst eine Konvertierung.",
+    "ignored_detail": "nicht konvertiert",
+    "import_assistant": "Importassistent",
+    "import_assistant_intro": "Dein Bundle wurde erzeugt. Folge diesen Schritten in OrcaSlicer.",
+    "import_assistant_need_generate": "Erzeuge zuerst das .orca_printer-Bundle.",
+    "import_into_orca": "In OrcaSlicer importieren",
+    "language_intro": "Wähle die Sprache der Oberfläche. Technische Prusa/Orca-Schlüssel bleiben unverändert.",
+    "mapping_intro": "Wähle einen ignorierten PrusaSlicer-Schlüssel, ordne ihn einem OrcaSlicer-Schlüssel zu und starte die Vorschau erneut.",
+    "next_step": "Nächster Schritt",
+    "open_detailed_view": "Detailansicht öffnen",
+    "open_orca_guide": "Orca-Anleitung öffnen",
+    "open_output_folder": "Ausgabeordner öffnen",
+    "orca_target_key": "OrcaSlicer-Zielschlüssel",
+    "output_subtitle": "nicht destruktiv",
+    "preview_again": "Vorschau erneut starten",
+    "preview_header": "03 // Vorschau",
+    "preview_subtitle": "was zu OrcaSlicer hinzugefügt wird",
+    "remove": "Entfernen",
+    "risk_waiting": "Risiko: wartet auf Vorschau",
+    "safe": "SICHER",
+    "save_mapping": "Mapping speichern",
+    "saved_mappings": "Gespeicherte Mappings",
+    "select_ignored": "Wähle einen ignorierten Schlüssel.",
+    "simple_empty": "Wähle ein PrusaSlicer-Bundle für eine verständliche Import-Zusammenfassung.",
+    "simple_summary_empty": "Wähle ein Bundle für eine nicht technische Zusammenfassung.",
+    "source_subtitle": ".ini-Datei oder Ordner",
+    "source_title": "01 // Quelle",
+    "store_as_list": "Wert als Orca-Liste speichern",
+    "tools_description": "Support- und Wartungsaktionen. Der Hauptablauf bleibt links.",
+})
+
+TRANSLATIONS["es"].update({
+    "advanced_no_section": "No hay sección para este filtro.",
+    "advanced_report_empty": "Previsualiza un bundle para ver el informe avanzado animado.",
+    "advanced_report_open_first": "Previsualiza o genera un bundle antes de abrir el informe avanzado.",
+    "advanced_report_title": "Informe avanzado",
+    "approx_detail": "campos aproximados",
+    "bug_report": "Informe de error",
+    "bug_report_exported": "Informe de error generado:\n{path}",
+    "bundle_files_empty": "Todavía no hay vista previa del bundle.",
+    "check_updates": "Buscar actualizaciones",
+    "choose_file_first": "Elige primero un archivo .ini o una carpeta.",
+    "choose_output_folder": "Elegir carpeta de salida",
+    "compat_loose": "FLEXIBLE",
+    "compat_strict": "ESTRICTO",
+    "converted_detail": "campos mapeados",
+    "copy_debug_info": "Copiar info de depuración",
+    "copy_file_path": "Copiar ruta del archivo",
+    "debug_copied": "Info de depuración copiada al portapapeles.",
+    "drop_subtitle": "previsualiza antes de escribir nada",
+    "export_before_csv": "Previsualiza o genera un bundle antes de exportar CSV.",
+    "export_before_html": "Previsualiza o genera un bundle antes de exportar HTML.",
+    "export_before_pdf": "Previsualiza o genera un bundle antes de exportar PDF.",
+    "export_csv_done": "Informe CSV exportado:\n{path}",
+    "export_html_done": "Informe HTML exportado:\n{path}",
+    "export_pdf_done": "Informe PDF exportado:\n{path}",
+    "generated_bundle_file": "Archivo bundle generado",
+    "generated_bundle_paths": "Ruta(s) del bundle generado",
+    "history_select_first": "Selecciona primero una conversión.",
+    "ignored_detail": "no convertidos",
+    "import_assistant": "Asistente de importación",
+    "import_assistant_intro": "Tu bundle se ha generado. Sigue estos pasos en OrcaSlicer.",
+    "import_assistant_need_generate": "Genera primero el bundle .orca_printer.",
+    "import_into_orca": "Importar en OrcaSlicer",
+    "language_intro": "Elige el idioma de la interfaz. Las claves técnicas Prusa/Orca mantienen su nombre real.",
+    "mapping_intro": "Elige una clave PrusaSlicer ignorada, asígnala a una clave OrcaSlicer y vuelve a previsualizar.",
+    "next_step": "Siguiente paso",
+    "open_detailed_view": "Abrir vista detallada",
+    "open_orca_guide": "Abrir guía Orca",
+    "open_output_folder": "Abrir carpeta de salida",
+    "orca_target_key": "Clave destino OrcaSlicer",
+    "output_subtitle": "no destructivo",
+    "preview_again": "Previsualizar otra vez",
+    "preview_header": "03 // vista previa",
+    "preview_subtitle": "lo que se añadirá a OrcaSlicer",
+    "remove": "Eliminar",
+    "risk_waiting": "Riesgo: esperando vista previa",
+    "safe": "SEGURO",
+    "save_mapping": "Guardar mapeo",
+    "saved_mappings": "Mapeos guardados",
+    "select_ignored": "Selecciona una clave ignorada.",
+    "simple_empty": "Elige un bundle PrusaSlicer para obtener un resumen claro de importación.",
+    "simple_summary_empty": "Elige un bundle para ver un resumen no técnico.",
+    "source_subtitle": "archivo .ini o carpeta",
+    "source_title": "01 // origen",
+    "store_as_list": "Guardar valor como lista Orca",
+    "tools_description": "Acciones de soporte y mantenimiento. El flujo principal queda en el panel izquierdo.",
+})
+
+TRANSLATIONS["it"].update({
+    "advanced_no_section": "Nessuna sezione per questo filtro.",
+    "advanced_report_empty": "Visualizza l'anteprima di un bundle per vedere il rapporto avanzato animato.",
+    "advanced_report_open_first": "Visualizza l'anteprima o genera un bundle prima di aprire il rapporto avanzato.",
+    "advanced_report_title": "Rapporto avanzato",
+    "approx_detail": "campi approssimati",
+    "bug_report": "Segnalazione bug",
+    "bug_report_exported": "Segnalazione bug generata:\n{path}",
+    "bundle_files_empty": "Nessuna anteprima bundle disponibile.",
+    "check_updates": "Controlla aggiornamenti",
+    "choose_file_first": "Scegli prima un file .ini o una cartella.",
+    "choose_output_folder": "Scegli cartella di output",
+    "compat_loose": "FLESSIBILE",
+    "compat_strict": "RIGIDO",
+    "converted_detail": "campi mappati",
+    "copy_debug_info": "Copia info debug",
+    "copy_file_path": "Copia percorso file",
+    "debug_copied": "Info debug copiate negli appunti.",
+    "drop_subtitle": "anteprima prima di scrivere qualsiasi cosa",
+    "export_before_csv": "Visualizza l'anteprima o genera un bundle prima di esportare CSV.",
+    "export_before_html": "Visualizza l'anteprima o genera un bundle prima di esportare HTML.",
+    "export_before_pdf": "Visualizza l'anteprima o genera un bundle prima di esportare PDF.",
+    "export_csv_done": "Rapporto CSV esportato:\n{path}",
+    "export_html_done": "Rapporto HTML esportato:\n{path}",
+    "export_pdf_done": "Rapporto PDF esportato:\n{path}",
+    "generated_bundle_file": "File bundle generato",
+    "generated_bundle_paths": "Percorso/i del bundle generato",
+    "history_select_first": "Seleziona prima una conversione.",
+    "ignored_detail": "non convertiti",
+    "import_assistant": "Assistente import",
+    "import_assistant_intro": "Il bundle è stato generato. Segui questi passaggi in OrcaSlicer.",
+    "import_assistant_need_generate": "Genera prima il bundle .orca_printer.",
+    "import_into_orca": "Importa in OrcaSlicer",
+    "language_intro": "Scegli la lingua dell'interfaccia. Le chiavi tecniche Prusa/Orca mantengono il nome reale.",
+    "mapping_intro": "Scegli una chiave PrusaSlicer ignorata, associala a una chiave OrcaSlicer e rilancia l'anteprima.",
+    "next_step": "Prossimo passo",
+    "open_detailed_view": "Apri vista dettagliata",
+    "open_orca_guide": "Apri guida Orca",
+    "open_output_folder": "Apri cartella output",
+    "orca_target_key": "Chiave destinazione OrcaSlicer",
+    "output_subtitle": "non distruttivo",
+    "preview_again": "Rilancia anteprima",
+    "preview_header": "03 // anteprima",
+    "preview_subtitle": "cosa verrà aggiunto a OrcaSlicer",
+    "remove": "Rimuovi",
+    "risk_waiting": "Rischio: in attesa di anteprima",
+    "safe": "SICURO",
+    "save_mapping": "Salva mapping",
+    "saved_mappings": "Mapping salvati",
+    "select_ignored": "Seleziona una chiave ignorata.",
+    "simple_empty": "Scegli un bundle PrusaSlicer per ottenere un riepilogo semplice dell'import.",
+    "simple_summary_empty": "Scegli un bundle per vedere un riepilogo non tecnico.",
+    "source_subtitle": "file .ini o cartella",
+    "source_title": "01 // sorgente",
+    "store_as_list": "Salva valore come lista Orca",
+    "tools_description": "Azioni di supporto e manutenzione. Il flusso principale resta nel pannello sinistro.",
+})
+
+TRANSLATIONS["pt"].update({
+    "advanced_no_section": "Nenhuma secção para este filtro.",
+    "advanced_report_empty": "Pré-visualiza um bundle para ver o relatório avançado animado.",
+    "advanced_report_open_first": "Pré-visualiza ou gera um bundle antes de abrir o relatório avançado.",
+    "advanced_report_title": "Relatório avançado",
+    "approx_detail": "campos aproximados",
+    "bug_report": "Relatório de erro",
+    "bug_report_exported": "Relatório de erro gerado:\n{path}",
+    "bundle_files_empty": "Ainda não há pré-visualização do bundle.",
+    "check_updates": "Procurar atualizações",
+    "choose_file_first": "Escolhe primeiro um ficheiro .ini ou uma pasta.",
+    "choose_output_folder": "Escolher pasta de saída",
+    "compat_loose": "FLEXÍVEL",
+    "compat_strict": "ESTRITO",
+    "converted_detail": "campos mapeados",
+    "copy_debug_info": "Copiar info de debug",
+    "copy_file_path": "Copiar caminho do ficheiro",
+    "debug_copied": "Info de debug copiada para a área de transferência.",
+    "drop_subtitle": "pré-visualiza antes de escrever qualquer coisa",
+    "export_before_csv": "Pré-visualiza ou gera um bundle antes de exportar CSV.",
+    "export_before_html": "Pré-visualiza ou gera um bundle antes de exportar HTML.",
+    "export_before_pdf": "Pré-visualiza ou gera um bundle antes de exportar PDF.",
+    "export_csv_done": "Relatório CSV exportado:\n{path}",
+    "export_html_done": "Relatório HTML exportado:\n{path}",
+    "export_pdf_done": "Relatório PDF exportado:\n{path}",
+    "generated_bundle_file": "Ficheiro bundle gerado",
+    "generated_bundle_paths": "Caminho(s) do bundle gerado",
+    "history_select_first": "Seleciona primeiro uma conversão.",
+    "ignored_detail": "não convertidos",
+    "import_assistant": "Assistente de importação",
+    "import_assistant_intro": "O teu bundle foi gerado. Segue estes passos no OrcaSlicer.",
+    "import_assistant_need_generate": "Gera primeiro o bundle .orca_printer.",
+    "import_into_orca": "Importar no OrcaSlicer",
+    "language_intro": "Escolhe o idioma da interface. As chaves técnicas Prusa/Orca mantêm o nome real.",
+    "mapping_intro": "Escolhe uma chave PrusaSlicer ignorada, associa-a a uma chave OrcaSlicer e volta a pré-visualizar.",
+    "next_step": "Próximo passo",
+    "open_detailed_view": "Abrir vista detalhada",
+    "open_orca_guide": "Abrir guia Orca",
+    "open_output_folder": "Abrir pasta de saída",
+    "orca_target_key": "Chave destino OrcaSlicer",
+    "output_subtitle": "não destrutivo",
+    "preview_again": "Pré-visualizar novamente",
+    "preview_header": "03 // pré-visualização",
+    "preview_subtitle": "o que será adicionado ao OrcaSlicer",
+    "remove": "Remover",
+    "risk_waiting": "Risco: à espera de pré-visualização",
+    "safe": "SEGURO",
+    "save_mapping": "Guardar mapeamento",
+    "saved_mappings": "Mapeamentos guardados",
+    "select_ignored": "Seleciona uma chave ignorada.",
+    "simple_empty": "Escolhe um bundle PrusaSlicer para obter um resumo simples da importação.",
+    "simple_summary_empty": "Escolhe um bundle para ver um resumo não técnico.",
+    "source_subtitle": "ficheiro .ini ou pasta",
+    "source_title": "01 // origem",
+    "store_as_list": "Guardar valor como lista Orca",
+    "tools_description": "Ações de suporte e manutenção. O fluxo principal fica no painel esquerdo.",
+})
+
+TRANSLATIONS["nl"].update({
+    "advanced_no_section": "Geen sectie voor dit filter.",
+    "advanced_report_empty": "Bekijk eerst een bundelvoorbeeld om het geanimeerde geavanceerde rapport te zien.",
+    "advanced_report_open_first": "Bekijk of genereer eerst een bundel voordat je het geavanceerde rapport opent.",
+    "advanced_report_title": "Geavanceerd rapport",
+    "approx_detail": "benaderde velden",
+    "bug_report": "Bugrapport",
+    "bug_report_exported": "Bugrapport gemaakt:\n{path}",
+    "bundle_files_empty": "Nog geen bundelvoorbeeld.",
+    "check_updates": "Updates controleren",
+    "choose_file_first": "Kies eerst een .ini-bestand of map.",
+    "choose_output_folder": "Uitvoermap kiezen",
+    "compat_loose": "SOEPEL",
+    "compat_strict": "STRIKT",
+    "converted_detail": "gekoppelde velden",
+    "copy_debug_info": "Debug-info kopiëren",
+    "copy_file_path": "Bestandspad kopiëren",
+    "debug_copied": "Debug-info gekopieerd naar het klembord.",
+    "drop_subtitle": "bekijk eerst een voorbeeld voordat er iets wordt geschreven",
+    "export_before_csv": "Bekijk of genereer eerst een bundel voordat je CSV exporteert.",
+    "export_before_html": "Bekijk of genereer eerst een bundel voordat je HTML exporteert.",
+    "export_before_pdf": "Bekijk of genereer eerst een bundel voordat je PDF exporteert.",
+    "export_csv_done": "CSV-rapport geëxporteerd:\n{path}",
+    "export_html_done": "HTML-rapport geëxporteerd:\n{path}",
+    "export_pdf_done": "PDF-rapport geëxporteerd:\n{path}",
+    "generated_bundle_file": "Gegenereerd bundelbestand",
+    "generated_bundle_paths": "Pad(en) van gegenereerde bundel",
+    "history_select_first": "Selecteer eerst een conversie.",
+    "ignored_detail": "niet omgezet",
+    "import_assistant": "Importassistent",
+    "import_assistant_intro": "Je bundel is gegenereerd. Volg deze stappen in OrcaSlicer.",
+    "import_assistant_need_generate": "Genereer eerst de .orca_printer-bundel.",
+    "import_into_orca": "Importeren in OrcaSlicer",
+    "language_intro": "Kies de interfacetaal. Technische Prusa/Orca-sleutels behouden hun echte naam.",
+    "mapping_intro": "Kies een genegeerde PrusaSlicer-sleutel, koppel die aan een OrcaSlicer-sleutel en bekijk opnieuw een voorbeeld.",
+    "next_step": "Volgende stap",
+    "open_detailed_view": "Detailweergave openen",
+    "open_orca_guide": "Orca-handleiding openen",
+    "open_output_folder": "Uitvoermap openen",
+    "orca_target_key": "OrcaSlicer-doelsleutel",
+    "output_subtitle": "niet-destructief",
+    "preview_again": "Opnieuw bekijken",
+    "preview_header": "03 // voorbeeld",
+    "preview_subtitle": "wat aan OrcaSlicer wordt toegevoegd",
+    "remove": "Verwijderen",
+    "risk_waiting": "Risico: wacht op voorbeeld",
+    "safe": "VEILIG",
+    "save_mapping": "Mapping opslaan",
+    "saved_mappings": "Opgeslagen mappings",
+    "select_ignored": "Selecteer een genegeerde sleutel.",
+    "simple_empty": "Kies een PrusaSlicer-bundel voor een duidelijke importsamenvatting.",
+    "simple_summary_empty": "Kies een bundel voor een niet-technische samenvatting.",
+    "source_subtitle": ".ini-bestand of map",
+    "source_title": "01 // bron",
+    "store_as_list": "Waarde opslaan als Orca-lijst",
+    "tools_description": "Support- en onderhoudsacties. De hoofdworkflow blijft links.",
+})
+
+TRANSLATIONS["pl"].update({
+    "advanced_no_section": "Brak sekcji dla tego filtra.",
+    "advanced_report_empty": "Podejrzyj pakiet, aby zobaczyć animowany raport zaawansowany.",
+    "advanced_report_open_first": "Podejrzyj lub wygeneruj pakiet przed otwarciem raportu zaawansowanego.",
+    "advanced_report_title": "Raport zaawansowany",
+    "approx_detail": "pola przybliżone",
+    "bug_report": "Raport błędu",
+    "bug_report_exported": "Raport błędu wygenerowany:\n{path}",
+    "bundle_files_empty": "Brak podglądu pakietu.",
+    "check_updates": "Sprawdź aktualizacje",
+    "choose_file_first": "Najpierw wybierz plik .ini lub folder.",
+    "choose_output_folder": "Wybierz folder wyjściowy",
+    "compat_loose": "LUŹNY",
+    "compat_strict": "ŚCISŁY",
+    "converted_detail": "zmapowane pola",
+    "copy_debug_info": "Kopiuj info debug",
+    "copy_file_path": "Kopiuj ścieżkę pliku",
+    "debug_copied": "Info debug skopiowane do schowka.",
+    "drop_subtitle": "podejrzyj, zanim cokolwiek zostanie zapisane",
+    "export_before_csv": "Podejrzyj lub wygeneruj pakiet przed eksportem CSV.",
+    "export_before_html": "Podejrzyj lub wygeneruj pakiet przed eksportem HTML.",
+    "export_before_pdf": "Podejrzyj lub wygeneruj pakiet przed eksportem PDF.",
+    "export_csv_done": "Raport CSV wyeksportowany:\n{path}",
+    "export_html_done": "Raport HTML wyeksportowany:\n{path}",
+    "export_pdf_done": "Raport PDF wyeksportowany:\n{path}",
+    "generated_bundle_file": "Wygenerowany plik pakietu",
+    "generated_bundle_paths": "Ścieżka/i wygenerowanego pakietu",
+    "history_select_first": "Najpierw wybierz konwersję.",
+    "ignored_detail": "nieprzekonwertowane",
+    "import_assistant": "Asystent importu",
+    "import_assistant_intro": "Pakiet został wygenerowany. Wykonaj te kroki w OrcaSlicer.",
+    "import_assistant_need_generate": "Najpierw wygeneruj pakiet .orca_printer.",
+    "import_into_orca": "Importuj do OrcaSlicer",
+    "language_intro": "Wybierz język interfejsu. Techniczne klucze Prusa/Orca zachowują oryginalne nazwy.",
+    "mapping_intro": "Wybierz pominięty klucz PrusaSlicer, przypisz go do klucza OrcaSlicer i uruchom podgląd ponownie.",
+    "next_step": "Następny krok",
+    "open_detailed_view": "Otwórz widok szczegółowy",
+    "open_orca_guide": "Otwórz poradnik Orca",
+    "open_output_folder": "Otwórz folder wyjściowy",
+    "orca_target_key": "Klucz docelowy OrcaSlicer",
+    "output_subtitle": "nieniszczący",
+    "preview_again": "Podgląd ponownie",
+    "preview_header": "03 // podgląd",
+    "preview_subtitle": "co zostanie dodane do OrcaSlicer",
+    "remove": "Usuń",
+    "risk_waiting": "Ryzyko: oczekiwanie na podgląd",
+    "safe": "BEZPIECZNIE",
+    "save_mapping": "Zapisz mapowanie",
+    "saved_mappings": "Zapisane mapowania",
+    "select_ignored": "Wybierz pominięty klucz.",
+    "simple_empty": "Wybierz pakiet PrusaSlicer, aby zobaczyć prosty opis importu.",
+    "simple_summary_empty": "Wybierz pakiet, aby zobaczyć nietechniczne podsumowanie.",
+    "source_subtitle": "plik .ini lub folder",
+    "source_title": "01 // źródło",
+    "store_as_list": "Zapisz wartość jako listę Orca",
+    "tools_description": "Akcje wsparcia i konserwacji. Główny przepływ zostaje w lewym panelu.",
+})
+
+TRANSLATIONS["de"].update({
+    "mapping_need_preview": "Zeige ein Bundle in der Vorschau an, bevor du ignorierte Schlüssel bearbeitest.",
+    "mapping_no_ignored": "Im aktuellen Bericht gibt es keine ignorierten Schlüssel.",
+    "mapping_need_target": "Wähle einen ignorierten Schlüssel und gib einen Orca-Zielschlüssel ein.",
+    "mapping_saved": "Mapping gespeichert. Starte die Vorschau erneut, um es anzuwenden.",
+    "bug_report_need_preview": "Zeige zuerst eine Vorschau an oder erzeuge ein Bundle, bevor du einen Fehlerbericht erstellst.",
+    "history_no_snapshot": "Dieser ältere Verlaufseintrag hat keinen gespeicherten Bericht.",
+    "reopen_report": "Bericht erneut öffnen",
+    "refresh": "Aktualisieren",
+})
+
+TRANSLATIONS["es"].update({
+    "mapping_need_preview": "Previsualiza un bundle antes de editar mapeos de claves ignoradas.",
+    "mapping_no_ignored": "No hay claves ignoradas en el informe actual.",
+    "mapping_need_target": "Selecciona una clave ignorada e introduce una clave Orca de destino.",
+    "mapping_saved": "Mapeo guardado. Vuelve a previsualizar para aplicarlo.",
+    "bug_report_need_preview": "Previsualiza o genera un bundle antes de crear un informe de error.",
+    "history_no_snapshot": "Este elemento antiguo del historial no tiene informe guardado.",
+    "reopen_report": "Reabrir informe",
+    "refresh": "Actualizar",
+})
+
+TRANSLATIONS["it"].update({
+    "mapping_need_preview": "Visualizza l'anteprima di un bundle prima di modificare i mapping delle chiavi ignorate.",
+    "mapping_no_ignored": "Nessuna chiave ignorata nel rapporto attuale.",
+    "mapping_need_target": "Seleziona una chiave ignorata e inserisci una chiave Orca di destinazione.",
+    "mapping_saved": "Mapping salvato. Rilancia l'anteprima per applicarlo.",
+    "bug_report_need_preview": "Visualizza l'anteprima o genera un bundle prima di creare una segnalazione bug.",
+    "history_no_snapshot": "Questo elemento storico non ha un rapporto salvato.",
+    "reopen_report": "Riapri rapporto",
+    "refresh": "Aggiorna",
+})
+
+TRANSLATIONS["pt"].update({
+    "mapping_need_preview": "Pré-visualiza um bundle antes de editar mapeamentos de chaves ignoradas.",
+    "mapping_no_ignored": "Não há chaves ignoradas no relatório atual.",
+    "mapping_need_target": "Seleciona uma chave ignorada e introduz uma chave Orca de destino.",
+    "mapping_saved": "Mapeamento guardado. Volta a pré-visualizar para o aplicar.",
+    "bug_report_need_preview": "Pré-visualiza ou gera um bundle antes de criar um relatório de erro.",
+    "history_no_snapshot": "Este item antigo do histórico não tem relatório guardado.",
+    "reopen_report": "Reabrir relatório",
+    "refresh": "Atualizar",
+})
+
+TRANSLATIONS["nl"].update({
+    "mapping_need_preview": "Bekijk eerst een bundelvoorbeeld voordat je mappings voor genegeerde sleutels bewerkt.",
+    "mapping_no_ignored": "Geen genegeerde sleutels in het huidige rapport.",
+    "mapping_need_target": "Selecteer een genegeerde sleutel en voer een Orca-doelsleutel in.",
+    "mapping_saved": "Mapping opgeslagen. Bekijk opnieuw een voorbeeld om dit toe te passen.",
+    "bug_report_need_preview": "Bekijk of genereer eerst een bundel voordat je een bugrapport maakt.",
+    "history_no_snapshot": "Dit oudere geschiedenisitem heeft geen opgeslagen rapport.",
+    "reopen_report": "Rapport opnieuw openen",
+    "refresh": "Vernieuwen",
+})
+
+TRANSLATIONS["pl"].update({
+    "mapping_need_preview": "Podejrzyj pakiet przed edycją mapowania pominiętych kluczy.",
+    "mapping_no_ignored": "W bieżącym raporcie nie ma pominiętych kluczy.",
+    "mapping_need_target": "Wybierz pominięty klucz i wpisz docelowy klucz Orca.",
+    "mapping_saved": "Mapowanie zapisane. Uruchom podgląd ponownie, aby je zastosować.",
+    "bug_report_need_preview": "Podejrzyj lub wygeneruj pakiet przed utworzeniem raportu błędu.",
+    "history_no_snapshot": "Ten starszy wpis historii nie ma zapisanego raportu.",
+    "reopen_report": "Otwórz raport ponownie",
+    "refresh": "Odśwież",
 })
 
 APP_BG = PANEL_BG = PANEL_TINT = INK = MUTED = LINE = ""
@@ -478,16 +908,12 @@ class PrusaToOrcaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("PrusaToOrca")
-        self.root.geometry("1120x720")
-        self.root.minsize(960, 620)
         self.theme_mode = tk.StringVar(value=load_theme_preference())
         self.language = tk.StringVar(value=load_language_preference())
         apply_theme(self.theme_mode.get())
         self.root.configure(bg=APP_BG)
-        try:
-            self.root.iconbitmap(resource_path("logo.ico"))
-        except Exception:
-            pass
+        self.apply_window_icon(self.root)
+        self.configure_main_window()
 
         self.input_path = tk.StringVar()
         self.output_path = tk.StringVar(value=str(Path.home() / "Desktop"))
@@ -526,6 +952,66 @@ class PrusaToOrcaApp:
     def tr(self, key, **kwargs):
         return translate(self.language.get(), key, **kwargs)
 
+    def apply_window_icon(self, window):
+        try:
+            window.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
+    def screen_size(self):
+        return self.root.winfo_screenwidth(), self.root.winfo_screenheight()
+
+    def fitted_window_size(self, width, height, min_width, min_height, width_ratio=0.9, height_ratio=0.88):
+        screen_w, screen_h = self.screen_size()
+        usable_w = max(720, screen_w - 80)
+        usable_h = max(520, screen_h - 100)
+        min_width = min(min_width, usable_w)
+        min_height = min(min_height, usable_h)
+        fitted_w = min(width, int(screen_w * width_ratio), usable_w)
+        fitted_h = min(height, int(screen_h * height_ratio), usable_h)
+        return max(min_width, fitted_w), max(min_height, fitted_h), min_width, min_height
+
+    def center_window(self, window, width=None, height=None, parent=None):
+        window.update_idletasks()
+        screen_w, screen_h = self.screen_size()
+        width = width or window.winfo_width() or window.winfo_reqwidth()
+        height = height or window.winfo_height() or window.winfo_reqheight()
+        if parent and parent.winfo_exists() and parent.winfo_viewable():
+            parent.update_idletasks()
+            base_x = parent.winfo_rootx()
+            base_y = parent.winfo_rooty()
+            base_w = max(parent.winfo_width(), 1)
+            base_h = max(parent.winfo_height(), 1)
+            x = base_x + (base_w - width) // 2
+            y = base_y + (base_h - height) // 2
+        else:
+            x = (screen_w - width) // 2
+            y = (screen_h - height) // 2
+        x = max(0, min(x, max(0, screen_w - width)))
+        y = max(0, min(y, max(0, screen_h - height)))
+        window.geometry(f"{int(width)}x{int(height)}+{int(x)}+{int(y)}")
+
+    def configure_main_window(self):
+        width, height, min_width, min_height = self.fitted_window_size(1180, 760, 960, 620)
+        self.root.minsize(min_width, min_height)
+        self.center_window(self.root, width, height)
+
+    def configure_child_window(self, window, title, width, height, min_width, min_height, bg=None, parent=None):
+        width, height, min_width, min_height = self.fitted_window_size(width, height, min_width, min_height)
+        window.title(title)
+        window.minsize(min_width, min_height)
+        window.configure(bg=bg or APP_BG)
+        window.resizable(True, True)
+        self.apply_window_icon(window)
+        if parent and window is not parent:
+            window.transient(parent)
+        self.center_window(window, width, height, parent or self.root)
+        return window
+
+    def make_child_window(self, title, width, height, min_width, min_height, bg=None, parent=None):
+        window = tk.Toplevel(parent or self.root)
+        return self.configure_child_window(window, title, width, height, min_width, min_height, bg=bg, parent=parent or self.root)
+
     def _build(self):
         shell = tk.Frame(self.root, bg=APP_BG, padx=22, pady=18)
         shell.pack(fill="both", expand=True)
@@ -538,8 +1024,21 @@ class PrusaToOrcaApp:
         body.grid_columnconfigure(1, weight=1)
         body.grid_rowconfigure(0, weight=1)
 
-        left = tk.Frame(body, bg=APP_BG)
-        left.grid(row=0, column=0, sticky="nsew", padx=(0, 16))
+        left_shell = tk.Frame(body, bg=APP_BG)
+        left_shell.grid(row=0, column=0, sticky="nsew", padx=(0, 16))
+        left_shell.grid_rowconfigure(0, weight=1)
+        left_shell.grid_columnconfigure(0, weight=1)
+        left_canvas = tk.Canvas(left_shell, bg=APP_BG, highlightthickness=0, width=380)
+        left_scroll = tk.Scrollbar(left_shell, orient="vertical", command=left_canvas.yview)
+        left = tk.Frame(left_canvas, bg=APP_BG)
+        left_window = left_canvas.create_window((0, 0), window=left, anchor="nw")
+        left_canvas.configure(yscrollcommand=left_scroll.set)
+        left_canvas.grid(row=0, column=0, sticky="nsew")
+        left_scroll.grid(row=0, column=1, sticky="ns")
+        left.bind("<Configure>", lambda _event: left_canvas.configure(scrollregion=left_canvas.bbox("all")))
+        left_canvas.bind("<Configure>", lambda event: left_canvas.itemconfigure(left_window, width=event.width))
+        left_canvas.bind("<Enter>", lambda _event: left_canvas.bind_all("<MouseWheel>", lambda event, canvas=left_canvas: self._on_canvas_mousewheel(canvas, event)))
+        left_canvas.bind("<Leave>", lambda _event: left_canvas.unbind_all("<MouseWheel>"))
 
         right = tk.Frame(body, bg=APP_BG)
         right.grid(row=0, column=1, sticky="nsew")
@@ -551,6 +1050,9 @@ class PrusaToOrcaApp:
         self._build_options_panel(left)
         self._build_preview_panel(right)
         self._build_report_panel(right)
+
+    def _on_canvas_mousewheel(self, canvas, event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _build_topbar(self, parent):
         top = tk.Frame(parent, bg=APP_BG)
@@ -844,15 +1346,7 @@ class PrusaToOrcaApp:
         self.rebuild_ui()
 
     def open_language_selector(self):
-        win = tk.Toplevel(self.root)
-        win.title(self.tr("language"))
-        win.geometry("520x420")
-        win.minsize(460, 360)
-        win.configure(bg=APP_BG)
-        try:
-            win.iconbitmap(resource_path("logo.ico"))
-        except Exception:
-            pass
+        win = self.make_child_window(self.tr("language"), 520, 420, 460, 360)
 
         shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
@@ -1579,16 +2073,15 @@ class PrusaToOrcaApp:
             return
 
         source = Path(self.advanced_model.get("source") or "bundle").name
-        self.advanced_window = tk.Toplevel(self.root)
-        self.advanced_window.title(f"{self.tr('advanced_report_title')} - {source}")
-        self.advanced_window.geometry("1120x720")
-        self.advanced_window.minsize(920, 600)
-        self.advanced_window.configure(bg=ADV_BG)
+        self.advanced_window = self.make_child_window(
+            f"{self.tr('advanced_report_title')} - {source}",
+            1160,
+            740,
+            920,
+            600,
+            bg=ADV_BG,
+        )
         self.advanced_window_bars = []
-        try:
-            self.advanced_window.iconbitmap(resource_path("logo.ico"))
-        except Exception:
-            pass
 
         shell = tk.Frame(self.advanced_window, bg=ADV_BG, padx=14, pady=10)
         shell.pack(fill="both", expand=True)
@@ -2173,7 +2666,7 @@ class PrusaToOrcaApp:
         else:
             next_text = "Generate the .orca_printer bundle first. The import assistant opens after generation."
         tk.Label(next_box, text=next_text, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=300, justify="left").pack(anchor="w", pady=(8, 12))
-        self._button(next_box, "Open import assistant", self.open_import_wizard, variant="primary").pack(anchor="w")
+        self._button(next_box, self.tr("import_assistant"), self.open_import_wizard, variant="primary").pack(anchor="w")
         self._button(next_box, self.tr("mapping_editor"), self.open_mapping_editor, variant="secondary").pack(anchor="w", pady=(8, 0))
 
         outputs = model.get("outputs", [])
@@ -2475,15 +2968,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         if self.import_wizard and self.import_wizard.winfo_exists():
             self.import_wizard.destroy()
 
-        self.import_wizard = tk.Toplevel(self.root)
-        self.import_wizard.title(self.tr("import_assistant"))
-        self.import_wizard.geometry("760x520")
-        self.import_wizard.minsize(680, 460)
-        self.import_wizard.configure(bg=APP_BG)
-        try:
-            self.import_wizard.iconbitmap(resource_path("logo.ico"))
-        except Exception:
-            pass
+        self.import_wizard = self.make_child_window(self.tr("import_assistant"), 780, 540, 680, 460)
 
         shell = tk.Frame(self.import_wizard, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
@@ -2567,15 +3052,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
             self.tools_window.lift()
             self.tools_window.focus_force()
             return
-        self.tools_window = tk.Toplevel(self.root)
-        self.tools_window.title("PrusaToOrca tools")
-        self.tools_window.geometry("560x420")
-        self.tools_window.minsize(500, 360)
-        self.tools_window.configure(bg=APP_BG)
-        try:
-            self.tools_window.iconbitmap(resource_path("logo.ico"))
-        except Exception:
-            pass
+        self.tools_window = self.make_child_window(self.tr("tools"), 620, 460, 500, 360)
 
         shell = tk.Frame(self.tools_window, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
@@ -2673,19 +3150,15 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def open_mapping_editor(self):
         if not self.advanced_model:
-            messagebox.showinfo(self.tr("mapping_editor"), "Preview a bundle before editing ignored-key mappings.")
+            messagebox.showinfo(self.tr("mapping_editor"), self.tr("mapping_need_preview"))
             return
         ignored_rows = self.advanced_model.get("ignored", [])
         if not ignored_rows:
-            messagebox.showinfo(self.tr("mapping_editor"), "No ignored keys in the current report.")
+            messagebox.showinfo(self.tr("mapping_editor"), self.tr("mapping_no_ignored"))
             return
 
         self.configure_tree_style()
-        win = tk.Toplevel(self.root)
-        win.title(self.tr("mapping_editor"))
-        win.geometry("1060x600")
-        win.minsize(900, 520)
-        win.configure(bg=APP_BG)
+        win = self.make_child_window(self.tr("mapping_editor"), 1080, 640, 900, 520)
 
         shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
@@ -2838,7 +3311,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
             row = current_row()
             target = target_var.get().strip()
             if not row or not target:
-                messagebox.showinfo("Mapping editor", "Select an ignored key and enter an Orca target key.")
+                messagebox.showinfo(self.tr("mapping_editor"), self.tr("mapping_need_target"))
                 return
             section_type = row["section_type"]
             self.custom_mappings.setdefault(section_type, {})[row["key"]] = {
@@ -2847,7 +3320,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
             }
             self.save_custom_mappings()
             render_saved()
-            messagebox.showinfo("Mapping editor", "Mapping saved. Run Preview again to apply it.")
+            messagebox.showinfo(self.tr("mapping_editor"), self.tr("mapping_saved"))
 
         def remove_mapping():
             row = current_row()
@@ -2880,7 +3353,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def export_bug_report(self):
         if not self.advanced_model:
-            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before generating a bug report.")
+            messagebox.showinfo("PrusaToOrca", self.tr("bug_report_need_preview"))
             return
         reports_dir = app_file("bug_reports")
         reports_dir.mkdir(exist_ok=True)
@@ -2919,11 +3392,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def open_history(self):
         self.configure_tree_style()
-        win = tk.Toplevel(self.root)
-        win.title(self.tr("history"))
-        win.geometry("1040x560")
-        win.minsize(860, 460)
-        win.configure(bg=APP_BG)
+        win = self.make_child_window(self.tr("history"), 1080, 620, 860, 460)
 
         shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
@@ -3030,7 +3499,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
                 return
             snapshot = item.get("report_snapshot")
             if not snapshot:
-                messagebox.showinfo("History", "This older history item has no saved report snapshot.")
+                messagebox.showinfo(self.tr("history"), self.tr("history_no_snapshot"))
                 return
             self.input_path.set(item.get("source", ""))
             self.output_path.set(item.get("output_folder", self.output_path.get()))
@@ -3041,9 +3510,9 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
             self.show_report_tab("Advanced report")
             self.open_advanced_report()
 
-        self._button(toolbar, "Open output folder", open_selected_output, variant="secondary").pack(side="left")
-        self._button(toolbar, "Reopen report", reopen_selected_report, variant="primary").pack(side="left", padx=(8, 0))
-        self._button(toolbar, "Refresh", render_history, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(toolbar, self.tr("open_output_folder"), open_selected_output, variant="secondary").pack(side="left")
+        self._button(toolbar, self.tr("reopen_report"), reopen_selected_report, variant="primary").pack(side="left", padx=(8, 0))
+        self._button(toolbar, self.tr("refresh"), render_history, variant="secondary").pack(side="left", padx=(8, 0))
 
         search_var.trace_add("write", render_history)
         render_history()

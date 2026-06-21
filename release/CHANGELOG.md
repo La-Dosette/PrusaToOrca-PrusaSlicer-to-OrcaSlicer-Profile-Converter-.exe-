@@ -28,3 +28,6 @@
 - Saved language preference locally in the project settings file.
 - Localized the main workflow, report tabs, advanced report controls, export messages,
   import assistant, mapping editor, tools, and conversion history labels.
+- Added shared window sizing and centering for the main app and secondary windows.
+- Added a scrollable left workflow column for smaller screen heights.
+- Completed translation key coverage for all supported languages to avoid English fallbacks.
