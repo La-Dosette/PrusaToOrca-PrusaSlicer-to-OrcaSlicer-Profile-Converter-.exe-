@@ -11,10 +11,21 @@ import tkinter as tk
 import sys
 import ctypes
 import csv
+import html
+import json
+import os
+import shutil
+import traceback
+import webbrowser
+import zipfile
+from datetime import datetime
 from pathlib import Path
 from tkinter import filedialog, messagebox
 
 from convert import ConversionLog, convert_ini_to_orca
+
+APP_VERSION = "0.2.0"
+APP_NAME = "PrusaToOrca"
 
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -68,6 +79,17 @@ def resource_path(name):
     return Path(base) / name
 
 
+def app_root():
+    if getattr(sys, "frozen", False):
+        exe_dir = Path(sys.executable).resolve().parent
+        return exe_dir.parent if exe_dir.name.lower() == "dist" else exe_dir
+    return Path(__file__).resolve().parent
+
+
+def app_file(name):
+    return app_root() / name
+
+
 def load_embedded_fonts():
     if sys.platform != "win32":
         return
@@ -107,6 +129,11 @@ class PrusaToOrcaApp:
         self.advanced_body = None
         self.advanced_sidebar = None
         self.advanced_search = None
+        self.advanced_filter = tk.StringVar(value="all")
+        self.history = self.load_history()
+        self.last_output_folder = None
+        self.risk_label = tk.StringVar(value="Risk: waiting for preview")
+        self.progress_label = tk.StringVar(value="")
         self.current_report_tab = "Summary"
         self.tab_buttons = {}
         self.quick_buttons = {}
@@ -174,6 +201,8 @@ class PrusaToOrcaApp:
             ("prefix", "PREFIX ON", self.toggle_prefix),
             ("compat", "STRICT", self.toggle_compatibility),
             ("advanced", "ADVANCED REPORT", self.open_advanced_report),
+            ("history", "HISTORY", self.open_history),
+            ("debug", "DEBUG INFO", self.copy_debug_info),
         ]:
             btn = self._top_button(quick_actions, text, command)
             btn.pack(side="left", padx=(8, 0))
@@ -257,6 +286,9 @@ class PrusaToOrcaApp:
             highlightthickness=1,
         ).pack(side="left", fill="x", expand=True, ipady=8)
         self._button(out_row, "...", self.choose_output, variant="secondary", width=4).pack(side="left", padx=(8, 0))
+        self._button(out_row, "Open", self.open_output_folder, variant="secondary", width=6).pack(side="left", padx=(8, 0))
+
+        tk.Label(panel, textvariable=self.risk_label, font=UI_FONT_BOLD, bg=PANEL_BG, fg=TEAL_DARK).pack(anchor="w", pady=(0, 12))
 
         tk.Label(panel, text="Compatibility", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
         chips = tk.Frame(panel, bg=PANEL_BG)
@@ -286,6 +318,14 @@ class PrusaToOrcaApp:
         self.preview_btn.pack(fill="x", pady=(0, 8))
         self.convert_btn = self._button(actions, "Generate .orca_printer", self.convert, variant="primary")
         self.convert_btn.pack(fill="x")
+        self.progress_canvas = tk.Canvas(actions, height=10, bg=PANEL_TINT, highlightthickness=1, highlightbackground=LINE)
+        self.progress_canvas.pack(fill="x", pady=(10, 4))
+        self.progress_fill = self.progress_canvas.create_rectangle(0, 0, 0, 10, fill=TEAL, outline="")
+        tk.Label(actions, textvariable=self.progress_label, font=UI_FONT, bg=APP_BG, fg=MUTED).pack(anchor="w")
+        aux = tk.Frame(actions, bg=APP_BG)
+        aux.pack(fill="x", pady=(8, 0))
+        self._button(aux, "Bug report", self.export_bug_report, variant="secondary").pack(side="left")
+        self._button(aux, "Guide", self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
 
     def _build_preview_panel(self, parent):
         header = tk.Frame(parent, bg=APP_BG)
@@ -329,6 +369,8 @@ class PrusaToOrcaApp:
             self.tab_buttons[text] = btn
         self.export_btn = self._button(tabs, "Export CSV", self.export_csv, variant="secondary")
         self.export_btn.pack(side="right", padx=(8, 0))
+        self._button(tabs, "HTML", self.export_html, variant="secondary").pack(side="right", padx=(8, 0))
+        self._button(tabs, "PDF", self.export_pdf, variant="secondary").pack(side="right", padx=(8, 0))
 
         self.report = tk.Text(
             frame,
@@ -531,13 +573,17 @@ class PrusaToOrcaApp:
             messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
             return
         self.set_busy(True)
+        self.set_progress(0, "Preview started")
         threading.Thread(target=self._preview_worker, daemon=True).start()
 
     def _preview_worker(self):
         try:
             previews = []
             used_outputs = set()
-            for ini_path in self.source_files():
+            files = self.source_files()
+            total_files = len(files)
+            for position, ini_path in enumerate(files, 1):
+                self.root.after(0, lambda p=position, t=total_files: self.set_progress((p - 1) / max(t, 1), f"Preview {p}/{t}"))
                 log = ConversionLog()
                 preview = convert_ini_to_orca(
                     ini_path,
@@ -555,8 +601,10 @@ class PrusaToOrcaApp:
             views, rows, advanced_model = self.build_report_views(previews, done=False)
             self.last_preview = previews
             self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
+            self.root.after(0, lambda: self.set_progress(1, f"Preview ready: {len(previews)} bundle(s)"))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Preview failed", str(exc)))
+            self.root.after(0, lambda: self.set_progress(0, "Preview failed"))
         finally:
             self.root.after(0, lambda: self.set_busy(False))
 
@@ -565,13 +613,17 @@ class PrusaToOrcaApp:
             messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
             return
         self.set_busy(True)
+        self.set_progress(0, "Generation started")
         threading.Thread(target=self._convert_worker, daemon=True).start()
 
     def _convert_worker(self):
         try:
             results = []
             used_outputs = set()
-            for ini_path in self.source_files():
+            files = self.source_files()
+            total_files = len(files)
+            for position, ini_path in enumerate(files, 1):
+                self.root.after(0, lambda p=position, t=total_files: self.set_progress((p - 1) / max(t, 1), f"Generate {p}/{t}"))
                 dry_log = ConversionLog()
                 preview = convert_ini_to_orca(
                     ini_path,
@@ -598,10 +650,14 @@ class PrusaToOrcaApp:
                 raise FileNotFoundError("No .ini files found in the selected folder.")
             views, rows, advanced_model = self.build_report_views(results, done=True)
             self.last_preview = results
+            self.last_output_folder = self.output_path.get()
             self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
+            self.root.after(0, lambda: self.record_history(results, advanced_model))
+            self.root.after(0, lambda: self.set_progress(1, f"Generated {len(results)} bundle(s)"))
             self.root.after(0, lambda: messagebox.showinfo("Done", f"Generated {len(results)} bundle(s)."))
         except Exception as exc:
             self.root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
+            self.root.after(0, lambda: self.set_progress(0, "Generation failed"))
         finally:
             self.root.after(0, lambda: self.set_busy(False))
 
@@ -620,6 +676,81 @@ class PrusaToOrcaApp:
             index += 1
         used_outputs.add(str(candidate).lower())
         return candidate
+
+    def existing_orca_names(self):
+        roots = []
+        appdata = os.environ.get("APPDATA")
+        if appdata:
+            roots.extend(
+                [
+                    Path(appdata) / "OrcaSlicer" / "user",
+                    Path(appdata) / "OrcaSlicer" / "system",
+                ]
+            )
+        names = set()
+        for root in roots:
+            if not root.exists():
+                continue
+            for path in root.rglob("*"):
+                if path.is_file() and path.suffix.lower() in {".json", ".ini"}:
+                    names.add(path.stem.lower())
+        return names
+
+    def assess_risk(self, entries):
+        existing = self.existing_orca_names()
+        generated = []
+        for preview, _log in entries:
+            for data in preview.get("files", {}).values():
+                name = data.get("name") if isinstance(data, dict) else None
+                if name:
+                    generated.append(str(name))
+        collisions = sorted({name for name in generated if name.lower() in existing})
+        if collisions:
+            return {
+                "level": "HIGH",
+                "message": f"Risk: HIGH - {len(collisions)} possible Orca name collision(s)",
+                "collisions": collisions,
+            }
+        if not self.prefix_profiles.get():
+            return {"level": "MEDIUM", "message": "Risk: MEDIUM - prefix disabled", "collisions": []}
+        return {"level": "LOW", "message": "Risk: LOW - no Orca name collisions detected", "collisions": []}
+
+    def set_progress(self, fraction, message=""):
+        fraction = max(0, min(1, float(fraction)))
+        if hasattr(self, "progress_canvas"):
+            width = max(self.progress_canvas.winfo_width(), 1)
+            self.progress_canvas.coords(self.progress_fill, 0, 0, int(width * fraction), 10)
+        self.progress_label.set(message)
+
+    def history_path(self):
+        return app_file("conversion_history.json")
+
+    def load_history(self):
+        path = self.history_path()
+        if not path.exists():
+            return []
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+
+    def save_history(self):
+        path = self.history_path()
+        path.write_text(json.dumps(self.history[-100:], indent=2, ensure_ascii=False), encoding="utf-8")
+
+    def record_history(self, results, model):
+        item = {
+            "date": datetime.now().isoformat(timespec="seconds"),
+            "source": self.input_path.get(),
+            "output_folder": self.output_path.get(),
+            "bundles": len(results),
+            "risk": model.get("risk", {}).get("level", "UNKNOWN"),
+            "converted": model["totals"]["converted"],
+            "approx": model["totals"]["approx"],
+            "ignored": model["totals"]["ignored"],
+        }
+        self.history.append(item)
+        self.save_history()
 
     def build_report_views(self, entries, done=False):
         total_printers = total_filaments = total_processes = 0
@@ -658,6 +789,21 @@ class PrusaToOrcaApp:
             "ignored": [],
             "warnings": [],
         }
+        risk = self.assess_risk(entries)
+        advanced_model["risk"] = risk
+        self.root.after(0, lambda msg=risk["message"]: self.risk_label.set(msg))
+        summary.extend(
+            [
+                "",
+                "User summary:",
+                f"  Risk level: {risk['level']}",
+                f"  Converted fields: {total_mapped}",
+                f"  Approximate fields: {total_approx}",
+                f"  Ignored fields: {total_ignored}",
+            ]
+        )
+        if risk["collisions"]:
+            summary.append(f"  Possible name collisions: {len(risk['collisions'])}")
         advanced_lines.extend(
             [
                 f"{STAR} {total_mapped} converted    {TRIANGLE} {total_approx} approximate    {CROSS} {total_ignored} ignored",
@@ -940,6 +1086,27 @@ class PrusaToOrcaApp:
         )
         search.grid(row=0, column=1, sticky="ew")
         self.advanced_search.trace_add("write", lambda *_args: self._advanced_render_summary())
+        filters = tk.Frame(search_row, bg=ADV_BG)
+        filters.grid(row=0, column=2, sticky="e", padx=(10, 0))
+        for label, value in [("Tous", "all"), ("Convertis", "mapped"), ("Approx", "approx"), ("Ignor\u00e9s", "ignored")]:
+            tk.Radiobutton(
+                filters,
+                text=label,
+                value=value,
+                variable=self.advanced_filter,
+                indicatoron=False,
+                command=self._advanced_render_summary,
+                font=ADV_FONT_BOLD,
+                bg=ADV_PANEL_ALT,
+                fg=ADV_TEXT,
+                selectcolor=TEAL,
+                activebackground=TEAL,
+                activeforeground=PANEL_BG,
+                padx=7,
+                pady=3,
+                relief="flat",
+                borderwidth=0,
+            ).pack(side="left", padx=(0, 4))
 
         content = tk.Frame(main, bg=ADV_PANEL, highlightbackground=ADV_LINE, highlightthickness=1)
         content.grid(row=1, column=0, sticky="nsew")
@@ -990,6 +1157,40 @@ class PrusaToOrcaApp:
             pady=7,
             cursor="hand2",
         ).pack(side="left")
+        tk.Button(
+            footer,
+            text="HTML",
+            command=self.export_html,
+            font=ADV_FONT_BOLD,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=TEAL,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            highlightbackground=LINE,
+            highlightthickness=1,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+        ).pack(side="left", padx=(8, 0))
+        tk.Button(
+            footer,
+            text="PDF",
+            command=self.export_pdf,
+            font=ADV_FONT_BOLD,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=TEAL,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            highlightbackground=LINE,
+            highlightthickness=1,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+        ).pack(side="left", padx=(8, 0))
 
         self._advanced_render_sidebar()
         self._advanced_render_summary()
@@ -1054,7 +1255,14 @@ class PrusaToOrcaApp:
 
     def _advanced_filter_sections(self):
         query = self._advanced_query()
+        mode = self.advanced_filter.get()
         sections = self.advanced_model.get("sections", [])
+        if mode == "approx":
+            sections = [section for section in sections if section["approx"]]
+        elif mode == "ignored":
+            sections = [section for section in sections if section["ignored"]]
+        elif mode == "mapped":
+            sections = [section for section in sections if section["converted"]]
         if not query:
             return sections
         filtered = []
@@ -1140,7 +1348,10 @@ class PrusaToOrcaApp:
             return
         self._advanced_clear(self.advanced_body)
         self._advanced_table_header(["Cl\u00e9 PrusaSlicer", "Cl\u00e9 OrcaSlicer", "Valeur", "Statut"])
+        mode = self.advanced_filter.get()
         for prusa_key, orca_key, value, note, approx in section["mapped"]:
+            if mode == "ignored" or (mode == "approx" and not approx):
+                continue
             if approx:
                 status = f"{TRIANGLE} approx"
                 if note:
@@ -1151,6 +1362,8 @@ class PrusaToOrcaApp:
                     status += f" {note}"
             self._advanced_table_row([prusa_key, orca_key, value, status], approx=approx, status_index=3)
         for prusa_key, value in section["skipped"]:
+            if mode in {"mapped", "approx"}:
+                continue
             self._advanced_table_row([prusa_key, "-", value, f"{CROSS} ignor\u00e9"], ignored=True, status_index=3)
 
     def _advanced_render_ignored(self):
@@ -1290,6 +1503,170 @@ class PrusaToOrcaApp:
             writer.writeheader()
             writer.writerows(self.report_rows)
         messagebox.showinfo("PrusaToOrca", f"CSV report exported:\n{path}")
+
+    def export_html(self):
+        if not self.advanced_model:
+            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting HTML.")
+            return
+        path = filedialog.asksaveasfilename(
+            title="Export HTML report",
+            defaultextension=".html",
+            filetypes=[("HTML report", "*.html"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        Path(path).write_text(self.render_html_report(), encoding="utf-8")
+        messagebox.showinfo("PrusaToOrca", f"HTML report exported:\n{path}")
+
+    def export_pdf(self):
+        if not self.advanced_model:
+            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting PDF.")
+            return
+        path = filedialog.asksaveasfilename(
+            title="Export PDF report",
+            defaultextension=".pdf",
+            filetypes=[("PDF report", "*.pdf"), ("All files", "*.*")],
+        )
+        if not path:
+            return
+        self.write_simple_pdf(path, self.report_views.get("Advanced report", "No report."))
+        messagebox.showinfo("PrusaToOrca", f"PDF report exported:\n{path}")
+
+    def render_html_report(self):
+        model = self.advanced_model
+        risk = model.get("risk", {})
+        rows = []
+        for row in self.report_rows:
+            if row["status"] == "summary":
+                continue
+            rows.append(
+                "<tr>"
+                f"<td>{html.escape(row['section_type'])}</td>"
+                f"<td>{html.escape(row['section_name'])}</td>"
+                f"<td>{html.escape(row['status'])}</td>"
+                f"<td>{html.escape(row['prusa_key'])}</td>"
+                f"<td>{html.escape(row['orca_key'])}</td>"
+                f"<td>{html.escape(row['value'])}</td>"
+                f"<td>{html.escape(row['note'])}</td>"
+                "</tr>"
+            )
+        return f"""<!doctype html>
+<html><head><meta charset="utf-8"><title>PrusaToOrca report</title>
+<style>
+body{{font-family:Segoe UI,Arial,sans-serif;background:#f3f0e9;color:#2b2825;margin:28px}}
+h1{{font-size:26px}} .bar{{height:6px;background:#009aa6;margin:18px 0}}
+.stats span{{display:inline-block;border:1px solid #2b2825;padding:8px 10px;margin-right:8px;background:#ece6da}}
+table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px solid #2b2825;padding:6px;text-align:left}} th{{background:#ece6da}}
+</style></head><body>
+<h1>PrusaToOrca conversion report</h1><div class="bar"></div>
+<p><b>Source:</b> {html.escape(model.get('source',''))}</p>
+<p><b>Output:</b> {html.escape(model.get('output',''))}</p>
+<p><b>Risk:</b> {html.escape(risk.get('level','UNKNOWN'))} - {html.escape(risk.get('message',''))}</p>
+<div class="stats"><span>{STAR} {model['totals']['converted']} converted</span><span>{TRIANGLE} {model['totals']['approx']} approx</span><span>{CROSS} {model['totals']['ignored']} ignored</span></div>
+<h2>Details</h2><table><thead><tr><th>Type</th><th>Section</th><th>Status</th><th>Prusa key</th><th>Orca key</th><th>Value</th><th>Note</th></tr></thead><tbody>
+{''.join(rows)}
+</tbody></table></body></html>"""
+
+    def write_simple_pdf(self, path, text):
+        lines = ["PrusaToOrca report", f"Version {APP_VERSION}", ""] + text.splitlines()
+        lines = [line[:100] for line in lines[:55]]
+        stream_lines = ["BT", "/F1 10 Tf", "50 790 Td"]
+        for index, line in enumerate(lines):
+            safe = line.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+            if index:
+                stream_lines.append("0 -13 Td")
+            stream_lines.append(f"({safe}) Tj")
+        stream_lines.append("ET")
+        stream = "\n".join(stream_lines).encode("latin-1", errors="replace")
+        objects = [
+            b"<< /Type /Catalog /Pages 2 0 R >>",
+            b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>",
+            b"<< /Length " + str(len(stream)).encode() + b" >>\nstream\n" + stream + b"\nendstream",
+        ]
+        pdf = bytearray(b"%PDF-1.4\n")
+        offsets = []
+        for number, obj in enumerate(objects, 1):
+            offsets.append(len(pdf))
+            pdf.extend(f"{number} 0 obj\n".encode() + obj + b"\nendobj\n")
+        xref = len(pdf)
+        pdf.extend(f"xref\n0 {len(objects)+1}\n0000000000 65535 f \n".encode())
+        for offset in offsets:
+            pdf.extend(f"{offset:010d} 00000 n \n".encode())
+        pdf.extend(f"trailer << /Size {len(objects)+1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n".encode())
+        Path(path).write_bytes(pdf)
+
+    def open_output_folder(self):
+        target = Path(self.last_output_folder or self.output_path.get())
+        target.mkdir(parents=True, exist_ok=True)
+        os.startfile(str(target))
+
+    def open_orca_guide(self):
+        webbrowser.open("https://github.com/SoftFever/OrcaSlicer/wiki")
+
+    def anonymize_path(self, value):
+        text = str(value)
+        home = str(Path.home())
+        return text.replace(home, "<USER_HOME>")
+
+    def export_bug_report(self):
+        if not self.advanced_model:
+            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before generating a bug report.")
+            return
+        reports_dir = app_file("bug_reports")
+        reports_dir.mkdir(exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        target = reports_dir / f"PrusaToOrca-bug-report-{stamp}.zip"
+        payload = {
+            "app": APP_NAME,
+            "version": APP_VERSION,
+            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "source": self.anonymize_path(self.input_path.get()),
+            "output": self.anonymize_path(self.output_path.get()),
+            "risk": self.advanced_model.get("risk", {}),
+            "totals": self.advanced_model.get("totals", {}),
+            "rows": [
+                {key: self.anonymize_path(value) if key in {"source", "value"} else value for key, value in row.items()}
+                for row in self.report_rows
+            ],
+        }
+        with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("report.json", json.dumps(payload, indent=2, ensure_ascii=False))
+            zf.writestr("advanced_report.txt", self.report_views.get("Advanced report", ""))
+        messagebox.showinfo("PrusaToOrca", f"Bug report generated:\n{target}")
+
+    def copy_debug_info(self):
+        info = (
+            f"{APP_NAME} {APP_VERSION}\n"
+            f"root={app_root()}\n"
+            f"python={sys.version.split()[0]}\n"
+            f"source={self.input_path.get()}\n"
+            f"output={self.output_path.get()}\n"
+            f"risk={self.advanced_model.get('risk', {}).get('level', 'N/A') if self.advanced_model else 'N/A'}"
+        )
+        self.root.clipboard_clear()
+        self.root.clipboard_append(info)
+        messagebox.showinfo("PrusaToOrca", "Debug info copied to clipboard.")
+
+    def open_history(self):
+        win = tk.Toplevel(self.root)
+        win.title("Conversion history")
+        win.geometry("780x420")
+        win.configure(bg=PANEL_BG)
+        text = tk.Text(win, bg=PANEL_BG, fg=INK, font=UI_FONT, wrap="none", padx=14, pady=14)
+        text.pack(fill="both", expand=True)
+        if not self.history:
+            text.insert("end", "No conversion history yet.\n")
+        else:
+            for item in reversed(self.history[-50:]):
+                text.insert(
+                    "end",
+                    f"{item['date']} | risk={item['risk']} | bundles={item['bundles']} | "
+                    f"converted={item['converted']} approx={item['approx']} ignored={item['ignored']}\n"
+                    f"  source: {item['source']}\n  output: {item['output_folder']}\n\n",
+                )
+        text.configure(state="disabled")
 
     def write_report(self, text):
         self.report.configure(state="normal")
