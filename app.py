@@ -46,13 +46,16 @@ TRIANGLE = "\u25b3"
 CROSS = "\u00d7"
 CHECK = "\u2611"
 
-ADV_BG = "#0f0d1d"
-ADV_PANEL = "#191730"
-ADV_PANEL_ALT = "#22203e"
-ADV_LINE = "#343154"
-ADV_TEXT = "#f6f2ff"
-ADV_MUTED = "#aaa3c9"
-ADV_GREEN = "#00e08a"
+ADV_BG = APP_BG
+ADV_PANEL = PANEL_BG
+ADV_PANEL_ALT = PANEL_TINT
+ADV_LINE = INK
+ADV_TEXT = INK
+ADV_MUTED = MUTED
+ADV_GREEN = TEAL_DARK
+ADV_RED = RED_ORANGE
+ADV_BLUE = TEAL
+ADV_PROGRESS_BG = "#d8d2ca"
 ADV_FONT = ("Segoe UI", 9)
 ADV_FONT_BOLD = ("Segoe UI", 9, "bold")
 ADV_TITLE_FONT = ("Segoe UI", 15, "bold")
@@ -885,9 +888,9 @@ class PrusaToOrcaApp:
         stats = tk.Frame(header, bg=ADV_BG)
         stats.grid(row=0, column=2, sticky="e")
         totals = self.advanced_model["totals"]
-        self._advanced_stat(stats, f"{CROSS} {totals['ignored']} ignor\u00e9s", "#ff4b4b")
+        self._advanced_stat(stats, f"{CROSS} {totals['ignored']} ignor\u00e9s", ADV_RED)
         self._advanced_stat(stats, f"{TRIANGLE} {totals['approx']} approx", ORANGE)
-        self._advanced_stat(stats, f"{STAR} {totals['converted']} convertis", "#00e08a")
+        self._advanced_stat(stats, f"{STAR} {totals['converted']} convertis", ADV_GREEN)
 
         sidebar_shell = tk.Frame(shell, bg=ADV_PANEL, highlightbackground=ADV_LINE, highlightthickness=1)
         sidebar_shell.grid(row=1, column=0, sticky="nsew", padx=(0, 12))
@@ -977,10 +980,10 @@ class PrusaToOrcaApp:
             text="Exporter CSV",
             command=self.export_csv,
             font=ADV_FONT_BOLD,
-            bg="#6c5cff",
-            fg=ADV_TEXT,
-            activebackground=TEAL,
-            activeforeground=ADV_TEXT,
+            bg=ORANGE,
+            fg=PANEL_BG,
+            activebackground=RED_ORANGE,
+            activeforeground=PANEL_BG,
             relief="flat",
             borderwidth=0,
             padx=14,
@@ -1111,14 +1114,14 @@ class PrusaToOrcaApp:
         stats = tk.Frame(top, bg=ADV_PANEL_ALT)
         stats.grid(row=0, column=1, sticky="e")
         for text, color in [
-            (f"{STAR} {section['converted']}", "#00e08a"),
+            (f"{STAR} {section['converted']}", ADV_GREEN),
             (f"{TRIANGLE} {section['approx']}", ORANGE),
-            (f"{CROSS} {section['ignored']}", "#ff4b4b"),
-            (f"{section['coverage']}% couverture", "#7d75ff"),
+            (f"{CROSS} {section['ignored']}", ADV_RED),
+            (f"{section['coverage']}% couverture", ADV_BLUE),
         ]:
             tk.Label(stats, text=text, font=ADV_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=6).pack(side="left")
 
-        bar = tk.Frame(card, bg="#2f2c4d", height=7)
+        bar = tk.Frame(card, bg=ADV_PROGRESS_BG, height=7)
         bar.grid(row=1, column=0, sticky="ew", pady=(9, 0))
         bar.grid_propagate(False)
         fill = tk.Frame(bar, bg=TEAL)
@@ -1217,8 +1220,8 @@ class PrusaToOrcaApp:
             ).grid(row=0, column=index, sticky="ew")
 
     def _advanced_table_row(self, columns, approx=False, ignored=False, status_index=None):
-        row_bg = "#111021" if ignored else "#141326"
-        status_color = "#ff4b4b" if ignored else ORANGE if approx else ADV_GREEN
+        row_bg = PANEL_TINT if ignored else PANEL_BG
+        status_color = ADV_RED if ignored else ORANGE if approx else ADV_GREEN
         row = tk.Frame(self.advanced_body, bg=row_bg)
         row.pack(fill="x")
         weights = [3, 3, 2, 2]
