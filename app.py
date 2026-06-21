@@ -44,6 +44,7 @@ SECTION_FONT = ("Space Mono", 12, "bold")
 STAR = "\u2605"
 TRIANGLE = "\u25b3"
 CROSS = "\u00d7"
+CHECK = "\u2611"
 
 ADV_BG = "#0f0d1d"
 ADV_PANEL = "#191730"
@@ -51,6 +52,7 @@ ADV_PANEL_ALT = "#22203e"
 ADV_LINE = "#343154"
 ADV_TEXT = "#f6f2ff"
 ADV_MUTED = "#aaa3c9"
+ADV_GREEN = "#00e08a"
 
 
 def resource_path(name):
@@ -1153,14 +1155,19 @@ class PrusaToOrcaApp:
         ]:
             tk.Label(stats, text=text, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=10, pady=6).pack(side="left", padx=(0, 8))
 
-        self._advanced_table_header(["status", "PrusaSlicer", "OrcaSlicer", "value / note"])
+        self._advanced_table_header(["Cl\u00e9 PrusaSlicer", "Cl\u00e9 OrcaSlicer", "Valeur", "Statut"])
         for prusa_key, orca_key, value, note, approx in section["mapped"]:
-            marker = TRIANGLE if approx else STAR
-            status = f"{marker} approx" if approx else f"{STAR} ok"
-            detail = value + (f" / {note}" if note else "")
-            self._advanced_table_row([status, prusa_key, orca_key, detail], approx=approx)
+            if approx:
+                status = f"{TRIANGLE} approx"
+                if note:
+                    status += f" {note}"
+            else:
+                status = f"{CHECK} exact"
+                if note:
+                    status += f" {note}"
+            self._advanced_table_row([prusa_key, orca_key, value, status], approx=approx, status_index=3)
         for prusa_key, value in section["skipped"]:
-            self._advanced_table_row([f"{CROSS} ignor\u00e9", prusa_key, "-", value], ignored=True)
+            self._advanced_table_row([prusa_key, "-", value, f"{CROSS} ignor\u00e9"], ignored=True, status_index=3)
 
     def _advanced_render_ignored(self):
         if not self.advanced_body:
@@ -1199,7 +1206,7 @@ class PrusaToOrcaApp:
                 fg=ADV_MUTED,
             ).pack(anchor="w")
             return
-        self._advanced_table_header(["bundle", "section", "PrusaSlicer key", "value"])
+        self._advanced_table_header(["Bundle", "Section", "Cl\u00e9 PrusaSlicer", "Valeur"])
         for row in ignored:
             self._advanced_table_row(
                 [
@@ -1212,42 +1219,44 @@ class PrusaToOrcaApp:
             )
 
     def _advanced_table_header(self, columns):
-        row = tk.Frame(self.advanced_body, bg=ADV_BG)
+        row = tk.Frame(self.advanced_body, bg=ADV_PANEL_ALT)
         row.pack(fill="x", pady=(0, 2))
-        widths = [15, 28, 28, 44]
+        weights = [3, 3, 2, 2]
         for index, text in enumerate(columns):
+            row.grid_columnconfigure(index, weight=weights[index] if index < len(weights) else 1, uniform="advanced_table")
             tk.Label(
                 row,
                 text=text,
                 font=UI_FONT_BOLD,
-                bg=ADV_BG,
-                fg=ADV_TEXT,
+                bg=ADV_PANEL_ALT,
+                fg=ADV_MUTED,
                 anchor="w",
                 padx=8,
                 pady=7,
-                width=widths[index] if index < len(widths) else 20,
-            ).pack(side="left", fill="x", expand=index == len(columns) - 1)
+            ).grid(row=0, column=index, sticky="ew")
 
-    def _advanced_table_row(self, columns, approx=False, ignored=False):
-        row_bg = "#17152a" if ignored else ADV_PANEL_ALT
-        status_color = "#ff4b4b" if ignored else ORANGE if approx else "#00e08a"
-        row = tk.Frame(self.advanced_body, bg=row_bg, highlightbackground=ADV_LINE, highlightthickness=1)
-        row.pack(fill="x", pady=(0, 2))
-        widths = [15, 28, 28, 44]
+    def _advanced_table_row(self, columns, approx=False, ignored=False, status_index=None):
+        row_bg = "#111021" if ignored else "#141326"
+        status_color = "#ff4b4b" if ignored else ORANGE if approx else ADV_GREEN
+        row = tk.Frame(self.advanced_body, bg=row_bg)
+        row.pack(fill="x")
+        weights = [3, 3, 2, 2]
+        if status_index is None:
+            status_index = len(columns) - 1
         for index, text in enumerate(columns):
+            row.grid_columnconfigure(index, weight=weights[index] if index < len(weights) else 1, uniform="advanced_table")
             tk.Label(
                 row,
                 text=str(text),
                 font=UI_FONT,
                 bg=row_bg,
-                fg=status_color if index == 0 else ADV_TEXT if not ignored else ADV_MUTED,
+                fg=status_color,
                 anchor="w",
                 padx=8,
                 pady=6,
-                width=widths[index] if index < len(widths) else 20,
-                wraplength=420 if index == len(columns) - 1 else 240,
+                wraplength=520 if index == status_index else 340,
                 justify="left",
-            ).pack(side="left", fill="x", expand=index == len(columns) - 1)
+            ).grid(row=0, column=index, sticky="ew")
 
     def set_report_views(self, views, rows, advanced_model=None):
         self.report_views = views
