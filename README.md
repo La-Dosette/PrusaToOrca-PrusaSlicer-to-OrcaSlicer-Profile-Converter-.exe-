@@ -65,6 +65,22 @@ with existing OrcaSlicer presets.
 
 ## Build A Windows Executable
 
+The easiest way on Windows is:
+
+```powershell
+$env:PYTHON="C:\Path\To\python.exe"
+.\build_exe.ps1
+```
+
+The script installs nothing by itself. Install runtime and build dependencies
+first:
+
+```bash
+pip install -r requirements.txt pyinstaller
+```
+
+Or run PyInstaller manually:
+
 ```bash
 pyinstaller --onefile --windowed --name "PrusaToOrca" --icon "logo.ico" --add-data "convert.py;." --add-data "logo.png;." --add-data "logo.ico;." app.py
 ```
