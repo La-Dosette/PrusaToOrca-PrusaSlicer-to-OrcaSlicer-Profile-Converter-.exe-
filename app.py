@@ -53,6 +53,11 @@ ADV_LINE = "#343154"
 ADV_TEXT = "#f6f2ff"
 ADV_MUTED = "#aaa3c9"
 ADV_GREEN = "#00e08a"
+ADV_FONT = ("Segoe UI", 9)
+ADV_FONT_BOLD = ("Segoe UI", 9, "bold")
+ADV_TITLE_FONT = ("Segoe UI", 15, "bold")
+ADV_SECTION_FONT = ("Segoe UI", 12, "bold")
+ADV_TABLE_FONT = ("Consolas", 8)
 
 
 def resource_path(name):
@@ -861,18 +866,18 @@ class PrusaToOrcaApp:
         except Exception:
             pass
 
-        shell = tk.Frame(self.advanced_window, bg=ADV_BG, padx=16, pady=14)
+        shell = tk.Frame(self.advanced_window, bg=ADV_BG, padx=14, pady=10)
         shell.pack(fill="both", expand=True)
         shell.grid_columnconfigure(1, weight=1)
         shell.grid_rowconfigure(1, weight=1)
 
         header = tk.Frame(shell, bg=ADV_BG)
-        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 12))
+        header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         header.grid_columnconfigure(1, weight=1)
         tk.Label(
             header,
-            text="Rapport avanc\u00e9",
-            font=("Archivo Black", 18),
+            text="\u2315  Rapport avanc\u00e9",
+            font=ADV_TITLE_FONT,
             bg=ADV_BG,
             fg=ADV_TEXT,
         ).grid(row=0, column=0, sticky="w")
@@ -890,13 +895,13 @@ class PrusaToOrcaApp:
         tk.Label(
             sidebar_shell,
             text="Sections",
-            font=UI_FONT_BOLD,
+            font=ADV_FONT_BOLD,
             bg=ADV_PANEL,
             fg=ADV_MUTED,
-            pady=10,
+            pady=8,
         ).grid(row=0, column=0, sticky="ew")
 
-        side_canvas = tk.Canvas(sidebar_shell, bg=ADV_PANEL, highlightthickness=0, width=230)
+        side_canvas = tk.Canvas(sidebar_shell, bg=ADV_PANEL, highlightthickness=0, width=208)
         side_scroll = tk.Scrollbar(sidebar_shell, orient="vertical", command=side_canvas.yview)
         self.advanced_sidebar = tk.Frame(side_canvas, bg=ADV_PANEL)
         side_window = side_canvas.create_window((0, 0), window=self.advanced_sidebar, anchor="nw")
@@ -915,14 +920,14 @@ class PrusaToOrcaApp:
         main.grid_rowconfigure(1, weight=1)
 
         search_row = tk.Frame(main, bg=ADV_BG)
-        search_row.grid(row=0, column=0, sticky="ew", pady=(0, 10))
+        search_row.grid(row=0, column=0, sticky="ew", pady=(0, 9))
         search_row.grid_columnconfigure(1, weight=1)
-        tk.Label(search_row, text="Search", font=UI_FONT_BOLD, bg=ADV_BG, fg=ADV_MUTED).grid(row=0, column=0, padx=(0, 8))
+        tk.Label(search_row, text="\U0001f50e", font=ADV_FONT, bg=ADV_BG, fg=ADV_MUTED).grid(row=0, column=0, padx=(0, 8))
         self.advanced_search = tk.StringVar()
         search = tk.Entry(
             search_row,
             textvariable=self.advanced_search,
-            font=UI_FONT,
+            font=ADV_FONT,
             bg=ADV_PANEL_ALT,
             fg=ADV_TEXT,
             insertbackground=ADV_TEXT,
@@ -939,7 +944,7 @@ class PrusaToOrcaApp:
         content.grid_rowconfigure(0, weight=1)
         canvas = tk.Canvas(content, bg=ADV_PANEL, highlightthickness=0)
         scrollbar = tk.Scrollbar(content, orient="vertical", command=canvas.yview)
-        self.advanced_body = tk.Frame(canvas, bg=ADV_PANEL, padx=16, pady=16)
+        self.advanced_body = tk.Frame(canvas, bg=ADV_PANEL, padx=12, pady=11)
         body_window = canvas.create_window((0, 0), window=self.advanced_body, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.grid(row=0, column=0, sticky="nsew")
@@ -956,30 +961,30 @@ class PrusaToOrcaApp:
             footer,
             text="Fermer",
             command=self.advanced_window.destroy,
-            font=UI_FONT,
+            font=ADV_FONT,
             bg=ADV_BG,
             fg=ADV_MUTED,
             activebackground=ADV_PANEL_ALT,
             activeforeground=ADV_TEXT,
             relief="flat",
             borderwidth=0,
-            padx=16,
-            pady=8,
+            padx=14,
+            pady=6,
             cursor="hand2",
         ).pack(side="left", padx=(0, 8))
         tk.Button(
             footer,
             text="Exporter CSV",
             command=self.export_csv,
-            font=UI_FONT_BOLD,
+            font=ADV_FONT_BOLD,
             bg="#6c5cff",
             fg=ADV_TEXT,
             activebackground=TEAL,
             activeforeground=ADV_TEXT,
             relief="flat",
             borderwidth=0,
-            padx=16,
-            pady=8,
+            padx=14,
+            pady=7,
             cursor="hand2",
         ).pack(side="left")
 
@@ -990,11 +995,11 @@ class PrusaToOrcaApp:
         tk.Label(
             parent,
             text=text,
-            font=UI_FONT_BOLD,
+            font=ADV_FONT_BOLD,
             bg=ADV_PANEL_ALT,
             fg=color,
-            padx=12,
-            pady=7,
+            padx=9,
+            pady=4,
         ).pack(side="left", padx=(8, 0))
 
     def _advanced_icon(self, section_type):
@@ -1024,7 +1029,7 @@ class PrusaToOrcaApp:
             self.advanced_sidebar,
             text=text,
             command=command,
-            font=UI_FONT_BOLD if active else UI_FONT,
+            font=ADV_FONT_BOLD if active else ADV_FONT,
             bg=ADV_PANEL_ALT if active else ADV_PANEL,
             fg=ADV_TEXT,
             activebackground=ADV_PANEL_ALT,
@@ -1032,9 +1037,9 @@ class PrusaToOrcaApp:
             relief="flat",
             borderwidth=0,
             anchor="w",
-            padx=12,
-            pady=8,
-            wraplength=190,
+            padx=11,
+            pady=7,
+            wraplength=174,
             cursor="hand2",
         )
         btn.pack(fill="x")
@@ -1075,7 +1080,7 @@ class PrusaToOrcaApp:
         tk.Label(
             self.advanced_body,
             text=title,
-            font=("Archivo Black", 16),
+            font=ADV_SECTION_FONT,
             bg=ADV_PANEL,
             fg=ADV_TEXT,
         ).pack(anchor="w", pady=(0, 14))
@@ -1084,7 +1089,7 @@ class PrusaToOrcaApp:
             tk.Label(
                 self.advanced_body,
                 text="Aucune section ne correspond \u00e0 la recherche.",
-                font=UI_FONT,
+                font=ADV_FONT,
                 bg=ADV_PANEL,
                 fg=ADV_MUTED,
             ).pack(anchor="w")
@@ -1094,15 +1099,15 @@ class PrusaToOrcaApp:
             self._advanced_section_card(section)
 
     def _advanced_section_card(self, section):
-        card = tk.Frame(self.advanced_body, bg=ADV_PANEL_ALT, highlightbackground=ADV_LINE, highlightthickness=1, padx=14, pady=12)
-        card.pack(fill="x", pady=(0, 10))
+        card = tk.Frame(self.advanced_body, bg=ADV_PANEL_ALT, highlightbackground=ADV_LINE, highlightthickness=1, padx=13, pady=9)
+        card.pack(fill="x", pady=(0, 8))
         card.grid_columnconfigure(0, weight=1)
 
         top = tk.Frame(card, bg=ADV_PANEL_ALT)
         top.grid(row=0, column=0, sticky="ew")
         top.grid_columnconfigure(0, weight=1)
         title = f"{self._advanced_icon(section['type'])}  {section['name']}"
-        tk.Label(top, text=title, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=ADV_TEXT).grid(row=0, column=0, sticky="w")
+        tk.Label(top, text=title, font=ADV_FONT_BOLD, bg=ADV_PANEL_ALT, fg=ADV_TEXT).grid(row=0, column=0, sticky="w")
         stats = tk.Frame(top, bg=ADV_PANEL_ALT)
         stats.grid(row=0, column=1, sticky="e")
         for text, color in [
@@ -1111,10 +1116,10 @@ class PrusaToOrcaApp:
             (f"{CROSS} {section['ignored']}", "#ff4b4b"),
             (f"{section['coverage']}% couverture", "#7d75ff"),
         ]:
-            tk.Label(stats, text=text, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=8).pack(side="left")
+            tk.Label(stats, text=text, font=ADV_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=6).pack(side="left")
 
         bar = tk.Frame(card, bg="#2f2c4d", height=7)
-        bar.grid(row=1, column=0, sticky="ew", pady=(12, 0))
+        bar.grid(row=1, column=0, sticky="ew", pady=(9, 0))
         bar.grid_propagate(False)
         fill = tk.Frame(bar, bg=TEAL)
         fill.place(relx=0, rely=0, relwidth=max(0.01, section["coverage"] / 100), relheight=1)
@@ -1131,30 +1136,6 @@ class PrusaToOrcaApp:
         if not self.advanced_body:
             return
         self._advanced_clear(self.advanced_body)
-        tk.Label(
-            self.advanced_body,
-            text=f"{self._advanced_icon(section['type'])} {section['name']}",
-            font=("Archivo Black", 16),
-            bg=ADV_PANEL,
-            fg=ADV_TEXT,
-        ).pack(anchor="w")
-        tk.Label(
-            self.advanced_body,
-            text=f"{section['source_name']} / {section['type']} / {section['coverage']}% couverture",
-            font=UI_FONT,
-            bg=ADV_PANEL,
-            fg=ADV_MUTED,
-        ).pack(anchor="w", pady=(4, 12))
-
-        stats = tk.Frame(self.advanced_body, bg=ADV_PANEL)
-        stats.pack(anchor="w", pady=(0, 16))
-        for text, color in [
-            (f"{STAR} {section['converted']} convertis", "#00e08a"),
-            (f"{TRIANGLE} {section['approx']} approx", ORANGE),
-            (f"{CROSS} {section['ignored']} ignor\u00e9s", "#ff4b4b"),
-        ]:
-            tk.Label(stats, text=text, font=UI_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=10, pady=6).pack(side="left", padx=(0, 8))
-
         self._advanced_table_header(["Cl\u00e9 PrusaSlicer", "Cl\u00e9 OrcaSlicer", "Valeur", "Statut"])
         for prusa_key, orca_key, value, note, approx in section["mapped"]:
             if approx:
@@ -1193,7 +1174,7 @@ class PrusaToOrcaApp:
         tk.Label(
             self.advanced_body,
             text=f"Ignor\u00e9s ({len(ignored)})",
-            font=("Archivo Black", 16),
+            font=ADV_SECTION_FONT,
             bg=ADV_PANEL,
             fg=ADV_TEXT,
         ).pack(anchor="w", pady=(0, 14))
@@ -1201,7 +1182,7 @@ class PrusaToOrcaApp:
             tk.Label(
                 self.advanced_body,
                 text="Aucun champ ignor\u00e9 pour ce filtre.",
-                font=UI_FONT,
+                font=ADV_FONT,
                 bg=ADV_PANEL,
                 fg=ADV_MUTED,
             ).pack(anchor="w")
@@ -1227,12 +1208,12 @@ class PrusaToOrcaApp:
             tk.Label(
                 row,
                 text=text,
-                font=UI_FONT_BOLD,
+                font=ADV_FONT_BOLD,
                 bg=ADV_PANEL_ALT,
                 fg=ADV_MUTED,
                 anchor="w",
                 padx=8,
-                pady=7,
+                pady=5,
             ).grid(row=0, column=index, sticky="ew")
 
     def _advanced_table_row(self, columns, approx=False, ignored=False, status_index=None):
@@ -1248,12 +1229,12 @@ class PrusaToOrcaApp:
             tk.Label(
                 row,
                 text=str(text),
-                font=UI_FONT,
+                font=ADV_TABLE_FONT,
                 bg=row_bg,
                 fg=status_color,
                 anchor="w",
                 padx=8,
-                pady=6,
+                pady=5,
                 wraplength=520 if index == status_index else 340,
                 justify="left",
             ).grid(row=0, column=index, sticky="ew")
