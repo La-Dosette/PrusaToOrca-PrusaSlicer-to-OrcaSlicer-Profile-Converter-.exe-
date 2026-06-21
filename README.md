@@ -82,7 +82,7 @@ pip install -r requirements.txt pyinstaller
 Or run PyInstaller manually:
 
 ```bash
-pyinstaller --onefile --windowed --name "PrusaToOrca" --icon "logo.ico" --add-data "convert.py;." --add-data "logo.png;." --add-data "logo.ico;." app.py
+pyinstaller --onefile --windowed --name "PrusaToOrca" --icon "logo.ico" --add-data "assets;assets" --add-data "logo.png;." --add-data "logo.ico;." app.py
 ```
 
 The executable will be created in `dist/`.

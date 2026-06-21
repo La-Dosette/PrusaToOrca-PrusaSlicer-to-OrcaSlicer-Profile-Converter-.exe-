@@ -9,6 +9,7 @@ the safe-import behavior visible instead of hiding it behind a single button.
 import threading
 import tkinter as tk
 import sys
+import ctypes
 from pathlib import Path
 from tkinter import filedialog, messagebox
 
@@ -21,9 +22,9 @@ except Exception:  # pragma: no cover - optional desktop enhancement
     TkinterDnD = None
 
 
-APP_BG = "#f8f7f4"
-PANEL_BG = "#ffffff"
-PANEL_TINT = "#f2eee8"
+APP_BG = "#f3f0e9"
+PANEL_BG = "#f3f0e9"
+PANEL_TINT = "#ece6da"
 INK = "#2b2825"
 MUTED = "#6f6862"
 LINE = "#2b2825"
@@ -34,15 +35,29 @@ ORANGE_DARK = "#de5f00"
 RED_ORANGE = "#f04412"
 CREAM = APP_BG
 
-UI_FONT = ("Courier New", 10)
-UI_FONT_BOLD = ("Courier New", 10, "bold")
-TITLE_FONT = ("Arial Black", 28)
-SECTION_FONT = ("Courier New", 12, "bold")
+UI_FONT = ("Space Mono", 10)
+UI_FONT_BOLD = ("Space Mono", 10, "bold")
+TITLE_FONT = ("Archivo Black", 28)
+SECTION_FONT = ("Space Mono", 12, "bold")
 
 
 def resource_path(name):
     base = getattr(sys, "_MEIPASS", Path(__file__).resolve().parent)
     return Path(base) / name
+
+
+def load_embedded_fonts():
+    if sys.platform != "win32":
+        return
+    font_dir = resource_path("assets") / "fonts"
+    if not font_dir.exists():
+        return
+    add_font_private = 0x10
+    for font_path in font_dir.glob("*.ttf"):
+        try:
+            ctypes.windll.gdi32.AddFontResourceExW(str(font_path), add_font_private, 0)
+        except Exception:
+            pass
 
 
 class PrusaToOrcaApp:
@@ -506,6 +521,7 @@ class PrusaToOrcaApp:
 
 
 def main():
+    load_embedded_fonts()
     root_cls = TkinterDnD.Tk if TkinterDnD else tk.Tk
     root = root_cls()
     PrusaToOrcaApp(root)
