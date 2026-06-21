@@ -83,6 +83,7 @@ class PrusaToOrcaApp:
         self.report_rows = []
         self.current_report_tab = "Summary"
         self.tab_buttons = {}
+        self.quick_buttons = {}
         self.logo_image = None
 
         self._build()
@@ -121,10 +122,10 @@ class PrusaToOrcaApp:
 
         brand = tk.Frame(top, bg=APP_BG)
         brand.grid(row=0, column=0, sticky="w")
-        logo_path = resource_path("logo.png")
+        logo_path = resource_path("assets/logo_header.png")
         if logo_path.exists():
             try:
-                self.logo_image = tk.PhotoImage(file=str(logo_path)).subsample(12, 12)
+                self.logo_image = tk.PhotoImage(file=str(logo_path))
                 tk.Label(brand, image=self.logo_image, bg=APP_BG).pack(side="left", padx=(0, 12))
             except Exception:
                 self.logo_image = None
@@ -140,17 +141,18 @@ class PrusaToOrcaApp:
             fg=MUTED,
         ).pack(anchor="w", pady=(2, 0))
 
-        stats = tk.Frame(top, bg=APP_BG)
-        stats.grid(row=0, column=1, sticky="e")
-        for label, value in [
-            ("mode", "safe"),
-            ("prefix", "on"),
-            ("compat", "strict"),
+        quick_actions = tk.Frame(top, bg=APP_BG)
+        quick_actions.grid(row=0, column=1, sticky="e")
+        for key, text, command in [
+            ("safe", "SAFE MODE", self.show_safety_info),
+            ("prefix", "PREFIX ON", self.toggle_prefix),
+            ("compat", "STRICT", self.toggle_compatibility),
+            ("advanced", "ADVANCED REPORT", lambda: self.show_report_tab("Advanced report")),
         ]:
-            item = tk.Frame(stats, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1)
-            item.pack(side="left", padx=(8, 0))
-            tk.Label(item, text=label, font=UI_FONT, bg=PANEL_BG, fg=MUTED, padx=10, pady=5).pack(side="left")
-            tk.Label(item, text=value, font=UI_FONT_BOLD, bg=TEAL if label == "compat" else INK, fg=PANEL_BG, padx=10, pady=5).pack(side="left")
+            btn = self._top_button(quick_actions, text, command)
+            btn.pack(side="left", padx=(8, 0))
+            self.quick_buttons[key] = btn
+        self.update_quick_actions()
 
         accent = tk.Frame(parent, bg=APP_BG, height=6)
         accent.pack(fill="x", pady=(0, 18))
@@ -281,7 +283,7 @@ class PrusaToOrcaApp:
         tabs = tk.Frame(frame, bg=PANEL_BG)
         tabs.grid(row=0, column=0, sticky="ew")
         tabs.grid_columnconfigure(3, weight=1)
-        for text in ["Summary", "Bundle files", "Conversion log"]:
+        for text in ["Summary", "Bundle files", "Advanced report"]:
             btn = tk.Button(
                 tabs,
                 text=text,
@@ -322,7 +324,7 @@ class PrusaToOrcaApp:
                     "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
                 ),
                 "Bundle files": "No bundle preview yet.\n",
-                "Conversion log": "No conversion log yet.\n",
+                "Advanced report": "No advanced report yet.\n",
             },
             [],
         )
@@ -354,6 +356,25 @@ class PrusaToOrcaApp:
             cursor="hand2",
         )
 
+    def _top_button(self, parent, text, command):
+        return tk.Button(
+            parent,
+            text=text,
+            command=command,
+            font=UI_FONT_BOLD,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=INK,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            highlightbackground=LINE,
+            highlightthickness=1,
+            padx=12,
+            pady=8,
+            cursor="hand2",
+        )
+
     def _chip(self, parent, text, value):
         btn = tk.Radiobutton(
             parent,
@@ -373,9 +394,53 @@ class PrusaToOrcaApp:
             highlightthickness=1,
             padx=12,
             pady=7,
-            command=self.refresh_preview_if_ready,
+            command=self.on_option_changed,
         )
         return btn
+
+    def on_option_changed(self):
+        self.update_quick_actions()
+        self.refresh_preview_if_ready()
+
+    def show_safety_info(self):
+        messagebox.showinfo(
+            "Safe mode",
+            "Safe mode is always on.\n\n"
+            "- Preview does not write files\n"
+            "- Generated presets are prefixed by default\n"
+            "- Existing OrcaSlicer preset files are not edited by PrusaToOrca\n"
+            "- Strict compatibility keeps imported presets tied to imported printers",
+        )
+
+    def toggle_prefix(self):
+        self.prefix_profiles.set(not self.prefix_profiles.get())
+        self.update_quick_actions()
+        self.refresh_preview_if_ready()
+
+    def toggle_compatibility(self):
+        self.compatibility.set("loose" if self.compatibility.get() == "strict" else "strict")
+        self.update_quick_actions()
+        self.refresh_preview_if_ready()
+
+    def update_quick_actions(self):
+        prefix = "PREFIX ON" if self.prefix_profiles.get() else "PREFIX OFF"
+        compat = self.compatibility.get().upper()
+        if "prefix" in self.quick_buttons:
+            self.quick_buttons["prefix"].configure(
+                text=prefix,
+                bg=INK if self.prefix_profiles.get() else PANEL_BG,
+                fg=PANEL_BG if self.prefix_profiles.get() else INK,
+            )
+        if "compat" in self.quick_buttons:
+            self.quick_buttons["compat"].configure(
+                text=compat,
+                bg=TEAL if self.compatibility.get() == "strict" else ORANGE,
+                fg=PANEL_BG,
+            )
+        if "safe" in self.quick_buttons:
+            self.quick_buttons["safe"].configure(bg=PANEL_BG, fg=INK)
+        if "advanced" in self.quick_buttons:
+            self.quick_buttons["advanced"].configure(bg=PANEL_BG, fg=INK)
 
     def _wire_drag_drop(self):
         if not DND_FILES or not hasattr(self.drop_zone, "drop_target_register"):
@@ -419,7 +484,7 @@ class PrusaToOrcaApp:
             {
                 "Summary": "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n",
                 "Bundle files": "No bundle preview yet.\n",
-                "Conversion log": "No conversion log yet.\n",
+                "Advanced report": "No advanced report yet.\n",
             },
             [],
         )
@@ -543,10 +608,19 @@ class PrusaToOrcaApp:
             f"{'Generated' if done else 'Will generate'} {len(entries)} bundle(s):",
         ]
         bundle_lines = []
-        log_lines = [
-            "Conversion log",
+        advanced_lines = [
+            "ADVANCED REPORT",
             "",
         ]
+        total_mapped = sum(log.total_mapped for _, log in entries)
+        total_approx = sum(log.total_approx for _, log in entries)
+        total_ignored = sum(log.total_skipped for _, log in entries)
+        advanced_lines.extend(
+            [
+                f"★ {total_mapped} converted    △ {total_approx} approximate    × {total_ignored} ignored",
+                "",
+            ]
+        )
 
         for index, (preview, log) in enumerate(entries, 1):
             files = preview["files"]
@@ -577,20 +651,34 @@ class PrusaToOrcaApp:
             bundle_lines.extend(f"  {name}" for name in sorted(files))
             bundle_lines.append("")
 
-            log_lines.extend(
+            advanced_lines.extend(
                 [
                     f"Bundle {index}: {Path(source).name if source else 'bundle'}",
-                    f"Converted: {log.total_mapped} | Approx: {log.total_approx} | Ignored: {log.total_skipped}",
+                    f"★ {log.total_mapped} converted | △ {log.total_approx} approximate | × {log.total_skipped} ignored",
                 ]
             )
             if log.warnings:
-                log_lines.append("Warnings:")
-                log_lines.extend(f"  {warning}" for warning in log.warnings)
+                advanced_lines.append("Warnings:")
+                advanced_lines.extend(f"  {warning}" for warning in log.warnings)
             for section in log.sections:
-                log_lines.append(
+                coverage = 0
+                total = section.n_mapped + section.n_skipped
+                if total:
+                    coverage = int(round(section.n_mapped / total * 100))
+                advanced_lines.append(
                     f"  [{section.type}] {section.name} "
-                    f"ok={section.n_mapped} approx={section.n_approx} ignored={section.n_skipped}"
+                    f"★ {section.n_mapped} △ {section.n_approx} × {section.n_skipped} | {coverage}% coverage"
                 )
+                for prusa_key, orca_key, value, note, approx in section.mapped[:8]:
+                    marker = "△" if approx else "★"
+                    suffix = f" ({note})" if note else ""
+                    advanced_lines.append(f"      {marker} {prusa_key} -> {orca_key}: {value}{suffix}")
+                if len(section.mapped) > 8:
+                    advanced_lines.append(f"      ... {len(section.mapped) - 8} more converted fields")
+                for prusa_key, value in section.skipped[:5]:
+                    advanced_lines.append(f"      × {prusa_key}: {value}")
+                if len(section.skipped) > 5:
+                    advanced_lines.append(f"      ... {len(section.skipped) - 5} more ignored fields")
                 rows.append(
                     {
                         "bundle": index,
@@ -635,7 +723,7 @@ class PrusaToOrcaApp:
                             "approx": "False",
                         }
                     )
-            log_lines.append("")
+            advanced_lines.append("")
 
         summary.extend(
             [
@@ -658,7 +746,7 @@ class PrusaToOrcaApp:
             {
                 "Summary": "\n".join(summary),
                 "Bundle files": "\n".join(bundle_lines).strip() + "\n",
-                "Conversion log": "\n".join(log_lines).strip() + "\n",
+                "Advanced report": "\n".join(advanced_lines).strip() + "\n",
             },
             rows,
         )
