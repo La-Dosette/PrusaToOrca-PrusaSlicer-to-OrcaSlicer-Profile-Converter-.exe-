@@ -9,7 +9,7 @@ without removing core functionality.
 
 - Removed duplicate top-bar shortcuts for Advanced Report and Debug Info.
 - Kept the top bar focused on live state: Safe, Prefix, Compatibility, Theme,
-  and History.
+  Language, and History.
 - Replaced four secondary buttons with a compact Tools window.
 - Renamed the output-folder button from Open to Folder for clarity.
 - Kept Mapping visible because it is part of the conversion workflow.
@@ -17,6 +17,9 @@ without removing core functionality.
   viewport at the default window size.
 - Removed duplicated compatibility/prefix controls from the Output panel because
   those states already live in the top toolbar.
+- Added a visible language selector with FR, EN, DE, ES, IT, PT, NL, and PL.
+- Localized the main workflow, report tabs, advanced report controls, assistant,
+  mapping editor, tools, history, and export messages.
 
 ### Tools Window
 
@@ -38,4 +41,4 @@ without removing core functionality.
 - Python compilation passed.
 - Unit tests passed.
 - Tkinter smoke test passed for Simple Summary, Import Assistant, and Tools.
-- Windows executable was rebuilt and launched successfully.
+- Windows executable was rebuilt successfully.

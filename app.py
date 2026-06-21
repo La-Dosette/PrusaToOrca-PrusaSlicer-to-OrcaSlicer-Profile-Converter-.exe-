@@ -79,6 +79,259 @@ THEMES = {
     },
 }
 
+LANGUAGE_OPTIONS = [
+    ("fr", "FR", "Français"),
+    ("en", "EN", "English"),
+    ("de", "DE", "Deutsch"),
+    ("es", "ES", "Español"),
+    ("it", "IT", "Italiano"),
+    ("pt", "PT", "Português"),
+    ("nl", "NL", "Nederlands"),
+    ("pl", "PL", "Polski"),
+]
+LANGUAGE_CODES = {code for code, _short, _name in LANGUAGE_OPTIONS}
+
+TRANSLATIONS = {
+    "en": {
+        "advanced_report": "Advanced report",
+        "advanced_report_empty": "Preview a bundle to see the animated advanced report.",
+        "advanced_report_open_first": "Preview or convert a bundle before opening the advanced report.",
+        "advanced_report_title": "Advanced report",
+        "all": "All",
+        "app_subtitle": "PrusaToOrca // safe profile importer",
+        "approx": "Approx",
+        "approx_detail": "approximate fields",
+        "bundle_files_empty": "No bundle preview yet.",
+        "bundle_files_tab": "Files",
+        "cancel": "Close",
+        "check_updates": "Check updates",
+        "choose_file": "Choose file",
+        "choose_file_first": "Choose a .ini file or folder first.",
+        "choose_folder": "Choose folder",
+        "choose_output_folder": "Choose output folder",
+        "clear": "Clear",
+        "compat_loose": "LOOSE",
+        "compat_strict": "STRICT",
+        "converted": "Converted",
+        "converted_detail": "mapped fields",
+        "copy_debug_info": "Copy debug info",
+        "csv": "CSV",
+        "day": "DAY",
+        "drop_subtitle": "preview before writing anything",
+        "drop_title": "DROP .INI HERE",
+        "export_html": "HTML",
+        "export_pdf": "PDF",
+        "folder": "Folder",
+        "generate": "Generate .orca_printer",
+        "history": "History",
+        "ignored": "Ignored",
+        "ignored_detail": "not converted",
+        "language": "Language",
+        "language_intro": "Choose the interface language. Technical Prusa/Orca keys keep their original names.",
+        "mapping_editor": "Mapping editor",
+        "night": "NIGHT",
+        "open": "Open",
+        "open_detailed_view": "Open detailed view",
+        "output_folder": "Output folder",
+        "output_subtitle": "non destructive",
+        "preview_button": "Preview safe import",
+        "preview_header": "03 // preview",
+        "preview_subtitle": "what will be added to OrcaSlicer",
+        "prefix_off": "PREFIX OFF",
+        "prefix_on": "PREFIX ON",
+        "risk": "Risk",
+        "risk_waiting": "Risk: waiting for preview",
+        "safe": "SAFE",
+        "simple_empty": "Choose a PrusaSlicer bundle to get a plain-language import summary.",
+        "simple_summary_empty": "Choose a bundle to see a non-technical import summary.",
+        "simple_tab": "Simple",
+        "source_subtitle": ".ini file or folder",
+        "source_title": "01 // source",
+        "technical_tab": "Technical",
+        "tools": "Tools",
+        "tools_description": "Support and maintenance actions. The main workflow stays on the left panel.",
+        "what_this_means": "What this means",
+    },
+    "fr": {
+        "advanced_report": "Rapport avancé",
+        "advanced_report_empty": "Prévisualise un bundle pour voir le rapport avancé animé.",
+        "advanced_report_open_first": "Prévisualise ou génère un bundle avant d’ouvrir le rapport avancé.",
+        "advanced_report_title": "Rapport avancé",
+        "all": "Tous",
+        "app_subtitle": "PrusaToOrca // importateur de profils sécurisé",
+        "approx": "Approx",
+        "approx_detail": "champs approximatifs",
+        "bundle_files_empty": "Aucun aperçu de bundle pour le moment.",
+        "bundle_files_tab": "Fichiers",
+        "cancel": "Fermer",
+        "check_updates": "Vérifier les mises à jour",
+        "choose_file": "Choisir fichier",
+        "choose_file_first": "Choisis d’abord un fichier .ini ou un dossier.",
+        "choose_folder": "Choisir dossier",
+        "choose_output_folder": "Choisir le dossier de sortie",
+        "clear": "Effacer",
+        "compat_loose": "SOUPLE",
+        "compat_strict": "STRICT",
+        "converted": "Convertis",
+        "converted_detail": "champs mappés",
+        "copy_debug_info": "Copier infos debug",
+        "csv": "CSV",
+        "day": "JOUR",
+        "drop_subtitle": "prévisualise avant d’écrire quoi que ce soit",
+        "drop_title": "DÉPOSE LE .INI ICI",
+        "export_html": "HTML",
+        "export_pdf": "PDF",
+        "folder": "Dossier",
+        "generate": "Générer .orca_printer",
+        "history": "Historique",
+        "ignored": "Ignorés",
+        "ignored_detail": "non convertis",
+        "language": "Langue",
+        "language_intro": "Choisis la langue de l’interface. Les clés techniques Prusa/Orca gardent leur nom réel.",
+        "mapping_editor": "Éditeur de mapping",
+        "night": "NUIT",
+        "open": "Ouvrir",
+        "open_detailed_view": "Ouvrir la vue détaillée",
+        "output_folder": "Dossier de sortie",
+        "output_subtitle": "non destructif",
+        "preview_button": "Prévisualiser l’import sûr",
+        "preview_header": "03 // aperçu",
+        "preview_subtitle": "ce qui sera ajouté à OrcaSlicer",
+        "prefix_off": "PRÉFIXE OFF",
+        "prefix_on": "PRÉFIXE ON",
+        "risk": "Risque",
+        "risk_waiting": "Risque : en attente d’aperçu",
+        "safe": "SAFE",
+        "simple_empty": "Choisis un bundle PrusaSlicer pour obtenir un résumé en langage simple.",
+        "simple_summary_empty": "Choisis un bundle pour voir un résumé non technique.",
+        "simple_tab": "Simple",
+        "source_subtitle": "fichier .ini ou dossier",
+        "source_title": "01 // source",
+        "technical_tab": "Technique",
+        "tools": "Outils",
+        "tools_description": "Actions de support et de maintenance. Le flux principal reste dans le panneau de gauche.",
+        "what_this_means": "Ce que ça veut dire",
+    },
+    "de": {
+        "advanced_report": "Erweiterter Bericht", "all": "Alle", "app_subtitle": "PrusaToOrca // sicherer Profilimport", "approx": "Näherung",
+        "bundle_files_tab": "Dateien", "cancel": "Schließen", "choose_file": "Datei wählen", "choose_folder": "Ordner wählen",
+        "clear": "Leeren", "converted": "Konvertiert", "csv": "CSV", "day": "TAG", "drop_title": ".INI HIER ABLEGEN",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Ordner", "generate": ".orca_printer erzeugen", "history": "Verlauf",
+        "ignored": "Ignoriert", "language": "Sprache", "mapping_editor": "Mapping-Editor", "night": "NACHT", "open": "Öffnen",
+        "output_folder": "Ausgabeordner", "preview_button": "Sicheren Import prüfen", "prefix_off": "PRÄFIX AUS", "prefix_on": "PRÄFIX AN",
+        "risk": "Risiko", "simple_tab": "Einfach", "technical_tab": "Technisch", "tools": "Werkzeuge", "what_this_means": "Bedeutung",
+    },
+    "es": {
+        "advanced_report": "Informe avanzado", "all": "Todos", "app_subtitle": "PrusaToOrca // importador seguro de perfiles", "approx": "Aprox",
+        "bundle_files_tab": "Archivos", "cancel": "Cerrar", "choose_file": "Elegir archivo", "choose_folder": "Elegir carpeta",
+        "clear": "Limpiar", "converted": "Convertidos", "csv": "CSV", "day": "DÍA", "drop_title": "SUELTA EL .INI AQUÍ",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Carpeta", "generate": "Generar .orca_printer", "history": "Historial",
+        "ignored": "Ignorados", "language": "Idioma", "mapping_editor": "Editor de mapeo", "night": "NOCHE", "open": "Abrir",
+        "output_folder": "Carpeta de salida", "preview_button": "Previsualizar importación segura", "prefix_off": "PREFIJO OFF", "prefix_on": "PREFIJO ON",
+        "risk": "Riesgo", "simple_tab": "Simple", "technical_tab": "Técnico", "tools": "Herramientas", "what_this_means": "Qué significa",
+    },
+    "it": {
+        "advanced_report": "Rapporto avanzato", "all": "Tutti", "app_subtitle": "PrusaToOrca // import sicuro dei profili", "approx": "Approx",
+        "bundle_files_tab": "File", "cancel": "Chiudi", "choose_file": "Scegli file", "choose_folder": "Scegli cartella",
+        "clear": "Pulisci", "converted": "Convertiti", "csv": "CSV", "day": "GIORNO", "drop_title": "TRASCINA .INI QUI",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Cartella", "generate": "Genera .orca_printer", "history": "Cronologia",
+        "ignored": "Ignorati", "language": "Lingua", "mapping_editor": "Editor mapping", "night": "NOTTE", "open": "Apri",
+        "output_folder": "Cartella output", "preview_button": "Anteprima import sicuro", "prefix_off": "PREFISSO OFF", "prefix_on": "PREFISSO ON",
+        "risk": "Rischio", "simple_tab": "Semplice", "technical_tab": "Tecnico", "tools": "Strumenti", "what_this_means": "Cosa significa",
+    },
+    "pt": {
+        "advanced_report": "Relatório avançado", "all": "Todos", "app_subtitle": "PrusaToOrca // importador seguro de perfis", "approx": "Aprox",
+        "bundle_files_tab": "Ficheiros", "cancel": "Fechar", "choose_file": "Escolher ficheiro", "choose_folder": "Escolher pasta",
+        "clear": "Limpar", "converted": "Convertidos", "csv": "CSV", "day": "DIA", "drop_title": "SOLTA O .INI AQUI",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Pasta", "generate": "Gerar .orca_printer", "history": "Histórico",
+        "ignored": "Ignorados", "language": "Idioma", "mapping_editor": "Editor de mapeamento", "night": "NOITE", "open": "Abrir",
+        "output_folder": "Pasta de saída", "preview_button": "Pré-visualizar importação segura", "prefix_off": "PREFIXO OFF", "prefix_on": "PREFIXO ON",
+        "risk": "Risco", "simple_tab": "Simples", "technical_tab": "Técnico", "tools": "Ferramentas", "what_this_means": "O que significa",
+    },
+    "nl": {
+        "advanced_report": "Geavanceerd rapport", "all": "Alles", "app_subtitle": "PrusaToOrca // veilige profielimport", "approx": "Benadering",
+        "bundle_files_tab": "Bestanden", "cancel": "Sluiten", "choose_file": "Kies bestand", "choose_folder": "Kies map",
+        "clear": "Wissen", "converted": "Omgezet", "csv": "CSV", "day": "DAG", "drop_title": "ZET .INI HIER",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Map", "generate": ".orca_printer maken", "history": "Geschiedenis",
+        "ignored": "Genegeerd", "language": "Taal", "mapping_editor": "Mapping-editor", "night": "NACHT", "open": "Openen",
+        "output_folder": "Uitvoermap", "preview_button": "Veilige import bekijken", "prefix_off": "PREFIX UIT", "prefix_on": "PREFIX AAN",
+        "risk": "Risico", "simple_tab": "Simpel", "technical_tab": "Technisch", "tools": "Tools", "what_this_means": "Wat dit betekent",
+    },
+    "pl": {
+        "advanced_report": "Raport zaawansowany", "all": "Wszystko", "app_subtitle": "PrusaToOrca // bezpieczny importer profili", "approx": "Przybliż.",
+        "bundle_files_tab": "Pliki", "cancel": "Zamknij", "choose_file": "Wybierz plik", "choose_folder": "Wybierz folder",
+        "clear": "Wyczyść", "converted": "Przekonwert.", "csv": "CSV", "day": "DZIEŃ", "drop_title": "UPUŚĆ .INI TUTAJ",
+        "export_html": "HTML", "export_pdf": "PDF", "folder": "Folder", "generate": "Utwórz .orca_printer", "history": "Historia",
+        "ignored": "Pominięte", "language": "Język", "mapping_editor": "Edytor mapowania", "night": "NOC", "open": "Otwórz",
+        "output_folder": "Folder wyjściowy", "preview_button": "Podgląd bezpiecznego importu", "prefix_off": "PREFIKS OFF", "prefix_on": "PREFIKS ON",
+        "risk": "Ryzyko", "simple_tab": "Prosty", "technical_tab": "Techniczny", "tools": "Narzędzia", "what_this_means": "Co to znaczy",
+    },
+}
+
+TRANSLATIONS["en"].update({
+    "advanced_no_section": "No section for this filter.",
+    "bug_report": "Bug report",
+    "bug_report_exported": "Bug report generated:\n{path}",
+    "copy_file_path": "Copy file path",
+    "debug_copied": "Debug info copied to clipboard.",
+    "export_before_csv": "Preview or convert a bundle before exporting CSV.",
+    "export_before_html": "Preview or convert a bundle before exporting HTML.",
+    "export_before_pdf": "Preview or convert a bundle before exporting PDF.",
+    "export_csv_done": "CSV report exported:\n{path}",
+    "export_html_done": "HTML report exported:\n{path}",
+    "export_pdf_done": "PDF report exported:\n{path}",
+    "generated_bundle_file": "Generated bundle file",
+    "generated_bundle_paths": "Generated bundle path(s)",
+    "history_select_first": "Select a conversion first.",
+    "import_assistant": "Import assistant",
+    "import_assistant_intro": "Your bundle was generated. Follow these steps in OrcaSlicer.",
+    "import_assistant_need_generate": "Generate the .orca_printer bundle first.",
+    "import_into_orca": "Import into OrcaSlicer",
+    "mapping_intro": "Choose an ignored PrusaSlicer key, map it to an OrcaSlicer key, then preview again.",
+    "next_step": "Next step",
+    "open_orca_guide": "Open Orca guide",
+    "open_output_folder": "Open output folder",
+    "orca_target_key": "OrcaSlicer target key",
+    "preview_again": "Preview again",
+    "remove": "Remove",
+    "save_mapping": "Save mapping",
+    "saved_mappings": "Saved mappings",
+    "select_ignored": "Select an ignored key.",
+    "store_as_list": "Store value as Orca list",
+})
+
+TRANSLATIONS["fr"].update({
+    "advanced_no_section": "Aucune section pour ce filtre.",
+    "bug_report": "Rapport de bug",
+    "bug_report_exported": "Rapport de bug généré :\n{path}",
+    "copy_file_path": "Copier le chemin",
+    "debug_copied": "Infos debug copiées dans le presse-papiers.",
+    "export_before_csv": "Prévisualise ou génère un bundle avant d’exporter le CSV.",
+    "export_before_html": "Prévisualise ou génère un bundle avant d’exporter le HTML.",
+    "export_before_pdf": "Prévisualise ou génère un bundle avant d’exporter le PDF.",
+    "export_csv_done": "Rapport CSV exporté :\n{path}",
+    "export_html_done": "Rapport HTML exporté :\n{path}",
+    "export_pdf_done": "Rapport PDF exporté :\n{path}",
+    "generated_bundle_file": "Fichier bundle généré",
+    "generated_bundle_paths": "Chemin(s) du bundle généré",
+    "history_select_first": "Sélectionne d’abord une conversion.",
+    "import_assistant": "Assistant d’import",
+    "import_assistant_intro": "Ton bundle a été généré. Suis ces étapes dans OrcaSlicer.",
+    "import_assistant_need_generate": "Génère d’abord le bundle .orca_printer.",
+    "import_into_orca": "Importer dans OrcaSlicer",
+    "mapping_intro": "Choisis une clé PrusaSlicer ignorée, associe-la à une clé OrcaSlicer, puis relance l’aperçu.",
+    "next_step": "Prochaine étape",
+    "open_orca_guide": "Ouvrir le guide Orca",
+    "open_output_folder": "Ouvrir le dossier de sortie",
+    "orca_target_key": "Clé cible OrcaSlicer",
+    "preview_again": "Relancer l’aperçu",
+    "remove": "Retirer",
+    "save_mapping": "Sauver mapping",
+    "saved_mappings": "Mappings sauvegardés",
+    "select_ignored": "Sélectionne une clé ignorée.",
+    "store_as_list": "Stocker la valeur comme liste Orca",
+})
+
 APP_BG = PANEL_BG = PANEL_TINT = INK = MUTED = LINE = ""
 HEADER_BG = HEADER_FG = TEAL = TEAL_DARK = ORANGE = ORANGE_DARK = RED_ORANGE = CREAM = ""
 ADV_PROGRESS_BG = ""
@@ -175,6 +428,24 @@ def save_theme_preference(mode):
     save_settings(settings)
 
 
+def load_language_preference():
+    language = load_settings().get("language", "fr")
+    return language if language in LANGUAGE_CODES else "fr"
+
+
+def save_language_preference(language):
+    settings = load_settings()
+    settings["language"] = language if language in LANGUAGE_CODES else "fr"
+    save_settings(settings)
+
+
+def translate(language, key, **kwargs):
+    text = TRANSLATIONS.get(language, {}).get(key)
+    if text is None:
+        text = TRANSLATIONS["en"].get(key, key)
+    return text.format(**kwargs) if kwargs else text
+
+
 def compare_versions(left, right):
     def parts(value):
         clean = str(value).strip().lstrip("vV")
@@ -210,6 +481,7 @@ class PrusaToOrcaApp:
         self.root.geometry("1120x720")
         self.root.minsize(960, 620)
         self.theme_mode = tk.StringVar(value=load_theme_preference())
+        self.language = tk.StringVar(value=load_language_preference())
         apply_theme(self.theme_mode.get())
         self.root.configure(bg=APP_BG)
         try:
@@ -241,7 +513,7 @@ class PrusaToOrcaApp:
         self.history = self.load_history()
         self.custom_mappings = self.load_custom_mappings()
         self.last_output_folder = None
-        self.risk_label = tk.StringVar(value="Risk: waiting for preview")
+        self.risk_label = tk.StringVar(value=self.tr("risk_waiting"))
         self.progress_label = tk.StringVar(value="")
         self.current_report_tab = "Simple summary"
         self.tab_buttons = {}
@@ -250,6 +522,9 @@ class PrusaToOrcaApp:
 
         self._build()
         self._wire_drag_drop()
+
+    def tr(self, key, **kwargs):
+        return translate(self.language.get(), key, **kwargs)
 
     def _build(self):
         shell = tk.Frame(self.root, bg=APP_BG, padx=22, pady=18)
@@ -297,7 +572,7 @@ class PrusaToOrcaApp:
         tk.Label(brand_text, text="PrusaToOrca", font=TITLE_FONT, bg=APP_BG, fg=INK).pack(anchor="w")
         tk.Label(
             brand_text,
-            text="PrusaToOrca // safe profile importer",
+            text=self.tr("app_subtitle"),
             font=UI_FONT,
             bg=APP_BG,
             fg=MUTED,
@@ -306,12 +581,13 @@ class PrusaToOrcaApp:
         quick_actions = tk.Frame(top, bg=APP_BG)
         quick_actions.grid(row=0, column=1, sticky="e")
         for key, text, command in [
-            ("safe", "SAFE", self.show_safety_info),
-            ("prefix", "PREFIX ON", self.toggle_prefix),
-            ("compat", "STRICT", self.toggle_compatibility),
-            ("theme", "NIGHT", self.toggle_theme),
-            ("history", "HISTORY", self.open_history),
-            ("tools", "TOOLS", self.open_tools),
+            ("safe", self.tr("safe"), self.show_safety_info),
+            ("prefix", self.tr("prefix_on"), self.toggle_prefix),
+            ("compat", self.tr("compat_strict"), self.toggle_compatibility),
+            ("theme", self.tr("night"), self.toggle_theme),
+            ("language", self.language.get().upper(), self.open_language_selector),
+            ("history", self.tr("history").upper(), self.open_history),
+            ("tools", self.tr("tools").upper(), self.open_tools),
         ]:
             btn = self._top_button(quick_actions, text, command)
             btn.pack(side="left", padx=(8, 0))
@@ -338,7 +614,7 @@ class PrusaToOrcaApp:
         return content
 
     def _build_import_panel(self, parent):
-        panel = self._panel(parent, "01 // source", ".ini file or folder")
+        panel = self._panel(parent, self.tr("source_title"), self.tr("source_subtitle"))
 
         self.drop_zone = tk.Frame(panel, bg=PANEL_TINT, highlightbackground=ORANGE, highlightthickness=2, height=104)
         self.drop_zone.pack(fill="x")
@@ -349,14 +625,14 @@ class PrusaToOrcaApp:
         drop_copy.pack(side="left", fill="both", expand=True)
         tk.Label(
             drop_copy,
-            text="DROP .INI HERE",
+            text=self.tr("drop_title"),
             font=("Arial Black", 16),
             bg=PANEL_TINT,
             fg=INK,
         ).pack(anchor="center", expand=True, pady=(12, 0))
         tk.Label(
             drop_copy,
-            text="preview before writing anything",
+            text=self.tr("drop_subtitle"),
             font=UI_FONT_BOLD,
             bg=PANEL_TINT,
             fg=ORANGE_DARK,
@@ -373,14 +649,14 @@ class PrusaToOrcaApp:
 
         row = tk.Frame(panel, bg=PANEL_BG)
         row.pack(fill="x")
-        self._button(row, "Choose file", self.choose_input, variant="secondary").pack(side="left")
-        self._button(row, "Choose folder", self.choose_folder, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(row, "Clear", self.clear_input, variant="ghost").pack(side="left", padx=(8, 0))
+        self._button(row, self.tr("choose_file"), self.choose_input, variant="secondary").pack(side="left")
+        self._button(row, self.tr("choose_folder"), self.choose_folder, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(row, self.tr("clear"), self.clear_input, variant="ghost").pack(side="left", padx=(8, 0))
 
     def _build_options_panel(self, parent):
-        panel = self._panel(parent, "02 // output", "non destructive")
+        panel = self._panel(parent, "02 // output", self.tr("output_subtitle"))
 
-        tk.Label(panel, text="Output folder", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
+        tk.Label(panel, text=self.tr("output_folder"), font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
         out_row = tk.Frame(panel, bg=PANEL_BG)
         out_row.pack(fill="x", pady=(6, 12))
         tk.Entry(
@@ -395,16 +671,16 @@ class PrusaToOrcaApp:
             highlightthickness=1,
         ).pack(side="left", fill="x", expand=True, ipady=8)
         self._button(out_row, "...", self.choose_output, variant="secondary", width=4).pack(side="left", padx=(8, 0))
-        self._button(out_row, "Folder", self.open_output_folder, variant="secondary", width=7).pack(side="left", padx=(8, 0))
+        self._button(out_row, self.tr("folder"), self.open_output_folder, variant="secondary", width=7).pack(side="left", padx=(8, 0))
 
         tk.Label(panel, textvariable=self.risk_label, font=UI_FONT_BOLD, bg=PANEL_BG, fg=TEAL_DARK).pack(anchor="w", pady=(0, 8))
 
     def _build_actions(self, parent):
         actions = tk.Frame(parent, bg=APP_BG)
         actions.pack(fill="x", pady=(2, 0))
-        self.preview_btn = self._button(actions, "Preview safe import", self.preview, variant="secondary")
+        self.preview_btn = self._button(actions, self.tr("preview_button"), self.preview, variant="secondary")
         self.preview_btn.pack(fill="x", pady=(0, 8))
-        self.convert_btn = self._button(actions, "Generate .orca_printer", self.convert, variant="primary")
+        self.convert_btn = self._button(actions, self.tr("generate"), self.convert, variant="primary")
         self.convert_btn.pack(fill="x")
         self.progress_canvas = tk.Canvas(actions, height=10, bg=PANEL_TINT, highlightthickness=1, highlightbackground=LINE)
         self.progress_canvas.pack(fill="x", pady=(10, 4))
@@ -415,10 +691,10 @@ class PrusaToOrcaApp:
         header = tk.Frame(parent, bg=APP_BG)
         header.grid(row=0, column=0, sticky="ew", pady=(0, 14))
         header.grid_columnconfigure(0, weight=1)
-        tk.Label(header, text="03 // preview", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(header, text=self.tr("preview_header"), font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
         tk.Label(
             header,
-            text="what will be added to OrcaSlicer",
+            text=self.tr("preview_subtitle"),
             font=UI_FONT,
             bg=APP_BG,
             fg=MUTED,
@@ -434,10 +710,10 @@ class PrusaToOrcaApp:
         tabs.grid(row=0, column=0, sticky="ew")
         tabs.grid_columnconfigure(4, weight=1)
         for label, name in [
-            ("Simple", "Simple summary"),
-            ("Technical", "Summary"),
-            ("Files", "Bundle files"),
-            ("Advanced", "Advanced report"),
+            (self.tr("simple_tab"), "Simple summary"),
+            (self.tr("technical_tab"), "Summary"),
+            (self.tr("bundle_files_tab"), "Bundle files"),
+            (self.tr("advanced_report"), "Advanced report"),
         ]:
             btn = tk.Button(
                 tabs,
@@ -456,10 +732,10 @@ class PrusaToOrcaApp:
             )
             btn.pack(side="left")
             self.tab_buttons[name] = btn
-        self.export_btn = self._button(tabs, "CSV", self.export_csv, variant="secondary")
+        self.export_btn = self._button(tabs, self.tr("csv"), self.export_csv, variant="secondary")
         self.export_btn.pack(side="right", padx=(8, 0))
-        self._button(tabs, "HTML", self.export_html, variant="secondary").pack(side="right", padx=(8, 0))
-        self._button(tabs, "PDF", self.export_pdf, variant="secondary").pack(side="right", padx=(8, 0))
+        self._button(tabs, self.tr("export_html"), self.export_html, variant="secondary").pack(side="right", padx=(8, 0))
+        self._button(tabs, self.tr("export_pdf"), self.export_pdf, variant="secondary").pack(side="right", padx=(8, 0))
 
         self.report = tk.Text(
             frame,
@@ -484,13 +760,13 @@ class PrusaToOrcaApp:
         self.advanced_tab.grid_remove()
 
         default_views = {
-            "Simple summary": "Choose a bundle to see a non-technical import summary.\n",
+            "Simple summary": self.tr("simple_summary_empty") + "\n",
             "Summary": (
                 "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
                 "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
             ),
-            "Bundle files": "No bundle preview yet.\n",
-            "Advanced report": "No advanced report yet.\n",
+            "Bundle files": self.tr("bundle_files_empty") + "\n",
+            "Advanced report": self.tr("advanced_report_empty") + "\n",
         }
         self.set_report_views(self.report_views or default_views, self.report_rows, self.advanced_model)
         self.report.configure(state="disabled")
@@ -542,7 +818,7 @@ class PrusaToOrcaApp:
 
     def show_safety_info(self):
         messagebox.showinfo(
-            "Safe mode",
+            self.tr("safe"),
             "Safe mode is always on.\n\n"
             "- Preview does not write files\n"
             "- Generated presets are prefixed by default\n"
@@ -566,6 +842,76 @@ class PrusaToOrcaApp:
         save_theme_preference(next_mode)
         apply_theme(next_mode)
         self.rebuild_ui()
+
+    def open_language_selector(self):
+        win = tk.Toplevel(self.root)
+        win.title(self.tr("language"))
+        win.geometry("520x420")
+        win.minsize(460, 360)
+        win.configure(bg=APP_BG)
+        try:
+            win.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
+        shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
+        shell.pack(fill="both", expand=True)
+        tk.Label(shell, text=self.tr("language"), font=SECTION_FONT, bg=APP_BG, fg=INK).pack(anchor="w")
+        tk.Label(
+            shell,
+            text=self.tr("language_intro"),
+            font=UI_FONT,
+            bg=APP_BG,
+            fg=MUTED,
+            wraplength=440,
+            justify="left",
+        ).pack(anchor="w", pady=(4, 14))
+
+        grid = tk.Frame(shell, bg=APP_BG)
+        grid.pack(fill="both", expand=True)
+        for index, (code, short, name) in enumerate(LANGUAGE_OPTIONS):
+            active = code == self.language.get()
+            btn = tk.Button(
+                grid,
+                text=f"{short}  {name}",
+                command=lambda lang=code, window=win: self.set_language(lang, window),
+                font=UI_FONT_BOLD if active else UI_FONT,
+                bg=TEAL if active else PANEL_BG,
+                fg=PANEL_BG if active else INK,
+                activebackground=TEAL,
+                activeforeground=PANEL_BG,
+                relief="flat",
+                borderwidth=0,
+                highlightbackground=LINE,
+                highlightthickness=1,
+                padx=12,
+                pady=10,
+                anchor="w",
+                cursor="hand2",
+            )
+            btn.grid(row=index // 2, column=index % 2, sticky="ew", padx=(0, 8), pady=(0, 8))
+        grid.grid_columnconfigure(0, weight=1)
+        grid.grid_columnconfigure(1, weight=1)
+        self._button(shell, self.tr("cancel"), win.destroy, variant="ghost").pack(anchor="e", pady=(8, 0))
+
+    def set_language(self, language, window=None):
+        if language not in LANGUAGE_CODES:
+            return
+        self.language.set(language)
+        save_language_preference(language)
+        self.refresh_report_language()
+        if window and window.winfo_exists():
+            window.destroy()
+        self.rebuild_ui()
+
+    def refresh_report_language(self):
+        if not self.last_preview:
+            return
+        done = bool(self.advanced_model and self.advanced_model.get("done"))
+        views, rows, advanced_model = self.build_report_views(self.last_preview, done=done)
+        self.report_views = views
+        self.report_rows = rows
+        self.advanced_model = advanced_model
 
     def rebuild_ui(self):
         for job in self.advanced_tab_counter_jobs:
@@ -602,8 +948,8 @@ class PrusaToOrcaApp:
             self.open_advanced_report()
 
     def update_quick_actions(self):
-        prefix = "PREFIX ON" if self.prefix_profiles.get() else "PREFIX OFF"
-        compat = self.compatibility.get().upper()
+        prefix = self.tr("prefix_on") if self.prefix_profiles.get() else self.tr("prefix_off")
+        compat = self.tr("compat_strict") if self.compatibility.get() == "strict" else self.tr("compat_loose")
         if "prefix" in self.quick_buttons:
             self.quick_buttons["prefix"].configure(
                 text=prefix,
@@ -617,16 +963,22 @@ class PrusaToOrcaApp:
                 fg=PANEL_BG,
             )
         if "safe" in self.quick_buttons:
-            self.quick_buttons["safe"].configure(bg=PANEL_BG, fg=INK)
+            self.quick_buttons["safe"].configure(text=self.tr("safe"), bg=PANEL_BG, fg=INK)
         if "theme" in self.quick_buttons:
             night = self.theme_mode.get() == "night"
             self.quick_buttons["theme"].configure(
-                text="DAY" if night else "NIGHT",
+                text=self.tr("day") if night else self.tr("night"),
                 bg=HEADER_BG if night else PANEL_BG,
                 fg=HEADER_FG if night else INK,
                 activebackground=TEAL,
                 activeforeground=PANEL_BG,
             )
+        if "language" in self.quick_buttons:
+            self.quick_buttons["language"].configure(text=self.language.get().upper(), bg=PANEL_BG, fg=INK)
+        if "history" in self.quick_buttons:
+            self.quick_buttons["history"].configure(text=self.tr("history").upper(), bg=PANEL_BG, fg=INK)
+        if "tools" in self.quick_buttons:
+            self.quick_buttons["tools"].configure(text=self.tr("tools").upper(), bg=PANEL_BG, fg=INK)
 
     def _wire_drag_drop(self):
         if not DND_FILES or not hasattr(self.drop_zone, "drop_target_register"):
@@ -667,12 +1019,15 @@ class PrusaToOrcaApp:
         self.source_mode.set("file")
         self.last_preview = None
         self.advanced_model = None
+        self.risk_label.set(self.tr("risk_waiting"))
         self.set_report_views(
             {
-                "Simple summary": "Choose a bundle to see a non-technical import summary.\n",
-                "Summary": "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n",
-                "Bundle files": "No bundle preview yet.\n",
-                "Advanced report": "No advanced report yet.\n",
+                "Simple summary": self.tr("simple_summary_empty") + "\n",
+                "Summary": (
+                    "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n"
+                ),
+                "Bundle files": self.tr("bundle_files_empty") + "\n",
+                "Advanced report": self.tr("advanced_report_empty") + "\n",
             },
             [],
         )
@@ -689,7 +1044,7 @@ class PrusaToOrcaApp:
 
     def preview(self):
         if not self.input_path.get():
-            messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
+            messagebox.showinfo("PrusaToOrca", self.tr("choose_file_first"))
             return
         self.set_busy(True)
         self.set_progress(0, "Preview started")
@@ -731,7 +1086,7 @@ class PrusaToOrcaApp:
 
     def convert(self):
         if not self.input_path.get():
-            messagebox.showinfo("PrusaToOrca", "Choose a .ini file or folder first.")
+            messagebox.showinfo("PrusaToOrca", self.tr("choose_file_first"))
             return
         self.set_busy(True)
         self.set_progress(0, "Generation started")
@@ -940,14 +1295,14 @@ class PrusaToOrcaApp:
             "",
             f"Source mode: {self.source_mode.get()}",
             f"Input: {self.input_path.get()}",
-            f"Output folder: {self.output_path.get()}",
+            f"{self.tr('output_folder')}: {self.output_path.get()}",
             f"Mode: compatibility={self.compatibility.get()} / prefix={'on' if self.prefix_profiles.get() else 'off'}",
             "",
             f"{'Generated' if done else 'Will generate'} {len(entries)} bundle(s):",
         ]
         bundle_lines = []
         advanced_lines = [
-            "ADVANCED REPORT",
+            self.tr("advanced_report").upper(),
             "",
         ]
         total_mapped = sum(log.total_mapped for _, log in entries)
@@ -977,10 +1332,10 @@ class PrusaToOrcaApp:
             [
                 "",
                 "User summary:",
-                f"  Risk level: {risk['level']}",
-                f"  Converted fields: {total_mapped}",
-                f"  Approximate fields: {total_approx}",
-                f"  Ignored fields: {total_ignored}",
+                f"  {self.tr('risk')}: {risk['level']}",
+                f"  {self.tr('converted')}: {total_mapped}",
+                f"  {self.tr('approx')}: {total_approx}",
+                f"  {self.tr('ignored')}: {total_ignored}",
             ]
         )
         if risk["collisions"]:
@@ -1216,7 +1571,7 @@ class PrusaToOrcaApp:
 
     def open_advanced_report(self):
         if not self.advanced_model or not self.advanced_model.get("sections"):
-            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before opening the advanced report.")
+            messagebox.showinfo("PrusaToOrca", self.tr("advanced_report_open_first"))
             return
         if self.advanced_window and self.advanced_window.winfo_exists():
             self.advanced_window.lift()
@@ -1225,7 +1580,7 @@ class PrusaToOrcaApp:
 
         source = Path(self.advanced_model.get("source") or "bundle").name
         self.advanced_window = tk.Toplevel(self.root)
-        self.advanced_window.title(f"Rapport avanc\u00e9 - {source}")
+        self.advanced_window.title(f"{self.tr('advanced_report_title')} - {source}")
         self.advanced_window.geometry("1120x720")
         self.advanced_window.minsize(920, 600)
         self.advanced_window.configure(bg=ADV_BG)
@@ -1245,7 +1600,7 @@ class PrusaToOrcaApp:
         header.grid_columnconfigure(1, weight=1)
         tk.Label(
             header,
-            text="\u2315  Rapport avanc\u00e9",
+            text=f"\u2315  {self.tr('advanced_report_title')}",
             font=ADV_TITLE_FONT,
             bg=ADV_BG,
             fg=ADV_TEXT,
@@ -1254,9 +1609,9 @@ class PrusaToOrcaApp:
         stats = tk.Frame(header, bg=ADV_BG)
         stats.grid(row=0, column=2, sticky="e")
         totals = self.advanced_model["totals"]
-        self._advanced_stat(stats, f"{CROSS} {totals['ignored']} ignor\u00e9s", ADV_RED)
-        self._advanced_stat(stats, f"{TRIANGLE} {totals['approx']} approx", ORANGE)
-        self._advanced_stat(stats, f"{STAR} {totals['converted']} convertis", ADV_GREEN)
+        self._advanced_stat(stats, f"{CROSS} {totals['ignored']} {self.tr('ignored').lower()}", ADV_RED)
+        self._advanced_stat(stats, f"{TRIANGLE} {totals['approx']} {self.tr('approx').lower()}", ORANGE)
+        self._advanced_stat(stats, f"{STAR} {totals['converted']} {self.tr('converted').lower()}", ADV_GREEN)
 
         sidebar_shell = tk.Frame(shell, bg=ADV_PANEL, highlightbackground=ADV_LINE, highlightthickness=1)
         sidebar_shell.grid(row=1, column=0, sticky="nsew", padx=(0, 12))
@@ -1308,7 +1663,7 @@ class PrusaToOrcaApp:
         self.advanced_search.trace_add("write", lambda *_args: self._advanced_render_summary())
         filters = tk.Frame(search_row, bg=ADV_BG)
         filters.grid(row=0, column=2, sticky="e", padx=(10, 0))
-        for label, value in [("Tous", "all"), ("Convertis", "mapped"), ("Approx", "approx"), ("Ignor\u00e9s", "ignored")]:
+        for label, value in [(self.tr("all"), "all"), (self.tr("converted"), "mapped"), (self.tr("approx"), "approx"), (self.tr("ignored"), "ignored")]:
             tk.Radiobutton(
                 filters,
                 text=label,
@@ -1349,7 +1704,7 @@ class PrusaToOrcaApp:
         footer.grid(row=2, column=1, sticky="e", pady=(12, 0))
         tk.Button(
             footer,
-            text="Fermer",
+            text=self.tr("cancel"),
             command=self.advanced_window.destroy,
             font=ADV_FONT,
             bg=ADV_BG,
@@ -1364,7 +1719,7 @@ class PrusaToOrcaApp:
         ).pack(side="left", padx=(0, 8))
         tk.Button(
             footer,
-            text="Exporter CSV",
+            text=self.tr("csv"),
             command=self.export_csv,
             font=ADV_FONT_BOLD,
             bg=ORANGE,
@@ -1749,7 +2104,7 @@ class PrusaToOrcaApp:
         if not self.advanced_model:
             tk.Label(
                 self.simple_tab,
-                text="Choose a PrusaSlicer bundle to get a plain-language import summary.",
+                text=self.tr("simple_empty"),
                 font=SECTION_FONT,
                 bg=PANEL_BG,
                 fg=INK,
@@ -1787,8 +2142,8 @@ class PrusaToOrcaApp:
         cards.pack(fill="x", pady=(0, 14))
         self.simple_card(cards, "Bundles", len(model.get("outputs", [])), "orca_printer files", TEAL_DARK)
         self.simple_card(cards, "Presets", sum(int(v or 0) for v in presets.values()), "printer / filament / process", TEAL_DARK)
-        self.simple_card(cards, "Approx", approx, "worth checking", ORANGE if approx else TEAL_DARK)
-        self.simple_card(cards, "Ignored", ignored, "not written", RED_ORANGE if ignored else TEAL_DARK)
+        self.simple_card(cards, self.tr("approx"), approx, "worth checking", ORANGE if approx else TEAL_DARK)
+        self.simple_card(cards, self.tr("ignored"), ignored, "not written", RED_ORANGE if ignored else TEAL_DARK)
 
         columns = tk.Frame(self.simple_tab, bg=PANEL_BG)
         columns.pack(fill="both", expand=True)
@@ -1797,7 +2152,7 @@ class PrusaToOrcaApp:
 
         meaning = tk.Frame(columns, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=14, pady=12)
         meaning.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
-        tk.Label(meaning, text="What this means", font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
+        tk.Label(meaning, text=self.tr("what_this_means"), font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
         notes = []
         if collisions:
             notes.append("Keep the prefix enabled or rename generated presets before importing.")
@@ -1812,20 +2167,20 @@ class PrusaToOrcaApp:
 
         next_box = tk.Frame(columns, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=14, pady=12)
         next_box.grid(row=0, column=1, sticky="nsew")
-        tk.Label(next_box, text="Next step", font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
+        tk.Label(next_box, text=self.tr("next_step"), font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
         if model.get("done"):
             next_text = "Open OrcaSlicer, import the generated Config Bundle, then select the imported printer."
         else:
             next_text = "Generate the .orca_printer bundle first. The import assistant opens after generation."
         tk.Label(next_box, text=next_text, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=300, justify="left").pack(anchor="w", pady=(8, 12))
         self._button(next_box, "Open import assistant", self.open_import_wizard, variant="primary").pack(anchor="w")
-        self._button(next_box, "Mapping editor", self.open_mapping_editor, variant="secondary").pack(anchor="w", pady=(8, 0))
+        self._button(next_box, self.tr("mapping_editor"), self.open_mapping_editor, variant="secondary").pack(anchor="w", pady=(8, 0))
 
         outputs = model.get("outputs", [])
         if outputs:
             paths = tk.Frame(self.simple_tab, bg=PANEL_BG)
             paths.pack(fill="x", pady=(14, 0))
-            tk.Label(paths, text="Generated bundle path(s)", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
+            tk.Label(paths, text=self.tr("generated_bundle_paths"), font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
             for path in outputs[:3]:
                 tk.Label(paths, text=path, font=UI_FONT, bg=PANEL_BG, fg=MUTED, wraplength=820, justify="left").pack(anchor="w", pady=(4, 0))
 
@@ -1842,7 +2197,7 @@ class PrusaToOrcaApp:
         if not self.advanced_model:
             tk.Label(
                 self.advanced_tab,
-                text="Preview a bundle to see the animated advanced report.",
+                text=self.tr("advanced_report_empty"),
                 font=SECTION_FONT,
                 bg=PANEL_BG,
                 fg=INK,
@@ -1853,10 +2208,10 @@ class PrusaToOrcaApp:
         risk = model.get("risk", {})
         header = tk.Frame(self.advanced_tab, bg=PANEL_BG)
         header.pack(fill="x", pady=(0, 14))
-        tk.Label(header, text="Advanced report", font=SECTION_FONT, bg=PANEL_BG, fg=INK).pack(side="left")
+        tk.Label(header, text=self.tr("advanced_report"), font=SECTION_FONT, bg=PANEL_BG, fg=INK).pack(side="left")
         tk.Button(
             header,
-            text="Mapping editor",
+            text=self.tr("mapping_editor"),
             command=self.open_mapping_editor,
             font=UI_FONT_BOLD,
             bg=PANEL_BG,
@@ -1873,7 +2228,7 @@ class PrusaToOrcaApp:
         ).pack(side="right", padx=(8, 0))
         tk.Button(
             header,
-            text="Open detailed view",
+            text=self.tr("open_detailed_view"),
             command=self.open_advanced_report,
             font=UI_FONT_BOLD,
             bg=HEADER_BG,
@@ -1889,14 +2244,14 @@ class PrusaToOrcaApp:
 
         cards = tk.Frame(self.advanced_tab, bg=PANEL_BG)
         cards.pack(fill="x", pady=(0, 14))
-        self.animated_card(cards, "Risk", risk.get("level", "N/A"), risk.get("message", ""), TEAL_DARK if risk.get("level") == "LOW" else ORANGE if risk.get("level") == "MEDIUM" else RED_ORANGE)
-        self.animated_card(cards, "Converted", model["totals"]["converted"], "mapped fields", TEAL_DARK)
-        self.animated_card(cards, "Approx", model["totals"]["approx"], "approximate fields", ORANGE)
-        self.animated_card(cards, "Ignored", model["totals"]["ignored"], "not converted", RED_ORANGE)
+        self.animated_card(cards, self.tr("risk"), risk.get("level", "N/A"), risk.get("message", ""), TEAL_DARK if risk.get("level") == "LOW" else ORANGE if risk.get("level") == "MEDIUM" else RED_ORANGE)
+        self.animated_card(cards, self.tr("converted"), model["totals"]["converted"], self.tr("converted_detail"), TEAL_DARK)
+        self.animated_card(cards, self.tr("approx"), model["totals"]["approx"], self.tr("approx_detail"), ORANGE)
+        self.animated_card(cards, self.tr("ignored"), model["totals"]["ignored"], self.tr("ignored_detail"), RED_ORANGE)
 
         filters = tk.Frame(self.advanced_tab, bg=PANEL_BG)
         filters.pack(fill="x", pady=(0, 12))
-        for label, value in [("Tous", "all"), ("Convertis", "mapped"), ("Approx", "approx"), ("Ignor\u00e9s", "ignored")]:
+        for label, value in [(self.tr("all"), "all"), (self.tr("converted"), "mapped"), (self.tr("approx"), "approx"), (self.tr("ignored"), "ignored")]:
             tk.Radiobutton(
                 filters,
                 text=label,
@@ -1920,7 +2275,7 @@ class PrusaToOrcaApp:
         body.pack(fill="both", expand=True)
         sections = self._advanced_filter_sections()
         if not sections:
-            tk.Label(body, text="No section for this filter.", font=UI_FONT, bg=PANEL_BG, fg=MUTED).pack(anchor="w")
+            tk.Label(body, text=self.tr("advanced_no_section"), font=UI_FONT, bg=PANEL_BG, fg=MUTED).pack(anchor="w")
             return
 
         for section in sections[:9]:
@@ -1975,7 +2330,7 @@ class PrusaToOrcaApp:
 
     def export_csv(self):
         if not self.report_rows:
-            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting CSV.")
+            messagebox.showinfo("PrusaToOrca", self.tr("export_before_csv"))
             return
         path = filedialog.asksaveasfilename(
             title="Export conversion report",
@@ -2000,11 +2355,11 @@ class PrusaToOrcaApp:
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writeheader()
             writer.writerows(self.report_rows)
-        messagebox.showinfo("PrusaToOrca", f"CSV report exported:\n{path}")
+        messagebox.showinfo("PrusaToOrca", self.tr("export_csv_done", path=path))
 
     def export_html(self):
         if not self.advanced_model:
-            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting HTML.")
+            messagebox.showinfo("PrusaToOrca", self.tr("export_before_html"))
             return
         path = filedialog.asksaveasfilename(
             title="Export HTML report",
@@ -2014,11 +2369,11 @@ class PrusaToOrcaApp:
         if not path:
             return
         Path(path).write_text(self.render_html_report(), encoding="utf-8")
-        messagebox.showinfo("PrusaToOrca", f"HTML report exported:\n{path}")
+        messagebox.showinfo("PrusaToOrca", self.tr("export_html_done", path=path))
 
     def export_pdf(self):
         if not self.advanced_model:
-            messagebox.showinfo("PrusaToOrca", "Preview or convert a bundle before exporting PDF.")
+            messagebox.showinfo("PrusaToOrca", self.tr("export_before_pdf"))
             return
         path = filedialog.asksaveasfilename(
             title="Export PDF report",
@@ -2028,7 +2383,7 @@ class PrusaToOrcaApp:
         if not path:
             return
         self.write_simple_pdf(path, self.report_views.get("Advanced report", "No report."))
-        messagebox.showinfo("PrusaToOrca", f"PDF report exported:\n{path}")
+        messagebox.showinfo("PrusaToOrca", self.tr("export_pdf_done", path=path))
 
     def render_html_report(self):
         model = self.advanced_model
@@ -2111,17 +2466,17 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def open_import_wizard(self, results=None):
         if results is None and self.advanced_model and not self.advanced_model.get("done"):
-            messagebox.showinfo("Import assistant", "Generate the .orca_printer bundle first, then open the import assistant.")
+            messagebox.showinfo(self.tr("import_assistant"), self.tr("import_assistant_need_generate"))
             return
         outputs = self.generated_output_paths(results)
         if not outputs:
-            messagebox.showinfo("Import assistant", "Generate a .orca_printer bundle first.")
+            messagebox.showinfo(self.tr("import_assistant"), self.tr("import_assistant_need_generate"))
             return
         if self.import_wizard and self.import_wizard.winfo_exists():
             self.import_wizard.destroy()
 
         self.import_wizard = tk.Toplevel(self.root)
-        self.import_wizard.title("OrcaSlicer import assistant")
+        self.import_wizard.title(self.tr("import_assistant"))
         self.import_wizard.geometry("760x520")
         self.import_wizard.minsize(680, 460)
         self.import_wizard.configure(bg=APP_BG)
@@ -2135,10 +2490,10 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         shell.grid_columnconfigure(0, weight=1)
         shell.grid_rowconfigure(2, weight=1)
 
-        tk.Label(shell, text="Import into OrcaSlicer", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(shell, text=self.tr("import_into_orca"), font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
         tk.Label(
             shell,
-            text="Your bundle was generated. Follow these steps in OrcaSlicer.",
+            text=self.tr("import_assistant_intro"),
             font=UI_FONT,
             bg=APP_BG,
             fg=MUTED,
@@ -2160,7 +2515,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         file_box = tk.Frame(shell, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1, padx=12, pady=12)
         file_box.grid(row=3, column=0, sticky="ew", pady=(14, 0))
         file_box.grid_columnconfigure(0, weight=1)
-        tk.Label(file_box, text="Generated bundle file", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(file_box, text=self.tr("generated_bundle_file"), font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=0, column=0, sticky="w")
         selected_path = tk.StringVar(value=outputs[0])
         listbox = tk.Listbox(
             file_box,
@@ -2199,10 +2554,10 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
         buttons = tk.Frame(shell, bg=APP_BG)
         buttons.grid(row=4, column=0, sticky="ew", pady=(14, 0))
-        self._button(buttons, "Copy file path", copy_path, variant="primary").pack(side="left")
-        self._button(buttons, "Open output folder", open_selected_folder, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(buttons, "Open Orca guide", self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(buttons, "Close", self.import_wizard.destroy, variant="ghost").pack(side="right")
+        self._button(buttons, self.tr("copy_file_path"), copy_path, variant="primary").pack(side="left")
+        self._button(buttons, self.tr("open_output_folder"), open_selected_folder, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, self.tr("open_orca_guide"), self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, self.tr("cancel"), self.import_wizard.destroy, variant="ghost").pack(side="right")
 
     def open_orca_guide(self):
         webbrowser.open("https://github.com/SoftFever/OrcaSlicer/wiki")
@@ -2224,10 +2579,10 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
         shell = tk.Frame(self.tools_window, bg=APP_BG, padx=18, pady=16)
         shell.pack(fill="both", expand=True)
-        tk.Label(shell, text="Tools", font=SECTION_FONT, bg=APP_BG, fg=INK).pack(anchor="w")
+        tk.Label(shell, text=self.tr("tools"), font=SECTION_FONT, bg=APP_BG, fg=INK).pack(anchor="w")
         tk.Label(
             shell,
-            text="Support and maintenance actions. The main workflow stays on the left panel.",
+            text=self.tr("tools_description"),
             font=UI_FONT,
             bg=APP_BG,
             fg=MUTED,
@@ -2237,16 +2592,17 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
         for title, description, command in [
             ("OrcaSlicer guide", "Open the official OrcaSlicer wiki in your browser.", self.open_orca_guide),
-            ("Check updates", "Compare this app version with the latest GitHub release.", self.check_for_updates),
+            (self.tr("check_updates"), "Compare this app version with the latest GitHub release.", self.check_for_updates),
             ("Bug report", "Generate an anonymized zip report for support.", self.export_bug_report),
-            ("Copy debug info", "Copy version, paths, and risk summary to clipboard.", self.copy_debug_info),
+            (self.tr("copy_debug_info"), "Copy version, paths, and risk summary to clipboard.", self.copy_debug_info),
+            (self.tr("language"), self.tr("language_intro"), self.open_language_selector),
         ]:
             row = tk.Frame(shell, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=12, pady=10)
             row.pack(fill="x", pady=(0, 10))
             row.grid_columnconfigure(0, weight=1)
             tk.Label(row, text=title, font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).grid(row=0, column=0, sticky="w")
             tk.Label(row, text=description, font=UI_FONT, bg=PANEL_TINT, fg=MUTED, wraplength=330, justify="left").grid(row=1, column=0, sticky="w", pady=(3, 0))
-            self._button(row, "Open", command, variant="secondary").grid(row=0, column=1, rowspan=2, sticky="e", padx=(12, 0))
+            self._button(row, self.tr("open"), command, variant="secondary").grid(row=0, column=1, rowspan=2, sticky="e", padx=(12, 0))
 
     def check_for_updates(self):
         self.set_progress(0.15, "Checking GitHub releases...")
@@ -2317,16 +2673,16 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def open_mapping_editor(self):
         if not self.advanced_model:
-            messagebox.showinfo("Mapping editor", "Preview a bundle before editing ignored-key mappings.")
+            messagebox.showinfo(self.tr("mapping_editor"), "Preview a bundle before editing ignored-key mappings.")
             return
         ignored_rows = self.advanced_model.get("ignored", [])
         if not ignored_rows:
-            messagebox.showinfo("Mapping editor", "No ignored keys in the current report.")
+            messagebox.showinfo(self.tr("mapping_editor"), "No ignored keys in the current report.")
             return
 
         self.configure_tree_style()
         win = tk.Toplevel(self.root)
-        win.title("Mapping editor")
+        win.title(self.tr("mapping_editor"))
         win.geometry("1060x600")
         win.minsize(900, 520)
         win.configure(bg=APP_BG)
@@ -2337,10 +2693,10 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         shell.grid_columnconfigure(1, weight=2)
         shell.grid_rowconfigure(2, weight=1)
 
-        tk.Label(shell, text="Mapping editor", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(shell, text=self.tr("mapping_editor"), font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
         tk.Label(
             shell,
-            text="Choose an ignored PrusaSlicer key, map it to an OrcaSlicer key, then preview again.",
+            text=self.tr("mapping_intro"),
             font=UI_FONT,
             bg=APP_BG,
             fg=MUTED,
@@ -2387,16 +2743,16 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         form.grid(row=2, column=1, sticky="nsew")
         form.grid_columnconfigure(0, weight=1)
 
-        selected_text = tk.StringVar(value="Select an ignored key.")
+        selected_text = tk.StringVar(value=self.tr("select_ignored"))
         target_var = tk.StringVar()
         as_list_var = tk.BooleanVar(value=False)
         tk.Label(form, textvariable=selected_text, font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK, wraplength=360, justify="left").grid(row=0, column=0, sticky="ew")
-        tk.Label(form, text="OrcaSlicer target key", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=1, column=0, sticky="w", pady=(18, 6))
+        tk.Label(form, text=self.tr("orca_target_key"), font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=1, column=0, sticky="w", pady=(18, 6))
         target_combo = ttk.Combobox(form, textvariable=target_var, values=self.orca_key_catalog(), font=UI_FONT)
         target_combo.grid(row=2, column=0, sticky="ew")
         tk.Checkbutton(
             form,
-            text="Store value as Orca list",
+            text=self.tr("store_as_list"),
             variable=as_list_var,
             font=UI_FONT,
             bg=PANEL_BG,
@@ -2407,7 +2763,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
             anchor="w",
         ).grid(row=3, column=0, sticky="w", pady=(10, 18))
 
-        saved_label = tk.Label(form, text="Saved mappings", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK)
+        saved_label = tk.Label(form, text=self.tr("saved_mappings"), font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK)
         saved_label.grid(row=5, column=0, sticky="w", pady=(18, 6))
         saved_box = tk.Listbox(
             form,
@@ -2505,9 +2861,9 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
         buttons = tk.Frame(form, bg=PANEL_BG)
         buttons.grid(row=4, column=0, sticky="ew")
-        self._button(buttons, "Save mapping", save_mapping, variant="primary").pack(side="left")
-        self._button(buttons, "Remove", remove_mapping, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(buttons, "Preview again", self.preview, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, self.tr("save_mapping"), save_mapping, variant="primary").pack(side="left")
+        self._button(buttons, self.tr("remove"), remove_mapping, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, self.tr("preview_again"), self.preview, variant="secondary").pack(side="left", padx=(8, 0))
 
         search_var.trace_add("write", render_rows)
         tree.bind("<<TreeviewSelect>>", on_select)
@@ -2546,7 +2902,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as zf:
             zf.writestr("report.json", json.dumps(payload, indent=2, ensure_ascii=False))
             zf.writestr("advanced_report.txt", self.report_views.get("Advanced report", ""))
-        messagebox.showinfo("PrusaToOrca", f"Bug report generated:\n{target}")
+        messagebox.showinfo("PrusaToOrca", self.tr("bug_report_exported", path=target))
 
     def copy_debug_info(self):
         info = (
@@ -2559,12 +2915,12 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         )
         self.root.clipboard_clear()
         self.root.clipboard_append(info)
-        messagebox.showinfo("PrusaToOrca", "Debug info copied to clipboard.")
+        messagebox.showinfo("PrusaToOrca", self.tr("debug_copied"))
 
     def open_history(self):
         self.configure_tree_style()
         win = tk.Toplevel(self.root)
-        win.title("Conversion history")
+        win.title(self.tr("history"))
         win.geometry("1040x560")
         win.minsize(860, 460)
         win.configure(bg=APP_BG)
@@ -2577,7 +2933,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         header = tk.Frame(shell, bg=APP_BG)
         header.grid(row=0, column=0, sticky="ew")
         header.grid_columnconfigure(1, weight=1)
-        tk.Label(header, text="Conversion history", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(header, text=self.tr("history"), font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
         search_var = tk.StringVar()
         tk.Entry(
             header,
@@ -2661,7 +3017,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         def open_selected_output():
             item = selected_item()
             if not item:
-                messagebox.showinfo("History", "Select a conversion first.")
+                messagebox.showinfo(self.tr("history"), self.tr("history_select_first"))
                 return
             target = Path(item.get("output_folder") or self.output_path.get())
             target.mkdir(parents=True, exist_ok=True)
@@ -2670,7 +3026,7 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         def reopen_selected_report():
             item = selected_item()
             if not item:
-                messagebox.showinfo("History", "Select a conversion first.")
+                messagebox.showinfo(self.tr("history"), self.tr("history_select_first"))
                 return
             snapshot = item.get("report_snapshot")
             if not snapshot:

@@ -17,6 +17,7 @@ not overwritten by matching names.
   process presets.
 - Supports strict or loose compatibility modes.
 - Day/night theme toggle stored locally in the project folder.
+- Language selector stored locally with FR, EN, DE, ES, IT, PT, NL, and PL labels.
 - Non-technical Simple Summary tab with import readiness, risk, and next steps.
 - OrcaSlicer import assistant after generation with copy-path and open-folder
   actions.

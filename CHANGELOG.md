@@ -24,3 +24,7 @@
 - Reordered the left panel so Preview, Generate, and Output are visible at the default size.
 - Fixed conversion history snapshots to save the exact generated report data.
 - Removed unused application code and dead imports.
+- Added a language selector with FR, EN, DE, ES, IT, PT, NL, and PL interface labels.
+- Saved language preference locally in the project settings file.
+- Localized the main workflow, report tabs, advanced report controls, export messages,
+  import assistant, mapping editor, tools, and conversion history labels.
