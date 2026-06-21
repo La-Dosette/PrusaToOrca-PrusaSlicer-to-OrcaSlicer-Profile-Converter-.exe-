@@ -303,9 +303,40 @@ def set_if_v(out, key, val):
         out[key] = val
 
 
+def _custom_section_mappings(custom_mappings, section_type):
+    if not custom_mappings:
+        return {}
+    return custom_mappings.get(section_type, {})
+
+
+def _mapping_target(spec):
+    if isinstance(spec, str):
+        return spec, None
+    if isinstance(spec, dict):
+        return spec.get('target') or spec.get('orca_key'), spec.get('as_list')
+    return None, None
+
+
+def apply_custom_mappings(out, source_data, section_type, custom_mappings, sl=None):
+    for prusa_key, spec in _custom_section_mappings(custom_mappings, section_type).items():
+        orca_key, as_list = _mapping_target(spec)
+        if not prusa_key or not orca_key or prusa_key not in source_data:
+            continue
+        if sl and prusa_key in sl._consumed:
+            continue
+        value = source_data.get(prusa_key)
+        if value in ('', 'nil', None, '""'):
+            continue
+        if as_list is None:
+            as_list = section_type == 'filament'
+        out[orca_key] = [value] if as_list else value
+        if sl:
+            sl.log(prusa_key, orca_key, value, 'custom mapping', True)
+
+
 # =================== PRINT PROFILE ===================
 
-def convert_print_profile(name, data, sl=None):
+def convert_print_profile(name, data, sl=None, custom_mappings=None):
     out = {
         'name': name, 'from': 'User', 'inherits': '',
         'print_settings_id': name, 'version': '1.9.0.0',
@@ -639,13 +670,14 @@ def convert_print_profile(name, data, sl=None):
     # Standby temp (ooze prevention)
     si('standby_temperature_delta', 'standby_temperature_delta')
 
+    apply_custom_mappings(out, data, 'process', custom_mappings, sl)
     if sl: sl.finalize(data)
     return out
 
 
 # =================== FILAMENT PROFILE ===================
 
-def convert_filament_profile(name, data, sl=None):
+def convert_filament_profile(name, data, sl=None, custom_mappings=None):
     out = {
         'name': name, 'from': 'User', 'inherits': '',
         'filament_settings_id': [name], 'version': '1.9.0.0',
@@ -795,13 +827,14 @@ def convert_filament_profile(name, data, sl=None):
     out['filament_end_gcode'] = clean_gcode(v)
     if sl and v.strip('"'): sl.log('end_filament_gcode','filament_end_gcode','<gcode>')
 
+    apply_custom_mappings(out, data, 'filament', custom_mappings, sl)
     if sl: sl.finalize(data)
     return out
 
 
 # =================== PRINTER PROFILE ===================
 
-def convert_printer_profile(name, data, sl=None):
+def convert_printer_profile(name, data, sl=None, custom_mappings=None):
     out = {
         'name': name, 'from': 'User', 'inherits': '',
         'printer_settings_id': name, 'printer_technology': 'FFF',
@@ -957,6 +990,7 @@ def convert_printer_profile(name, data, sl=None):
     out['extruder_type']       = ['Direct Drive']
     out['printer_extruder_id'] = ['1']
 
+    apply_custom_mappings(out, data, 'printer', custom_mappings, sl)
     if sl: sl.finalize(data)
     return out
 
@@ -988,6 +1022,7 @@ def convert_ini_to_orca(
     dry_run=False,
     compatibility='strict',
     prefix_profiles=True,
+    custom_mappings=None,
 ):
     ini_path = Path(ini_path)
     if not ini_path.exists():
@@ -1029,14 +1064,14 @@ def convert_ini_to_orca(
         fname = unique_zip_path('printer', out_name, used_paths)
         printer_files.append(fname)
         sl = log.new_section(name, 'printer') if log else None
-        converted[fname] = convert_printer_profile(out_name, data, sl)
+        converted[fname] = convert_printer_profile(out_name, data, sl, custom_mappings)
 
     for name, data in filament_sections.items():
         out_name = bundled_profile_name(printer_name, name, prefix_profiles)
         fname = unique_zip_path('filament', out_name, used_paths)
         filament_files.append(fname)
         sl = log.new_section(name, 'filament') if log else None
-        converted[fname] = convert_filament_profile(out_name, data, sl)
+        converted[fname] = convert_filament_profile(out_name, data, sl, custom_mappings)
         converted[fname]['compatible_printers'] = compatible_printer_names if compatibility == 'strict' else []
         converted[fname]['compatible_printers_condition'] = ''
 
@@ -1045,7 +1080,7 @@ def convert_ini_to_orca(
         fname = unique_zip_path('process', out_name, used_paths)
         process_files.append(fname)
         sl = log.new_section(name, 'process') if log else None
-        converted[fname] = convert_print_profile(out_name, data, sl)
+        converted[fname] = convert_print_profile(out_name, data, sl, custom_mappings)
         converted[fname]['compatible_printers'] = compatible_printer_names if compatibility == 'strict' else []
         converted[fname]['compatible_printers_condition'] = ''
 

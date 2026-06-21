@@ -16,17 +16,28 @@ import json
 import os
 import shutil
 import traceback
+import urllib.error
+import urllib.request
 import webbrowser
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, ttk
 
 from convert import ConversionLog, convert_ini_to_orca
 
 APP_VERSION = "0.2.0"
 APP_NAME = "PrusaToOrca"
 SETTINGS_FILE = "settings.json"
+CUSTOM_MAPPINGS_FILE = "custom_mappings.json"
+GITHUB_RELEASES_API = (
+    "https://api.github.com/repos/"
+    "La-Dosette/PrusaToOrca-PrusaSlicer-to-OrcaSlicer-Profile-Converter-.exe-/releases/latest"
+)
+GITHUB_RELEASES_URL = (
+    "https://github.com/"
+    "La-Dosette/PrusaToOrca-PrusaSlicer-to-OrcaSlicer-Profile-Converter-.exe-/releases"
+)
 
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -166,6 +177,20 @@ def save_theme_preference(mode):
     save_settings(settings)
 
 
+def compare_versions(left, right):
+    def parts(value):
+        clean = str(value).strip().lstrip("vV")
+        numbers = []
+        for item in clean.split("."):
+            digits = "".join(ch for ch in item if ch.isdigit())
+            numbers.append(int(digits or 0))
+        return (numbers + [0, 0, 0])[:3]
+
+    a = parts(left)
+    b = parts(right)
+    return (a > b) - (a < b)
+
+
 def load_embedded_fonts():
     if sys.platform != "win32":
         return
@@ -211,7 +236,9 @@ class PrusaToOrcaApp:
         self.advanced_tab = None
         self.advanced_tab_bars = []
         self.advanced_tab_counter_jobs = []
+        self.advanced_window_bars = []
         self.history = self.load_history()
+        self.custom_mappings = self.load_custom_mappings()
         self.last_output_folder = None
         self.risk_label = tk.StringVar(value="Risk: waiting for preview")
         self.progress_label = tk.StringVar(value="")
@@ -408,6 +435,8 @@ class PrusaToOrcaApp:
         aux.pack(fill="x", pady=(8, 0))
         self._button(aux, "Bug report", self.export_bug_report, variant="secondary").pack(side="left")
         self._button(aux, "Guide", self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(aux, "Mapping", self.open_mapping_editor, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(aux, "Updates", self.check_for_updates, variant="secondary").pack(side="left", padx=(8, 0))
 
     def _build_preview_panel(self, parent):
         header = tk.Frame(parent, bg=APP_BG)
@@ -720,6 +749,7 @@ class PrusaToOrcaApp:
                     dry_run=True,
                     compatibility=self.compatibility.get(),
                     prefix_profiles=self.prefix_profiles.get(),
+                    custom_mappings=self.custom_mappings,
                 )
                 preview["source_path"] = ini_path
                 preview["output_path"] = self.unique_output_path(preview["output_path"], used_outputs)
@@ -731,7 +761,8 @@ class PrusaToOrcaApp:
             self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
             self.root.after(0, lambda: self.set_progress(1, f"Preview ready: {len(previews)} bundle(s)"))
         except Exception as exc:
-            self.root.after(0, lambda: messagebox.showerror("Preview failed", str(exc)))
+            error = str(exc)
+            self.root.after(0, lambda: messagebox.showerror("Preview failed", error))
             self.root.after(0, lambda: self.set_progress(0, "Preview failed"))
         finally:
             self.root.after(0, lambda: self.set_busy(False))
@@ -760,6 +791,7 @@ class PrusaToOrcaApp:
                     dry_run=True,
                     compatibility=self.compatibility.get(),
                     prefix_profiles=self.prefix_profiles.get(),
+                    custom_mappings=self.custom_mappings,
                 )
                 target = self.unique_output_path(preview["output_path"], used_outputs)
                 log = ConversionLog()
@@ -770,6 +802,7 @@ class PrusaToOrcaApp:
                     dry_run=False,
                     compatibility=self.compatibility.get(),
                     prefix_profiles=self.prefix_profiles.get(),
+                    custom_mappings=self.custom_mappings,
                 )
                 preview["source_path"] = ini_path
                 preview["output_path"] = result
@@ -784,7 +817,8 @@ class PrusaToOrcaApp:
             self.root.after(0, lambda: self.set_progress(1, f"Generated {len(results)} bundle(s)"))
             self.root.after(0, lambda: messagebox.showinfo("Done", f"Generated {len(results)} bundle(s)."))
         except Exception as exc:
-            self.root.after(0, lambda: messagebox.showerror("Conversion failed", str(exc)))
+            error = str(exc)
+            self.root.after(0, lambda: messagebox.showerror("Conversion failed", error))
             self.root.after(0, lambda: self.set_progress(0, "Generation failed"))
         finally:
             self.root.after(0, lambda: self.set_busy(False))
@@ -866,6 +900,57 @@ class PrusaToOrcaApp:
         path = self.history_path()
         path.write_text(json.dumps(self.history[-100:], indent=2, ensure_ascii=False), encoding="utf-8")
 
+    def mapping_path(self):
+        return app_file(CUSTOM_MAPPINGS_FILE)
+
+    def load_custom_mappings(self):
+        defaults = {"printer": {}, "filament": {}, "process": {}}
+        path = self.mapping_path()
+        if not path.exists():
+            return defaults
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return defaults
+        for key in defaults:
+            if isinstance(loaded.get(key), dict):
+                defaults[key].update(loaded[key])
+        return defaults
+
+    def save_custom_mappings(self):
+        self.mapping_path().write_text(
+            json.dumps(self.custom_mappings, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+    def orca_key_catalog(self, section_type=None):
+        keys = set()
+        if self.advanced_model:
+            for section in self.advanced_model.get("sections", []):
+                if section_type and section["type"] != section_type:
+                    continue
+                keys.update(row[1] for row in section.get("mapped", []) if row[1] and row[1] != "-")
+        fallback = {
+            "printer": [
+                "printer_notes", "printable_height", "nozzle_diameter", "machine_start_gcode",
+                "machine_end_gcode", "retraction_length", "z_hop",
+            ],
+            "filament": [
+                "filament_notes", "filament_type", "filament_vendor", "filament_density",
+                "filament_cost", "filament_max_volumetric_speed", "filament_flow_ratio",
+            ],
+            "process": [
+                "notes", "layer_height", "wall_loops", "sparse_infill_density",
+                "sparse_infill_speed", "travel_speed", "seam_gap",
+            ],
+        }
+        if section_type:
+            keys.update(fallback.get(section_type, []))
+        else:
+            for values in fallback.values():
+                keys.update(values)
+        return sorted(keys)
+
     def record_history(self, results, model):
         item = {
             "date": datetime.now().isoformat(timespec="seconds"),
@@ -876,6 +961,11 @@ class PrusaToOrcaApp:
             "converted": model["totals"]["converted"],
             "approx": model["totals"]["approx"],
             "ignored": model["totals"]["ignored"],
+            "report_snapshot": {
+                "views": self.report_views,
+                "rows": self.report_rows,
+                "advanced_model": model,
+            },
         }
         self.history.append(item)
         self.save_history()
@@ -1138,6 +1228,7 @@ class PrusaToOrcaApp:
         self.advanced_window.geometry("1120x720")
         self.advanced_window.minsize(920, 600)
         self.advanced_window.configure(bg=ADV_BG)
+        self.advanced_window_bars = []
         try:
             self.advanced_window.iconbitmap(resource_path("logo.ico"))
         except Exception:
@@ -1287,6 +1378,23 @@ class PrusaToOrcaApp:
         ).pack(side="left")
         tk.Button(
             footer,
+            text="Mapping",
+            command=self.open_mapping_editor,
+            font=ADV_FONT_BOLD,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=TEAL,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            highlightbackground=LINE,
+            highlightthickness=1,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+        ).pack(side="left", padx=(8, 0))
+        tk.Button(
+            footer,
             text="HTML",
             command=self.export_html,
             font=ADV_FONT_BOLD,
@@ -1412,6 +1520,7 @@ class PrusaToOrcaApp:
         if not self.advanced_body:
             return
         self._advanced_clear(self.advanced_body)
+        self.advanced_window_bars = []
         sections = self._advanced_filter_sections()
         title = "R\u00e9sum\u00e9 par section"
         if self._advanced_query():
@@ -1436,6 +1545,7 @@ class PrusaToOrcaApp:
 
         for section in sections:
             self._advanced_section_card(section)
+        self.root.after(80, self.animate_advanced_window_bars)
 
     def _advanced_section_card(self, section):
         card = tk.Frame(self.advanced_body, bg=ADV_PANEL_ALT, highlightbackground=ADV_LINE, highlightthickness=1, padx=13, pady=9)
@@ -1457,19 +1567,31 @@ class PrusaToOrcaApp:
         ]:
             tk.Label(stats, text=text, font=ADV_FONT_BOLD, bg=ADV_PANEL_ALT, fg=color, padx=6).pack(side="left")
 
-        bar = tk.Frame(card, bg=ADV_PROGRESS_BG, height=7)
+        bar = tk.Canvas(card, bg=ADV_PROGRESS_BG, height=7, highlightthickness=0)
         bar.grid(row=1, column=0, sticky="ew", pady=(9, 0))
-        bar.grid_propagate(False)
-        fill = tk.Frame(bar, bg=TEAL)
-        fill.place(relx=0, rely=0, relwidth=max(0.01, section["coverage"] / 100), relheight=1)
-        if section["coverage"] < 100:
-            warn = tk.Frame(bar, bg=ORANGE)
-            warn.place(relx=0, rely=0, relwidth=max(0.01, (100 - section["coverage"]) / 100), relheight=1)
-            fill.lift()
+        warn = bar.create_rectangle(0, 0, 0, 7, fill=ORANGE, outline="")
+        fill = bar.create_rectangle(0, 0, 0, 7, fill=TEAL, outline="")
+        self.advanced_window_bars.append((bar, fill, warn, section["coverage"] / 100))
 
         for widget in (card, top, bar):
             widget.bind("<Button-1>", lambda _event, s=section: self._advanced_render_detail(s))
             widget.configure(cursor="hand2")
+
+        def hover(_event, active):
+            card.configure(bg=PANEL_TINT if active else ADV_PANEL_ALT)
+            top.configure(bg=PANEL_TINT if active else ADV_PANEL_ALT)
+
+        card.bind("<Enter>", lambda event: hover(event, True))
+        card.bind("<Leave>", lambda event: hover(event, False))
+
+    def animate_advanced_window_bars(self, step=0):
+        steps = 18
+        for bar, fill, warn, target in self.advanced_window_bars:
+            width = max(bar.winfo_width(), 1)
+            bar.coords(warn, 0, 0, width, 7)
+            bar.coords(fill, 0, 0, int(width * target * step / steps), 7)
+        if step < steps and self.advanced_window and self.advanced_window.winfo_exists():
+            self.root.after(16, lambda: self.animate_advanced_window_bars(step + 1))
 
     def _advanced_render_detail(self, section):
         if not self.advanced_body:
@@ -1632,6 +1754,23 @@ class PrusaToOrcaApp:
         header = tk.Frame(self.advanced_tab, bg=PANEL_BG)
         header.pack(fill="x", pady=(0, 14))
         tk.Label(header, text="Advanced report", font=SECTION_FONT, bg=PANEL_BG, fg=INK).pack(side="left")
+        tk.Button(
+            header,
+            text="Mapping editor",
+            command=self.open_mapping_editor,
+            font=UI_FONT_BOLD,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=TEAL,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            highlightbackground=LINE,
+            highlightthickness=1,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+        ).pack(side="right", padx=(8, 0))
         tk.Button(
             header,
             text="Open detailed view",
@@ -1864,6 +2003,275 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
     def open_orca_guide(self):
         webbrowser.open("https://github.com/SoftFever/OrcaSlicer/wiki")
 
+    def check_for_updates(self):
+        self.set_progress(0.15, "Checking GitHub releases...")
+
+        def worker():
+            try:
+                request = urllib.request.Request(
+                    GITHUB_RELEASES_API,
+                    headers={"User-Agent": f"{APP_NAME}/{APP_VERSION}"},
+                )
+                with urllib.request.urlopen(request, timeout=10) as response:
+                    payload = json.loads(response.read().decode("utf-8"))
+                latest = payload.get("tag_name", "").lstrip("vV") or payload.get("name", "")
+                release_url = payload.get("html_url") or GITHUB_RELEASES_URL
+                if not latest:
+                    raise ValueError("No version tag found in the latest GitHub release.")
+                self.root.after(0, lambda: self.show_update_result(latest, release_url))
+            except urllib.error.HTTPError as exc:
+                if exc.code == 404:
+                    message = "No GitHub release found yet for this repository."
+                else:
+                    message = f"GitHub update check failed: HTTP {exc.code}"
+                self.root.after(0, lambda: messagebox.showinfo("Updates", message))
+                self.root.after(0, lambda: self.set_progress(0, "Update check unavailable"))
+            except Exception as exc:
+                error = str(exc)
+                self.root.after(0, lambda: messagebox.showerror("Updates", error))
+                self.root.after(0, lambda: self.set_progress(0, "Update check failed"))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def show_update_result(self, latest, release_url):
+        self.set_progress(1, f"Latest release: {latest}")
+        if compare_versions(latest, APP_VERSION) > 0:
+            open_release = messagebox.askyesno(
+                "Update available",
+                f"A newer PrusaToOrca release is available.\n\n"
+                f"Installed: {APP_VERSION}\nLatest: {latest}\n\nOpen GitHub Releases?",
+            )
+            if open_release:
+                webbrowser.open(release_url)
+        else:
+            messagebox.showinfo("Updates", f"PrusaToOrca is up to date.\n\nInstalled: {APP_VERSION}\nLatest: {latest}")
+
+    def configure_tree_style(self):
+        style = ttk.Style()
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+        style.configure(
+            "Prusa.Treeview",
+            background=PANEL_BG,
+            foreground=INK,
+            fieldbackground=PANEL_BG,
+            rowheight=28,
+            bordercolor=LINE,
+            font=UI_FONT,
+        )
+        style.configure(
+            "Prusa.Treeview.Heading",
+            background=HEADER_BG,
+            foreground=HEADER_FG,
+            relief="flat",
+            font=UI_FONT_BOLD,
+        )
+        style.map("Prusa.Treeview", background=[("selected", TEAL)], foreground=[("selected", PANEL_BG)])
+
+    def open_mapping_editor(self):
+        if not self.advanced_model:
+            messagebox.showinfo("Mapping editor", "Preview a bundle before editing ignored-key mappings.")
+            return
+        ignored_rows = self.advanced_model.get("ignored", [])
+        if not ignored_rows:
+            messagebox.showinfo("Mapping editor", "No ignored keys in the current report.")
+            return
+
+        self.configure_tree_style()
+        win = tk.Toplevel(self.root)
+        win.title("Mapping editor")
+        win.geometry("1060x600")
+        win.minsize(900, 520)
+        win.configure(bg=APP_BG)
+
+        shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
+        shell.pack(fill="both", expand=True)
+        shell.grid_columnconfigure(0, weight=3)
+        shell.grid_columnconfigure(1, weight=2)
+        shell.grid_rowconfigure(2, weight=1)
+
+        tk.Label(shell, text="Mapping editor", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(
+            shell,
+            text="Choose an ignored PrusaSlicer key, map it to an OrcaSlicer key, then preview again.",
+            font=UI_FONT,
+            bg=APP_BG,
+            fg=MUTED,
+        ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(4, 12))
+
+        search_var = tk.StringVar()
+        tk.Entry(
+            shell,
+            textvariable=search_var,
+            font=UI_FONT,
+            bg=PANEL_BG,
+            fg=INK,
+            insertbackground=INK,
+            relief="flat",
+            highlightbackground=LINE,
+            highlightthickness=1,
+        ).grid(row=0, column=1, sticky="ew", padx=(18, 0))
+
+        table_frame = tk.Frame(shell, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1)
+        table_frame.grid(row=2, column=0, sticky="nsew", padx=(0, 16))
+        table_frame.grid_rowconfigure(0, weight=1)
+        table_frame.grid_columnconfigure(0, weight=1)
+        tree = ttk.Treeview(
+            table_frame,
+            style="Prusa.Treeview",
+            columns=("type", "section", "key", "value"),
+            show="headings",
+            selectmode="browse",
+        )
+        for col, text, width in [
+            ("type", "Type", 80),
+            ("section", "Section", 220),
+            ("key", "Prusa key", 210),
+            ("value", "Value", 220),
+        ]:
+            tree.heading(col, text=text)
+            tree.column(col, width=width, anchor="w")
+        scroll = tk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scroll.set)
+        tree.grid(row=0, column=0, sticky="nsew")
+        scroll.grid(row=0, column=1, sticky="ns")
+
+        form = tk.Frame(shell, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1, padx=14, pady=14)
+        form.grid(row=2, column=1, sticky="nsew")
+        form.grid_columnconfigure(0, weight=1)
+
+        selected_text = tk.StringVar(value="Select an ignored key.")
+        target_var = tk.StringVar()
+        as_list_var = tk.BooleanVar(value=False)
+        tk.Label(form, textvariable=selected_text, font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK, wraplength=360, justify="left").grid(row=0, column=0, sticky="ew")
+        tk.Label(form, text="OrcaSlicer target key", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=1, column=0, sticky="w", pady=(18, 6))
+        target_combo = ttk.Combobox(form, textvariable=target_var, values=self.orca_key_catalog(), font=UI_FONT)
+        target_combo.grid(row=2, column=0, sticky="ew")
+        tk.Checkbutton(
+            form,
+            text="Store value as Orca list",
+            variable=as_list_var,
+            font=UI_FONT,
+            bg=PANEL_BG,
+            fg=INK,
+            activebackground=PANEL_BG,
+            activeforeground=INK,
+            selectcolor=PANEL_BG,
+            anchor="w",
+        ).grid(row=3, column=0, sticky="w", pady=(10, 18))
+
+        saved_label = tk.Label(form, text="Saved mappings", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK)
+        saved_label.grid(row=5, column=0, sticky="w", pady=(18, 6))
+        saved_box = tk.Listbox(
+            form,
+            bg=PANEL_TINT,
+            fg=INK,
+            selectbackground=TEAL,
+            selectforeground=PANEL_BG,
+            font=UI_FONT,
+            relief="flat",
+            highlightbackground=LINE,
+            highlightthickness=1,
+            height=7,
+        )
+        saved_box.grid(row=6, column=0, sticky="nsew")
+        form.grid_rowconfigure(6, weight=1)
+
+        visible_rows = []
+
+        def mapping_spec(section_type, prusa_key):
+            spec = self.custom_mappings.get(section_type, {}).get(prusa_key)
+            if isinstance(spec, str):
+                return spec, section_type == "filament"
+            if isinstance(spec, dict):
+                return spec.get("target") or spec.get("orca_key") or "", bool(spec.get("as_list"))
+            return "", section_type == "filament"
+
+        def render_saved():
+            saved_box.delete(0, "end")
+            for section_type in ("printer", "filament", "process"):
+                for prusa_key, spec in sorted(self.custom_mappings.get(section_type, {}).items()):
+                    target, as_list = mapping_spec(section_type, prusa_key)
+                    suffix = "[]" if as_list else ""
+                    saved_box.insert("end", f"{section_type}: {prusa_key} -> {target}{suffix}")
+
+        def render_rows(*_args):
+            for child in tree.get_children():
+                tree.delete(child)
+            visible_rows.clear()
+            query = search_var.get().strip().lower()
+            for row in ignored_rows:
+                haystack = " ".join([row["section_type"], row["section_name"], row["key"], row["value"]]).lower()
+                if query and query not in haystack:
+                    continue
+                visible_rows.append(row)
+                tree.insert(
+                    "",
+                    "end",
+                    iid=str(len(visible_rows) - 1),
+                    values=(row["section_type"], row["section_name"], row["key"], row["value"]),
+                )
+
+        def current_row():
+            selected = tree.selection()
+            if not selected:
+                return None
+            index = int(selected[0])
+            if index >= len(visible_rows):
+                return None
+            return visible_rows[index]
+
+        def on_select(_event=None):
+            row = current_row()
+            if not row:
+                return
+            selected_text.set(f"{row['section_type']} / {row['section_name']}\n{row['key']} = {row['value']}")
+            target, as_list = mapping_spec(row["section_type"], row["key"])
+            target_var.set(target)
+            as_list_var.set(as_list)
+            target_combo.configure(values=self.orca_key_catalog(row["section_type"]))
+
+        def save_mapping():
+            row = current_row()
+            target = target_var.get().strip()
+            if not row or not target:
+                messagebox.showinfo("Mapping editor", "Select an ignored key and enter an Orca target key.")
+                return
+            section_type = row["section_type"]
+            self.custom_mappings.setdefault(section_type, {})[row["key"]] = {
+                "target": target,
+                "as_list": bool(as_list_var.get()),
+            }
+            self.save_custom_mappings()
+            render_saved()
+            messagebox.showinfo("Mapping editor", "Mapping saved. Run Preview again to apply it.")
+
+        def remove_mapping():
+            row = current_row()
+            if not row:
+                return
+            section_type = row["section_type"]
+            self.custom_mappings.get(section_type, {}).pop(row["key"], None)
+            self.save_custom_mappings()
+            target_var.set("")
+            render_saved()
+
+        buttons = tk.Frame(form, bg=PANEL_BG)
+        buttons.grid(row=4, column=0, sticky="ew")
+        self._button(buttons, "Save mapping", save_mapping, variant="primary").pack(side="left")
+        self._button(buttons, "Remove", remove_mapping, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, "Preview again", self.preview, variant="secondary").pack(side="left", padx=(8, 0))
+
+        search_var.trace_add("write", render_rows)
+        tree.bind("<<TreeviewSelect>>", on_select)
+        render_rows()
+        render_saved()
+        if visible_rows:
+            tree.selection_set("0")
+            on_select()
+
     def anonymize_path(self, value):
         text = str(value)
         home = str(Path.home())
@@ -1909,23 +2317,137 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         messagebox.showinfo("PrusaToOrca", "Debug info copied to clipboard.")
 
     def open_history(self):
+        self.configure_tree_style()
         win = tk.Toplevel(self.root)
         win.title("Conversion history")
-        win.geometry("780x420")
-        win.configure(bg=PANEL_BG)
-        text = tk.Text(win, bg=PANEL_BG, fg=INK, font=UI_FONT, wrap="none", padx=14, pady=14)
-        text.pack(fill="both", expand=True)
-        if not self.history:
-            text.insert("end", "No conversion history yet.\n")
-        else:
-            for item in reversed(self.history[-50:]):
-                text.insert(
+        win.geometry("1040x560")
+        win.minsize(860, 460)
+        win.configure(bg=APP_BG)
+
+        shell = tk.Frame(win, bg=APP_BG, padx=18, pady=16)
+        shell.pack(fill="both", expand=True)
+        shell.grid_columnconfigure(0, weight=1)
+        shell.grid_rowconfigure(2, weight=1)
+
+        header = tk.Frame(shell, bg=APP_BG)
+        header.grid(row=0, column=0, sticky="ew")
+        header.grid_columnconfigure(1, weight=1)
+        tk.Label(header, text="Conversion history", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        search_var = tk.StringVar()
+        tk.Entry(
+            header,
+            textvariable=search_var,
+            font=UI_FONT,
+            bg=PANEL_BG,
+            fg=INK,
+            insertbackground=INK,
+            relief="flat",
+            highlightbackground=LINE,
+            highlightthickness=1,
+        ).grid(row=0, column=1, sticky="ew", padx=(18, 0))
+
+        toolbar = tk.Frame(shell, bg=APP_BG)
+        toolbar.grid(row=1, column=0, sticky="ew", pady=(12, 10))
+
+        table_frame = tk.Frame(shell, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1)
+        table_frame.grid(row=2, column=0, sticky="nsew")
+        table_frame.grid_rowconfigure(0, weight=1)
+        table_frame.grid_columnconfigure(0, weight=1)
+        tree = ttk.Treeview(
+            table_frame,
+            style="Prusa.Treeview",
+            columns=("date", "risk", "bundles", "converted", "approx", "ignored", "source", "output"),
+            show="headings",
+            selectmode="browse",
+        )
+        columns = [
+            ("date", "Date", 150),
+            ("risk", "Risk", 80),
+            ("bundles", "Bundles", 70),
+            ("converted", "OK", 70),
+            ("approx", "Approx", 70),
+            ("ignored", "Ignored", 80),
+            ("source", "Source", 260),
+            ("output", "Output", 260),
+        ]
+        for col, text, width in columns:
+            tree.heading(col, text=text)
+            tree.column(col, width=width, anchor="w")
+        scroll = tk.Scrollbar(table_frame, orient="vertical", command=tree.yview)
+        tree.configure(yscrollcommand=scroll.set)
+        tree.grid(row=0, column=0, sticky="nsew")
+        scroll.grid(row=0, column=1, sticky="ns")
+
+        visible_items = []
+
+        def render_history(*_args):
+            for child in tree.get_children():
+                tree.delete(child)
+            visible_items.clear()
+            query = search_var.get().strip().lower()
+            for item in reversed(self.history[-100:]):
+                haystack = " ".join(str(item.get(key, "")) for key in ("date", "risk", "source", "output_folder")).lower()
+                if query and query not in haystack:
+                    continue
+                visible_items.append(item)
+                tree.insert(
+                    "",
                     "end",
-                    f"{item['date']} | risk={item['risk']} | bundles={item['bundles']} | "
-                    f"converted={item['converted']} approx={item['approx']} ignored={item['ignored']}\n"
-                    f"  source: {item['source']}\n  output: {item['output_folder']}\n\n",
+                    iid=str(len(visible_items) - 1),
+                    values=(
+                        item.get("date", ""),
+                        item.get("risk", ""),
+                        item.get("bundles", ""),
+                        item.get("converted", ""),
+                        item.get("approx", ""),
+                        item.get("ignored", ""),
+                        self.anonymize_path(item.get("source", "")),
+                        self.anonymize_path(item.get("output_folder", "")),
+                    ),
                 )
-        text.configure(state="disabled")
+
+        def selected_item():
+            selected = tree.selection()
+            if not selected:
+                return None
+            index = int(selected[0])
+            return visible_items[index] if index < len(visible_items) else None
+
+        def open_selected_output():
+            item = selected_item()
+            if not item:
+                messagebox.showinfo("History", "Select a conversion first.")
+                return
+            target = Path(item.get("output_folder") or self.output_path.get())
+            target.mkdir(parents=True, exist_ok=True)
+            os.startfile(str(target))
+
+        def reopen_selected_report():
+            item = selected_item()
+            if not item:
+                messagebox.showinfo("History", "Select a conversion first.")
+                return
+            snapshot = item.get("report_snapshot")
+            if not snapshot:
+                messagebox.showinfo("History", "This older history item has no saved report snapshot.")
+                return
+            self.input_path.set(item.get("source", ""))
+            self.output_path.set(item.get("output_folder", self.output_path.get()))
+            self.report_views = snapshot.get("views", {})
+            self.report_rows = snapshot.get("rows", [])
+            self.advanced_model = snapshot.get("advanced_model")
+            self.set_report_views(self.report_views, self.report_rows, self.advanced_model)
+            self.show_report_tab("Advanced report")
+            self.open_advanced_report()
+
+        self._button(toolbar, "Open output folder", open_selected_output, variant="secondary").pack(side="left")
+        self._button(toolbar, "Reopen report", reopen_selected_report, variant="primary").pack(side="left", padx=(8, 0))
+        self._button(toolbar, "Refresh", render_history, variant="secondary").pack(side="left", padx=(8, 0))
+
+        search_var.trace_add("write", render_history)
+        render_history()
+        if visible_items:
+            tree.selection_set("0")
 
     def write_report(self, text):
         self.report.configure(state="normal")

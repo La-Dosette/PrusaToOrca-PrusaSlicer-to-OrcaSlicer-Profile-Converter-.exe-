@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from convert import convert_ini_to_orca, parse_ini
+from convert import ConversionLog, convert_ini_to_orca, parse_ini
 
 
 FIXTURE = Path(__file__).parent / 'fixtures' / 'sample_safe.ini'
@@ -104,6 +104,41 @@ class SafeImportTests(unittest.TestCase):
 
             sections = parse_ini(bom_path)
             self.assertIn('printer:Original Prusa/MK4:Input Shaper 0.4 nozzle', sections)
+
+    def test_custom_mapping_copies_ignored_key(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ini_path = Path(tmp) / 'custom.ini'
+            ini_path.write_text(
+                '\n'.join([
+                    '[filament:Mapped PLA]',
+                    'filament_type = PLA',
+                    'filament_spool_weight = 750',
+                    '',
+                    '[printer:Printer A]',
+                    'nozzle_diameter = 0.4',
+                ]),
+                encoding='utf-8',
+            )
+            log = ConversionLog()
+            bundle_path = convert_ini_to_orca(
+                ini_path,
+                Path(tmp) / 'out',
+                log=log,
+                custom_mappings={
+                    'filament': {
+                        'filament_spool_weight': {
+                            'target': 'filament_custom_spool_weight',
+                            'as_list': True,
+                        }
+                    }
+                },
+            )
+            bundle = read_bundle(bundle_path)
+            filament = next(data for name, data in bundle.items() if name.startswith('filament/'))
+
+            self.assertEqual(filament['filament_custom_spool_weight'], ['750'])
+            skipped = [key for section in log.sections for key, _ in section.skipped]
+            self.assertNotIn('filament_spool_weight', skipped)
 
 
 if __name__ == '__main__':

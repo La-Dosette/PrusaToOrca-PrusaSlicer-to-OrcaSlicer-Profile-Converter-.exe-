@@ -16,9 +16,15 @@ not overwritten by matching names.
 - Adds explicit OrcaSlicer compatibility metadata for generated filament and
   process presets.
 - Supports strict or loose compatibility modes.
+- Day/night theme toggle stored locally in the project folder.
+- Mapping editor for ignored PrusaSlicer keys that should be copied to a
+  chosen OrcaSlicer key.
+- Searchable conversion history with output-folder actions and report snapshots
+  for new conversions.
 - CLI mode for automation and testing.
 - Conversion report with summary, bundle file list, advanced field details, and
-  CSV export.
+  CSV, HTML, and simple PDF export.
+- GitHub Releases update check from the desktop app.
 
 ## Install
 
@@ -43,8 +49,9 @@ Workflow:
 2. Review the safe import preview.
 3. Choose strict or loose compatibility.
 4. Generate the `.orca_printer` bundle.
-5. Export the CSV report if needed.
-6. Import the generated bundle in OrcaSlicer.
+5. If needed, use Mapping to map ignored keys, then preview again.
+6. Export CSV, HTML, or PDF reports if needed.
+7. Import the generated bundle in OrcaSlicer.
 
 ## CLI Usage
 
@@ -97,7 +104,8 @@ python -m unittest discover -s tests -v
 ```
 
 The test suite covers safe import behavior, filename sanitizing, strict/loose
-compatibility, multi-printer bundles, dry-run behavior, and UTF-8 BOM parsing.
+compatibility, multi-printer bundles, dry-run behavior, UTF-8 BOM parsing, and
+custom ignored-key mappings.
 
 ## Project Structure
 

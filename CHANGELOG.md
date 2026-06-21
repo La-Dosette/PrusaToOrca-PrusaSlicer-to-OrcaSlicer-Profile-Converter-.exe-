@@ -12,4 +12,8 @@
 - Added debug info copy action.
 - Added versioned release packaging.
 - Added GitHub Actions Windows build workflow.
-
+- Added day/night theme toggle stored in the project folder.
+- Added a custom mapping editor for ignored PrusaSlicer keys.
+- Improved conversion history with search, output-folder action, and report snapshots.
+- Added GitHub Releases update checks from the app.
+- Improved Advanced Report cards with animated progress bars.

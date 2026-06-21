@@ -5,6 +5,7 @@
 config.json
 conversion_history.json
 settings.json
+custom_mappings.json
 bug_reports/
 
 # PyInstaller build artifacts
