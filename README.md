@@ -17,6 +17,9 @@ not overwritten by matching names.
   process presets.
 - Supports strict or loose compatibility modes.
 - Day/night theme toggle stored locally in the project folder.
+- Non-technical Simple Summary tab with import readiness, risk, and next steps.
+- OrcaSlicer import assistant after generation with copy-path and open-folder
+  actions.
 - Mapping editor for ignored PrusaSlicer keys that should be copied to a
   chosen OrcaSlicer key.
 - Searchable conversion history with output-folder actions and report snapshots
@@ -46,12 +49,12 @@ python app.py
 Workflow:
 
 1. Drop or choose a PrusaSlicer `.ini` config bundle, or choose a folder.
-2. Review the safe import preview.
+2. Review the Simple Summary and safe import preview.
 3. Choose strict or loose compatibility.
 4. Generate the `.orca_printer` bundle.
-5. If needed, use Mapping to map ignored keys, then preview again.
-6. Export CSV, HTML, or PDF reports if needed.
-7. Import the generated bundle in OrcaSlicer.
+5. Follow the OrcaSlicer import assistant to import the generated bundle.
+6. If needed, use Mapping to map ignored keys, then preview again.
+7. Export CSV, HTML, or PDF reports if needed.
 
 ## CLI Usage
 

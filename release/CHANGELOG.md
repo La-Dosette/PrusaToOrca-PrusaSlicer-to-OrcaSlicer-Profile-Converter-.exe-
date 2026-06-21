@@ -17,3 +17,5 @@
 - Improved conversion history with search, output-folder action, and report snapshots.
 - Added GitHub Releases update checks from the app.
 - Improved Advanced Report cards with animated progress bars.
+- Added a non-technical Simple Summary tab for normal users.
+- Added an OrcaSlicer import assistant with copy-path and open-folder actions.

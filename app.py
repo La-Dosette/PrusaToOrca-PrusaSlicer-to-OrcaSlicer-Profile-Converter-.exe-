@@ -233,16 +233,18 @@ class PrusaToOrcaApp:
         self.advanced_sidebar = None
         self.advanced_search = None
         self.advanced_filter = tk.StringVar(value="all")
+        self.simple_tab = None
         self.advanced_tab = None
         self.advanced_tab_bars = []
         self.advanced_tab_counter_jobs = []
         self.advanced_window_bars = []
+        self.import_wizard = None
         self.history = self.load_history()
         self.custom_mappings = self.load_custom_mappings()
         self.last_output_folder = None
         self.risk_label = tk.StringVar(value="Risk: waiting for preview")
         self.progress_label = tk.StringVar(value="")
-        self.current_report_tab = "Summary"
+        self.current_report_tab = "Simple summary"
         self.tab_buttons = {}
         self.quick_buttons = {}
         self.logo_image = None
@@ -459,16 +461,21 @@ class PrusaToOrcaApp:
 
         tabs = tk.Frame(frame, bg=PANEL_BG)
         tabs.grid(row=0, column=0, sticky="ew")
-        tabs.grid_columnconfigure(3, weight=1)
-        for text in ["Summary", "Bundle files", "Advanced report"]:
+        tabs.grid_columnconfigure(4, weight=1)
+        for label, name in [
+            ("Simple", "Simple summary"),
+            ("Technical", "Summary"),
+            ("Files", "Bundle files"),
+            ("Advanced", "Advanced report"),
+        ]:
             btn = tk.Button(
                 tabs,
-                text=text,
-                command=lambda name=text: self.show_report_tab(name),
+                text=label,
+                command=lambda tab_name=name: self.show_report_tab(tab_name),
                 font=UI_FONT_BOLD,
-                bg=TEAL_DARK if text == self.current_report_tab else PANEL_BG,
-                fg=PANEL_BG if text == self.current_report_tab else MUTED,
-                padx=14,
+                bg=TEAL_DARK if name == self.current_report_tab else PANEL_BG,
+                fg=PANEL_BG if name == self.current_report_tab else MUTED,
+                padx=12,
                 pady=9,
                 relief="flat",
                 borderwidth=0,
@@ -477,8 +484,8 @@ class PrusaToOrcaApp:
                 cursor="hand2",
             )
             btn.pack(side="left")
-            self.tab_buttons[text] = btn
-        self.export_btn = self._button(tabs, "Export CSV", self.export_csv, variant="secondary")
+            self.tab_buttons[name] = btn
+        self.export_btn = self._button(tabs, "CSV", self.export_csv, variant="secondary")
         self.export_btn.pack(side="right", padx=(8, 0))
         self._button(tabs, "HTML", self.export_html, variant="secondary").pack(side="right", padx=(8, 0))
         self._button(tabs, "PDF", self.export_pdf, variant="secondary").pack(side="right", padx=(8, 0))
@@ -497,11 +504,16 @@ class PrusaToOrcaApp:
         )
         self.report.grid(row=1, column=0, sticky="nsew")
 
+        self.simple_tab = tk.Frame(frame, bg=PANEL_BG, padx=18, pady=16)
+        self.simple_tab.grid(row=1, column=0, sticky="nsew")
+        self.simple_tab.grid_remove()
+
         self.advanced_tab = tk.Frame(frame, bg=PANEL_BG, padx=18, pady=16)
         self.advanced_tab.grid(row=1, column=0, sticky="nsew")
         self.advanced_tab.grid_remove()
 
         default_views = {
+            "Simple summary": "Choose a bundle to see a non-technical import summary.\n",
             "Summary": (
                 "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n\n"
                 "No file is written during preview.\nExisting Orca presets are not touched by this app.\n"
@@ -621,12 +633,16 @@ class PrusaToOrcaApp:
         reopen_advanced = bool(self.advanced_window and self.advanced_window.winfo_exists())
         if reopen_advanced:
             self.advanced_window.destroy()
+        if self.import_wizard and self.import_wizard.winfo_exists():
+            self.import_wizard.destroy()
         self.advanced_window = None
         self.advanced_body = None
         self.advanced_sidebar = None
         self.advanced_search = None
+        self.simple_tab = None
         self.advanced_tab = None
         self.advanced_tab_bars = []
+        self.import_wizard = None
         self.tab_buttons = {}
         self.quick_buttons = {}
         self.logo_image = None
@@ -708,6 +724,7 @@ class PrusaToOrcaApp:
         self.advanced_model = None
         self.set_report_views(
             {
+                "Simple summary": "Choose a bundle to see a non-technical import summary.\n",
                 "Summary": "Choose a PrusaSlicer config bundle or a folder to preview the safe Orca import.\n",
                 "Bundle files": "No bundle preview yet.\n",
                 "Advanced report": "No advanced report yet.\n",
@@ -815,7 +832,7 @@ class PrusaToOrcaApp:
             self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
             self.root.after(0, lambda: self.record_history(results, advanced_model))
             self.root.after(0, lambda: self.set_progress(1, f"Generated {len(results)} bundle(s)"))
-            self.root.after(0, lambda: messagebox.showinfo("Done", f"Generated {len(results)} bundle(s)."))
+            self.root.after(0, lambda r=results: self.open_import_wizard(r))
         except Exception as exc:
             error = str(exc)
             self.root.after(0, lambda: messagebox.showerror("Conversion failed", error))
@@ -997,6 +1014,7 @@ class PrusaToOrcaApp:
             "output": self.output_path.get(),
             "mode": self.compatibility.get(),
             "prefix": self.prefix_profiles.get(),
+            "outputs": [],
             "totals": {
                 "converted": total_mapped,
                 "approx": total_approx,
@@ -1043,6 +1061,7 @@ class PrusaToOrcaApp:
 
             source = preview.get("source_path", "")
             source_name = Path(source).name if source else "bundle"
+            advanced_model["outputs"].append(str(preview["output_path"]))
             summary.extend(
                 [
                     f"  {index}. {source_name}",
@@ -1182,9 +1201,11 @@ class PrusaToOrcaApp:
         )
         if done:
             summary.extend(["", "Next step in OrcaSlicer:", "  File > Import > Import Config Bundle"])
+        simple_summary = self.build_simple_summary_text(advanced_model)
 
         return (
             {
+                "Simple summary": simple_summary,
                 "Summary": "\n".join(summary),
                 "Bundle files": "\n".join(bundle_lines).strip() + "\n",
                 "Advanced report": "\n".join(advanced_lines).strip() + "\n",
@@ -1192,6 +1213,61 @@ class PrusaToOrcaApp:
             rows,
             advanced_model,
         )
+
+    def build_simple_summary_text(self, model):
+        totals = model.get("totals", {})
+        presets = model.get("preset_totals", {})
+        risk = model.get("risk", {})
+        outputs = model.get("outputs", [])
+        done = model.get("done", False)
+        ignored = int(totals.get("ignored", 0) or 0)
+        approx = int(totals.get("approx", 0) or 0)
+        collisions = len(risk.get("collisions", []))
+
+        if collisions:
+            status = "PAUSE AND REVIEW"
+            meaning = "Some generated names may collide with existing OrcaSlicer presets."
+        elif ignored:
+            status = "OK TO IMPORT, WITH REVIEW"
+            meaning = "The bundle can be imported, but a few source settings were not converted."
+        elif approx:
+            status = "OK TO IMPORT, CHECK APPROXIMATIONS"
+            meaning = "All important presets were generated, with a few approximate field translations."
+        else:
+            status = "OK TO IMPORT"
+            meaning = "The generated bundle looks clean for a safe OrcaSlicer import."
+
+        lines = [
+            "SIMPLE IMPORT SUMMARY",
+            "",
+            status,
+            meaning,
+            "",
+            f"Bundles: {len(outputs)}",
+            f"Presets: {presets.get('printer', 0)} printer / {presets.get('filament', 0)} filament / {presets.get('process', 0)} process",
+            f"Fields: {totals.get('converted', 0)} converted / {approx} approximate / {ignored} ignored",
+            f"Risk: {risk.get('level', 'UNKNOWN')}",
+            "",
+            "What this means:",
+        ]
+        if collisions:
+            lines.append("- Keep the prefix enabled or rename the generated presets before importing.")
+        if approx:
+            lines.append("- Approximate fields were converted to the closest OrcaSlicer setting.")
+        if ignored:
+            lines.append("- Ignored fields were not written to OrcaSlicer. Use Mapping if one matters.")
+        if not any([collisions, approx, ignored]):
+            lines.append("- No obvious manual cleanup is needed before import.")
+
+        lines.extend(["", "Next step:"])
+        if done:
+            lines.append("- Open the import assistant and choose the generated .orca_printer file in OrcaSlicer.")
+        else:
+            lines.append("- Click Generate .orca_printer, then follow the import assistant.")
+        if outputs:
+            lines.extend(["", "Generated bundle path(s):"])
+            lines.extend(f"- {path}" for path in outputs)
+        return "\n".join(lines)
 
     def format_log_lines(self, log):
         lines = [
@@ -1723,11 +1799,18 @@ class PrusaToOrcaApp:
                 fg=PANEL_BG if active else MUTED,
                 font=UI_FONT_BOLD if active else UI_FONT,
             )
-        if name == "Advanced report":
+        if name == "Simple summary":
             self.report.grid_remove()
+            self.advanced_tab.grid_remove()
+            self.simple_tab.grid()
+            self.render_simple_summary_tab()
+        elif name == "Advanced report":
+            self.report.grid_remove()
+            self.simple_tab.grid_remove()
             self.advanced_tab.grid()
             self.render_advanced_tab()
         else:
+            self.simple_tab.grid_remove()
             self.advanced_tab.grid_remove()
             self.report.grid()
             self.write_report(self.report_views.get(name, "No report yet.\n"))
@@ -1735,6 +1818,98 @@ class PrusaToOrcaApp:
     def clear_frame(self, frame):
         for child in frame.winfo_children():
             child.destroy()
+
+    def render_simple_summary_tab(self):
+        self.clear_frame(self.simple_tab)
+        if not self.advanced_model:
+            tk.Label(
+                self.simple_tab,
+                text="Choose a PrusaSlicer bundle to get a plain-language import summary.",
+                font=SECTION_FONT,
+                bg=PANEL_BG,
+                fg=INK,
+                wraplength=720,
+                justify="left",
+            ).pack(anchor="w")
+            return
+
+        model = self.advanced_model
+        totals = model.get("totals", {})
+        presets = model.get("preset_totals", {})
+        risk = model.get("risk", {})
+        ignored = int(totals.get("ignored", 0) or 0)
+        approx = int(totals.get("approx", 0) or 0)
+        collisions = len(risk.get("collisions", []))
+        if collisions:
+            status, status_color = "PAUSE AND REVIEW", RED_ORANGE
+            message = "Possible OrcaSlicer name collisions were detected."
+        elif ignored:
+            status, status_color = "OK TO IMPORT, WITH REVIEW", ORANGE
+            message = "Some settings were ignored. The bundle is safe, but check what matters."
+        elif approx:
+            status, status_color = "OK TO IMPORT, CHECK APPROXIMATIONS", ORANGE
+            message = "Some fields were translated to the closest OrcaSlicer equivalent."
+        else:
+            status, status_color = "OK TO IMPORT", TEAL_DARK
+            message = "No obvious manual cleanup is needed before import."
+
+        header = tk.Frame(self.simple_tab, bg=PANEL_BG)
+        header.pack(fill="x", pady=(0, 14))
+        tk.Label(header, text=status, font=SECTION_FONT, bg=PANEL_BG, fg=status_color).pack(anchor="w")
+        tk.Label(header, text=message, font=UI_FONT, bg=PANEL_BG, fg=INK, wraplength=760, justify="left").pack(anchor="w", pady=(4, 0))
+
+        cards = tk.Frame(self.simple_tab, bg=PANEL_BG)
+        cards.pack(fill="x", pady=(0, 14))
+        self.simple_card(cards, "Bundles", len(model.get("outputs", [])), "orca_printer files", TEAL_DARK)
+        self.simple_card(cards, "Presets", sum(int(v or 0) for v in presets.values()), "printer / filament / process", TEAL_DARK)
+        self.simple_card(cards, "Approx", approx, "worth checking", ORANGE if approx else TEAL_DARK)
+        self.simple_card(cards, "Ignored", ignored, "not written", RED_ORANGE if ignored else TEAL_DARK)
+
+        columns = tk.Frame(self.simple_tab, bg=PANEL_BG)
+        columns.pack(fill="both", expand=True)
+        columns.grid_columnconfigure(0, weight=1)
+        columns.grid_columnconfigure(1, weight=1)
+
+        meaning = tk.Frame(columns, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=14, pady=12)
+        meaning.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+        tk.Label(meaning, text="What this means", font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
+        notes = []
+        if collisions:
+            notes.append("Keep the prefix enabled or rename generated presets before importing.")
+        if approx:
+            notes.append("Approximate fields use the closest OrcaSlicer setting.")
+        if ignored:
+            notes.append("Ignored fields were not imported. Use Mapping if a field matters.")
+        if not notes:
+            notes.append("The generated bundle is ready for the normal OrcaSlicer import flow.")
+        for note in notes:
+            tk.Label(meaning, text=f"- {note}", font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=300, justify="left").pack(anchor="w", pady=(8, 0))
+
+        next_box = tk.Frame(columns, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=14, pady=12)
+        next_box.grid(row=0, column=1, sticky="nsew")
+        tk.Label(next_box, text="Next step", font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).pack(anchor="w")
+        if model.get("done"):
+            next_text = "Open OrcaSlicer, import the generated Config Bundle, then select the imported printer."
+        else:
+            next_text = "Generate the .orca_printer bundle first. The import assistant opens after generation."
+        tk.Label(next_box, text=next_text, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=300, justify="left").pack(anchor="w", pady=(8, 12))
+        self._button(next_box, "Open import assistant", self.open_import_wizard, variant="primary").pack(anchor="w")
+        self._button(next_box, "Mapping editor", self.open_mapping_editor, variant="secondary").pack(anchor="w", pady=(8, 0))
+
+        outputs = model.get("outputs", [])
+        if outputs:
+            paths = tk.Frame(self.simple_tab, bg=PANEL_BG)
+            paths.pack(fill="x", pady=(14, 0))
+            tk.Label(paths, text="Generated bundle path(s)", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
+            for path in outputs[:3]:
+                tk.Label(paths, text=path, font=UI_FONT, bg=PANEL_BG, fg=MUTED, wraplength=820, justify="left").pack(anchor="w", pady=(4, 0))
+
+    def simple_card(self, parent, label, value, detail, color):
+        card = tk.Frame(parent, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=12, pady=10)
+        card.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        tk.Label(card, text=label, font=UI_FONT_BOLD, bg=PANEL_TINT, fg=MUTED).pack(anchor="w")
+        tk.Label(card, text=str(value), font=("Arial Black", 18), bg=PANEL_TINT, fg=color).pack(anchor="w")
+        tk.Label(card, text=detail, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=160, justify="left").pack(anchor="w")
 
     def render_advanced_tab(self):
         self.clear_frame(self.advanced_tab)
@@ -1999,6 +2174,110 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
         target = Path(self.last_output_folder or self.output_path.get())
         target.mkdir(parents=True, exist_ok=True)
         os.startfile(str(target))
+
+    def generated_output_paths(self, results=None):
+        if results:
+            return [str(preview["output_path"]) for preview, _log in results]
+        if self.advanced_model:
+            return [str(path) for path in self.advanced_model.get("outputs", [])]
+        if self.last_preview:
+            return [str(preview["output_path"]) for preview, _log in self.last_preview]
+        return []
+
+    def open_import_wizard(self, results=None):
+        if results is None and self.advanced_model and not self.advanced_model.get("done"):
+            messagebox.showinfo("Import assistant", "Generate the .orca_printer bundle first, then open the import assistant.")
+            return
+        outputs = self.generated_output_paths(results)
+        if not outputs:
+            messagebox.showinfo("Import assistant", "Generate a .orca_printer bundle first.")
+            return
+        if self.import_wizard and self.import_wizard.winfo_exists():
+            self.import_wizard.destroy()
+
+        self.import_wizard = tk.Toplevel(self.root)
+        self.import_wizard.title("OrcaSlicer import assistant")
+        self.import_wizard.geometry("760x520")
+        self.import_wizard.minsize(680, 460)
+        self.import_wizard.configure(bg=APP_BG)
+        try:
+            self.import_wizard.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
+        shell = tk.Frame(self.import_wizard, bg=APP_BG, padx=18, pady=16)
+        shell.pack(fill="both", expand=True)
+        shell.grid_columnconfigure(0, weight=1)
+        shell.grid_rowconfigure(2, weight=1)
+
+        tk.Label(shell, text="Import into OrcaSlicer", font=SECTION_FONT, bg=APP_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        tk.Label(
+            shell,
+            text="Your bundle was generated. Follow these steps in OrcaSlicer.",
+            font=UI_FONT,
+            bg=APP_BG,
+            fg=MUTED,
+        ).grid(row=1, column=0, sticky="w", pady=(4, 14))
+
+        steps = tk.Frame(shell, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=14, pady=12)
+        steps.grid(row=2, column=0, sticky="nsew")
+        steps.grid_columnconfigure(1, weight=1)
+        step_texts = [
+            ("01", "Open OrcaSlicer."),
+            ("02", "Go to File > Import > Import Config Bundle."),
+            ("03", "Select the generated .orca_printer file below."),
+            ("04", "After import, pick the imported printer and check the filament/process presets."),
+        ]
+        for index, (number, text) in enumerate(step_texts):
+            tk.Label(steps, text=number, font=UI_FONT_BOLD, bg=PANEL_TINT, fg=ORANGE).grid(row=index, column=0, sticky="nw", padx=(0, 12), pady=(0, 8))
+            tk.Label(steps, text=text, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=600, justify="left").grid(row=index, column=1, sticky="w", pady=(0, 8))
+
+        file_box = tk.Frame(shell, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1, padx=12, pady=12)
+        file_box.grid(row=3, column=0, sticky="ew", pady=(14, 0))
+        file_box.grid_columnconfigure(0, weight=1)
+        tk.Label(file_box, text="Generated bundle file", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).grid(row=0, column=0, sticky="w")
+        selected_path = tk.StringVar(value=outputs[0])
+        listbox = tk.Listbox(
+            file_box,
+            bg=PANEL_TINT,
+            fg=INK,
+            selectbackground=TEAL,
+            selectforeground=PANEL_BG,
+            font=UI_FONT,
+            height=min(4, max(1, len(outputs))),
+            relief="flat",
+            highlightbackground=LINE,
+            highlightthickness=1,
+        )
+        listbox.grid(row=1, column=0, sticky="ew", pady=(8, 10))
+        for path in outputs:
+            listbox.insert("end", path)
+        listbox.selection_set(0)
+
+        def select_path(_event=None):
+            selected = listbox.curselection()
+            if selected:
+                selected_path.set(outputs[selected[0]])
+
+        def copy_path():
+            self.root.clipboard_clear()
+            self.root.clipboard_append(selected_path.get())
+            self.set_progress(1, "Import path copied")
+
+        def open_selected_folder():
+            target = Path(selected_path.get()).parent
+            target.mkdir(parents=True, exist_ok=True)
+            os.startfile(str(target))
+
+        listbox.bind("<<ListboxSelect>>", select_path)
+        tk.Label(file_box, textvariable=selected_path, font=UI_FONT, bg=PANEL_BG, fg=MUTED, wraplength=680, justify="left").grid(row=2, column=0, sticky="w")
+
+        buttons = tk.Frame(shell, bg=APP_BG)
+        buttons.grid(row=4, column=0, sticky="ew", pady=(14, 0))
+        self._button(buttons, "Copy file path", copy_path, variant="primary").pack(side="left")
+        self._button(buttons, "Open output folder", open_selected_folder, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, "Open Orca guide", self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
+        self._button(buttons, "Close", self.import_wizard.destroy, variant="ghost").pack(side="right")
 
     def open_orca_guide(self):
         webbrowser.open("https://github.com/SoftFever/OrcaSlicer/wiki")
