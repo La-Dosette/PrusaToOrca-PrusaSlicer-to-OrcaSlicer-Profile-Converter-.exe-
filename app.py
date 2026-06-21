@@ -130,6 +130,9 @@ class PrusaToOrcaApp:
         self.advanced_sidebar = None
         self.advanced_search = None
         self.advanced_filter = tk.StringVar(value="all")
+        self.advanced_tab = None
+        self.advanced_tab_bars = []
+        self.advanced_tab_counter_jobs = []
         self.history = self.load_history()
         self.last_output_folder = None
         self.risk_label = tk.StringVar(value="Risk: waiting for preview")
@@ -385,6 +388,11 @@ class PrusaToOrcaApp:
             pady=16,
         )
         self.report.grid(row=1, column=0, sticky="nsew")
+
+        self.advanced_tab = tk.Frame(frame, bg=PANEL_BG, padx=18, pady=16)
+        self.advanced_tab.grid(row=1, column=0, sticky="nsew")
+        self.advanced_tab.grid_remove()
+
         self.set_report_views(
             {
                 "Summary": (
@@ -1473,7 +1481,138 @@ class PrusaToOrcaApp:
                 fg=PANEL_BG if active else MUTED,
                 font=UI_FONT_BOLD if active else UI_FONT,
             )
-        self.write_report(self.report_views.get(name, "No report yet.\n"))
+        if name == "Advanced report":
+            self.report.grid_remove()
+            self.advanced_tab.grid()
+            self.render_advanced_tab()
+        else:
+            self.advanced_tab.grid_remove()
+            self.report.grid()
+            self.write_report(self.report_views.get(name, "No report yet.\n"))
+
+    def clear_frame(self, frame):
+        for child in frame.winfo_children():
+            child.destroy()
+
+    def render_advanced_tab(self):
+        self.clear_frame(self.advanced_tab)
+        self.advanced_tab_bars = []
+        if not self.advanced_model:
+            tk.Label(
+                self.advanced_tab,
+                text="Preview a bundle to see the animated advanced report.",
+                font=SECTION_FONT,
+                bg=PANEL_BG,
+                fg=INK,
+            ).pack(anchor="w")
+            return
+
+        model = self.advanced_model
+        risk = model.get("risk", {})
+        header = tk.Frame(self.advanced_tab, bg=PANEL_BG)
+        header.pack(fill="x", pady=(0, 14))
+        tk.Label(header, text="Advanced report", font=SECTION_FONT, bg=PANEL_BG, fg=INK).pack(side="left")
+        tk.Button(
+            header,
+            text="Open detailed view",
+            command=self.open_advanced_report,
+            font=UI_FONT_BOLD,
+            bg=INK,
+            fg=PANEL_BG,
+            activebackground=TEAL,
+            activeforeground=PANEL_BG,
+            relief="flat",
+            borderwidth=0,
+            padx=12,
+            pady=7,
+            cursor="hand2",
+        ).pack(side="right")
+
+        cards = tk.Frame(self.advanced_tab, bg=PANEL_BG)
+        cards.pack(fill="x", pady=(0, 14))
+        self.animated_card(cards, "Risk", risk.get("level", "N/A"), risk.get("message", ""), TEAL_DARK if risk.get("level") == "LOW" else ORANGE if risk.get("level") == "MEDIUM" else RED_ORANGE)
+        self.animated_card(cards, "Converted", model["totals"]["converted"], "mapped fields", TEAL_DARK)
+        self.animated_card(cards, "Approx", model["totals"]["approx"], "approximate fields", ORANGE)
+        self.animated_card(cards, "Ignored", model["totals"]["ignored"], "not converted", RED_ORANGE)
+
+        filters = tk.Frame(self.advanced_tab, bg=PANEL_BG)
+        filters.pack(fill="x", pady=(0, 12))
+        for label, value in [("Tous", "all"), ("Convertis", "mapped"), ("Approx", "approx"), ("Ignor\u00e9s", "ignored")]:
+            tk.Radiobutton(
+                filters,
+                text=label,
+                value=value,
+                variable=self.advanced_filter,
+                indicatoron=False,
+                command=self.render_advanced_tab,
+                font=UI_FONT_BOLD,
+                bg=PANEL_TINT,
+                fg=INK,
+                selectcolor=TEAL,
+                activebackground=TEAL,
+                activeforeground=PANEL_BG,
+                padx=10,
+                pady=6,
+                relief="flat",
+                borderwidth=0,
+            ).pack(side="left", padx=(0, 8))
+
+        body = tk.Frame(self.advanced_tab, bg=PANEL_BG)
+        body.pack(fill="both", expand=True)
+        sections = self._advanced_filter_sections()
+        if not sections:
+            tk.Label(body, text="No section for this filter.", font=UI_FONT, bg=PANEL_BG, fg=MUTED).pack(anchor="w")
+            return
+
+        for section in sections[:9]:
+            self.advanced_dashboard_row(body, section)
+        self.root.after(80, self.animate_advanced_tab_bars)
+
+    def animated_card(self, parent, label, value, detail, color):
+        card = tk.Frame(parent, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=12, pady=10)
+        card.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        tk.Label(card, text=label, font=UI_FONT_BOLD, bg=PANEL_TINT, fg=MUTED).pack(anchor="w")
+        value_label = tk.Label(card, text="0" if isinstance(value, int) else str(value), font=("Arial Black", 18), bg=PANEL_TINT, fg=color)
+        value_label.pack(anchor="w")
+        tk.Label(card, text=detail, font=UI_FONT, bg=PANEL_TINT, fg=INK, wraplength=160, justify="left").pack(anchor="w")
+        if isinstance(value, int):
+            self.animate_counter(value_label, value, color)
+
+    def animate_counter(self, label, target, color, step=0):
+        steps = 16
+        value = int(round(target * step / steps))
+        label.configure(text=str(value), fg=color)
+        if step < steps:
+            job = self.root.after(18, lambda: self.animate_counter(label, target, color, step + 1))
+            self.advanced_tab_counter_jobs.append(job)
+
+    def advanced_dashboard_row(self, parent, section):
+        row = tk.Frame(parent, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1, padx=12, pady=9)
+        row.pack(fill="x", pady=(0, 8))
+        top = tk.Frame(row, bg=PANEL_BG)
+        top.pack(fill="x")
+        tk.Label(top, text=f"{self._advanced_icon(section['type'])} {section['name']}", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(side="left")
+        stat = f"{STAR} {section['converted']}   {TRIANGLE} {section['approx']}   {CROSS} {section['ignored']}   {section['coverage']}%"
+        tk.Label(top, text=stat, font=UI_FONT_BOLD, bg=PANEL_BG, fg=TEAL_DARK).pack(side="right")
+        bar = tk.Canvas(row, height=8, bg=ADV_PROGRESS_BG, highlightthickness=0)
+        bar.pack(fill="x", pady=(8, 0))
+        fill = bar.create_rectangle(0, 0, 0, 8, fill=TEAL, outline="")
+        self.advanced_tab_bars.append((bar, fill, section["coverage"] / 100))
+        row.bind("<Button-1>", lambda _event, s=section: self.open_advanced_detail_from_tab(s))
+        row.configure(cursor="hand2")
+
+    def open_advanced_detail_from_tab(self, section):
+        self.open_advanced_report()
+        if self.advanced_window and self.advanced_window.winfo_exists():
+            self._advanced_render_detail(section)
+
+    def animate_advanced_tab_bars(self, step=0):
+        steps = 18
+        for bar, fill, target in self.advanced_tab_bars:
+            width = max(bar.winfo_width(), 1)
+            bar.coords(fill, 0, 0, int(width * target * step / steps), 8)
+        if step < steps:
+            self.root.after(16, lambda: self.animate_advanced_tab_bars(step + 1))
 
     def export_csv(self):
         if not self.report_rows:
