@@ -19,3 +19,8 @@
 - Improved Advanced Report cards with animated progress bars.
 - Added a non-technical Simple Summary tab for normal users.
 - Added an OrcaSlicer import assistant with copy-path and open-folder actions.
+- Cleaned up the main toolbar by removing duplicate report/debug shortcuts.
+- Added a compact Tools window for guide, updates, bug report, and debug info.
+- Reordered the left panel so Preview, Generate, and Output are visible at the default size.
+- Fixed conversion history snapshots to save the exact generated report data.
+- Removed unused application code and dead imports.

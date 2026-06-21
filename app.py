@@ -14,8 +14,6 @@ import csv
 import html
 import json
 import os
-import shutil
-import traceback
 import urllib.error
 import urllib.request
 import webbrowser
@@ -239,6 +237,7 @@ class PrusaToOrcaApp:
         self.advanced_tab_counter_jobs = []
         self.advanced_window_bars = []
         self.import_wizard = None
+        self.tools_window = None
         self.history = self.load_history()
         self.custom_mappings = self.load_custom_mappings()
         self.last_output_folder = None
@@ -273,8 +272,8 @@ class PrusaToOrcaApp:
         right.grid_columnconfigure(0, weight=1)
 
         self._build_import_panel(left)
-        self._build_options_panel(left)
         self._build_actions(left)
+        self._build_options_panel(left)
         self._build_preview_panel(right)
         self._build_report_panel(right)
 
@@ -311,9 +310,8 @@ class PrusaToOrcaApp:
             ("prefix", "PREFIX ON", self.toggle_prefix),
             ("compat", "STRICT", self.toggle_compatibility),
             ("theme", "NIGHT", self.toggle_theme),
-            ("advanced", "REPORT", self.open_advanced_report),
             ("history", "HISTORY", self.open_history),
-            ("debug", "DEBUG", self.copy_debug_info),
+            ("tools", "TOOLS", self.open_tools),
         ]:
             btn = self._top_button(quick_actions, text, command)
             btn.pack(side="left", padx=(8, 0))
@@ -328,21 +326,21 @@ class PrusaToOrcaApp:
 
     def _panel(self, parent, title, subtitle=None):
         frame = tk.Frame(parent, bg=PANEL_BG, highlightbackground=LINE, highlightthickness=1)
-        frame.pack(fill="x", pady=(0, 14))
+        frame.pack(fill="x", pady=(0, 10))
         header = tk.Frame(frame, bg=HEADER_BG)
         header.pack(fill="x")
         tk.Frame(header, bg=ORANGE, width=6).pack(side="left", fill="y")
         tk.Label(header, text=title, font=SECTION_FONT, bg=HEADER_BG, fg=HEADER_FG, padx=14, pady=9).pack(side="left")
         if subtitle:
             tk.Label(header, text=subtitle, font=UI_FONT, bg=HEADER_BG, fg=MUTED, padx=12).pack(side="right")
-        content = tk.Frame(frame, bg=PANEL_BG, padx=14, pady=14)
+        content = tk.Frame(frame, bg=PANEL_BG, padx=14, pady=10)
         content.pack(fill="both", expand=True)
         return content
 
     def _build_import_panel(self, parent):
         panel = self._panel(parent, "01 // source", ".ini file or folder")
 
-        self.drop_zone = tk.Frame(panel, bg=PANEL_TINT, highlightbackground=ORANGE, highlightthickness=2, height=128)
+        self.drop_zone = tk.Frame(panel, bg=PANEL_TINT, highlightbackground=ORANGE, highlightthickness=2, height=104)
         self.drop_zone.pack(fill="x")
         self.drop_zone.pack_propagate(False)
         drop_accent = tk.Frame(self.drop_zone, bg=TEAL, width=8)
@@ -352,17 +350,17 @@ class PrusaToOrcaApp:
         tk.Label(
             drop_copy,
             text="DROP .INI HERE",
-            font=("Arial Black", 18),
+            font=("Arial Black", 16),
             bg=PANEL_TINT,
             fg=INK,
-        ).pack(anchor="center", expand=True, pady=(18, 0))
+        ).pack(anchor="center", expand=True, pady=(12, 0))
         tk.Label(
             drop_copy,
             text="preview before writing anything",
             font=UI_FONT_BOLD,
             bg=PANEL_TINT,
             fg=ORANGE_DARK,
-        ).pack(anchor="center", pady=(0, 18))
+        ).pack(anchor="center", pady=(0, 12))
         tk.Label(
             panel,
             textvariable=self.input_path,
@@ -371,7 +369,7 @@ class PrusaToOrcaApp:
             fg=MUTED,
             wraplength=320,
             justify="left",
-        ).pack(anchor="w", pady=(10, 8))
+        ).pack(anchor="w", pady=(8, 6))
 
         row = tk.Frame(panel, bg=PANEL_BG)
         row.pack(fill="x")
@@ -397,30 +395,9 @@ class PrusaToOrcaApp:
             highlightthickness=1,
         ).pack(side="left", fill="x", expand=True, ipady=8)
         self._button(out_row, "...", self.choose_output, variant="secondary", width=4).pack(side="left", padx=(8, 0))
-        self._button(out_row, "Open", self.open_output_folder, variant="secondary", width=6).pack(side="left", padx=(8, 0))
+        self._button(out_row, "Folder", self.open_output_folder, variant="secondary", width=7).pack(side="left", padx=(8, 0))
 
-        tk.Label(panel, textvariable=self.risk_label, font=UI_FONT_BOLD, bg=PANEL_BG, fg=TEAL_DARK).pack(anchor="w", pady=(0, 12))
-
-        tk.Label(panel, text="Compatibility", font=UI_FONT_BOLD, bg=PANEL_BG, fg=INK).pack(anchor="w")
-        chips = tk.Frame(panel, bg=PANEL_BG)
-        chips.pack(fill="x", pady=(6, 12))
-        self._chip(chips, "Strict", "strict").pack(side="left")
-        self._chip(chips, "Loose", "loose").pack(side="left", padx=(8, 0))
-
-        check = tk.Checkbutton(
-            panel,
-            text="Prefix generated presets",
-            variable=self.prefix_profiles,
-            font=UI_FONT,
-            bg=PANEL_BG,
-            fg=INK,
-            activebackground=PANEL_BG,
-            activeforeground=INK,
-            selectcolor=PANEL_BG,
-            anchor="w",
-            command=self.refresh_preview_if_ready,
-        )
-        check.pack(anchor="w")
+        tk.Label(panel, textvariable=self.risk_label, font=UI_FONT_BOLD, bg=PANEL_BG, fg=TEAL_DARK).pack(anchor="w", pady=(0, 8))
 
     def _build_actions(self, parent):
         actions = tk.Frame(parent, bg=APP_BG)
@@ -433,12 +410,6 @@ class PrusaToOrcaApp:
         self.progress_canvas.pack(fill="x", pady=(10, 4))
         self.progress_fill = self.progress_canvas.create_rectangle(0, 0, 0, 10, fill=TEAL, outline="")
         tk.Label(actions, textvariable=self.progress_label, font=UI_FONT, bg=APP_BG, fg=MUTED).pack(anchor="w")
-        aux = tk.Frame(actions, bg=APP_BG)
-        aux.pack(fill="x", pady=(8, 0))
-        self._button(aux, "Bug report", self.export_bug_report, variant="secondary").pack(side="left")
-        self._button(aux, "Guide", self.open_orca_guide, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(aux, "Mapping", self.open_mapping_editor, variant="secondary").pack(side="left", padx=(8, 0))
-        self._button(aux, "Updates", self.check_for_updates, variant="secondary").pack(side="left", padx=(8, 0))
 
     def _build_preview_panel(self, parent):
         header = tk.Frame(parent, bg=APP_BG)
@@ -569,33 +540,6 @@ class PrusaToOrcaApp:
             cursor="hand2",
         )
 
-    def _chip(self, parent, text, value):
-        btn = tk.Radiobutton(
-            parent,
-            text=text,
-            value=value,
-            variable=self.compatibility,
-            indicatoron=False,
-            font=UI_FONT_BOLD,
-            bg=PANEL_BG,
-            fg=INK,
-            activebackground=TEAL,
-            activeforeground=PANEL_BG,
-            selectcolor=TEAL,
-            relief="flat",
-            borderwidth=0,
-            highlightbackground=TEAL if value == "strict" else ORANGE,
-            highlightthickness=1,
-            padx=12,
-            pady=7,
-            command=self.on_option_changed,
-        )
-        return btn
-
-    def on_option_changed(self):
-        self.update_quick_actions()
-        self.refresh_preview_if_ready()
-
     def show_safety_info(self):
         messagebox.showinfo(
             "Safe mode",
@@ -635,6 +579,8 @@ class PrusaToOrcaApp:
             self.advanced_window.destroy()
         if self.import_wizard and self.import_wizard.winfo_exists():
             self.import_wizard.destroy()
+        if self.tools_window and self.tools_window.winfo_exists():
+            self.tools_window.destroy()
         self.advanced_window = None
         self.advanced_body = None
         self.advanced_sidebar = None
@@ -643,6 +589,7 @@ class PrusaToOrcaApp:
         self.advanced_tab = None
         self.advanced_tab_bars = []
         self.import_wizard = None
+        self.tools_window = None
         self.tab_buttons = {}
         self.quick_buttons = {}
         self.logo_image = None
@@ -671,8 +618,6 @@ class PrusaToOrcaApp:
             )
         if "safe" in self.quick_buttons:
             self.quick_buttons["safe"].configure(bg=PANEL_BG, fg=INK)
-        if "advanced" in self.quick_buttons:
-            self.quick_buttons["advanced"].configure(bg=PANEL_BG, fg=INK)
         if "theme" in self.quick_buttons:
             night = self.theme_mode.get() == "night"
             self.quick_buttons["theme"].configure(
@@ -830,7 +775,7 @@ class PrusaToOrcaApp:
             self.last_preview = results
             self.last_output_folder = self.output_path.get()
             self.root.after(0, lambda: self.set_report_views(views, rows, advanced_model))
-            self.root.after(0, lambda: self.record_history(results, advanced_model))
+            self.root.after(0, lambda v=views, r=rows, m=advanced_model: self.record_history(results, m, v, r))
             self.root.after(0, lambda: self.set_progress(1, f"Generated {len(results)} bundle(s)"))
             self.root.after(0, lambda r=results: self.open_import_wizard(r))
         except Exception as exc:
@@ -968,7 +913,7 @@ class PrusaToOrcaApp:
                 keys.update(values)
         return sorted(keys)
 
-    def record_history(self, results, model):
+    def record_history(self, results, model, views=None, rows=None):
         item = {
             "date": datetime.now().isoformat(timespec="seconds"),
             "source": self.input_path.get(),
@@ -979,8 +924,8 @@ class PrusaToOrcaApp:
             "approx": model["totals"]["approx"],
             "ignored": model["totals"]["ignored"],
             "report_snapshot": {
-                "views": self.report_views,
-                "rows": self.report_rows,
+                "views": views if views is not None else self.report_views,
+                "rows": rows if rows is not None else self.report_rows,
                 "advanced_model": model,
             },
         }
@@ -1268,26 +1213,6 @@ class PrusaToOrcaApp:
             lines.extend(["", "Generated bundle path(s):"])
             lines.extend(f"- {path}" for path in outputs)
         return "\n".join(lines)
-
-    def format_log_lines(self, log):
-        lines = [
-            "Conversion report:",
-            f"  converted: {log.total_mapped}",
-            f"  approximate: {log.total_approx}",
-            f"  ignored: {log.total_skipped}",
-        ]
-        if log.warnings:
-            lines.append("")
-            lines.append("Warnings:")
-            lines.extend(f"  {warning}" for warning in log.warnings)
-        lines.append("")
-        lines.append("Sections:")
-        for section in log.sections:
-            lines.append(
-                f"  {section.type:<8} {section.name} "
-                f"ok={section.n_mapped} approx={section.n_approx} ignored={section.n_skipped}"
-            )
-        return lines
 
     def open_advanced_report(self):
         if not self.advanced_model or not self.advanced_model.get("sections"):
@@ -2281,6 +2206,47 @@ table{{border-collapse:collapse;width:100%;font-size:13px}} th,td{{border:1px so
 
     def open_orca_guide(self):
         webbrowser.open("https://github.com/SoftFever/OrcaSlicer/wiki")
+
+    def open_tools(self):
+        if self.tools_window and self.tools_window.winfo_exists():
+            self.tools_window.lift()
+            self.tools_window.focus_force()
+            return
+        self.tools_window = tk.Toplevel(self.root)
+        self.tools_window.title("PrusaToOrca tools")
+        self.tools_window.geometry("560x420")
+        self.tools_window.minsize(500, 360)
+        self.tools_window.configure(bg=APP_BG)
+        try:
+            self.tools_window.iconbitmap(resource_path("logo.ico"))
+        except Exception:
+            pass
+
+        shell = tk.Frame(self.tools_window, bg=APP_BG, padx=18, pady=16)
+        shell.pack(fill="both", expand=True)
+        tk.Label(shell, text="Tools", font=SECTION_FONT, bg=APP_BG, fg=INK).pack(anchor="w")
+        tk.Label(
+            shell,
+            text="Support and maintenance actions. The main workflow stays on the left panel.",
+            font=UI_FONT,
+            bg=APP_BG,
+            fg=MUTED,
+            wraplength=480,
+            justify="left",
+        ).pack(anchor="w", pady=(4, 14))
+
+        for title, description, command in [
+            ("OrcaSlicer guide", "Open the official OrcaSlicer wiki in your browser.", self.open_orca_guide),
+            ("Check updates", "Compare this app version with the latest GitHub release.", self.check_for_updates),
+            ("Bug report", "Generate an anonymized zip report for support.", self.export_bug_report),
+            ("Copy debug info", "Copy version, paths, and risk summary to clipboard.", self.copy_debug_info),
+        ]:
+            row = tk.Frame(shell, bg=PANEL_TINT, highlightbackground=LINE, highlightthickness=1, padx=12, pady=10)
+            row.pack(fill="x", pady=(0, 10))
+            row.grid_columnconfigure(0, weight=1)
+            tk.Label(row, text=title, font=UI_FONT_BOLD, bg=PANEL_TINT, fg=INK).grid(row=0, column=0, sticky="w")
+            tk.Label(row, text=description, font=UI_FONT, bg=PANEL_TINT, fg=MUTED, wraplength=330, justify="left").grid(row=1, column=0, sticky="w", pady=(3, 0))
+            self._button(row, "Open", command, variant="secondary").grid(row=0, column=1, rowspan=2, sticky="e", padx=(12, 0))
 
     def check_for_updates(self):
         self.set_progress(0.15, "Checking GitHub releases...")

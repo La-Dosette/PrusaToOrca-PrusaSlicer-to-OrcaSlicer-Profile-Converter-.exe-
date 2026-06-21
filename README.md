@@ -24,6 +24,7 @@ not overwritten by matching names.
   chosen OrcaSlicer key.
 - Searchable conversion history with output-folder actions and report snapshots
   for new conversions.
+- Compact Tools window for guide, update checks, bug reports, and debug info.
 - CLI mode for automation and testing.
 - Conversion report with summary, bundle file list, advanced field details, and
   CSV, HTML, and simple PDF export.

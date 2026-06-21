@@ -1,0 +1,41 @@
+# PrusaToOrca Patch Notes
+
+## Cleanup Pass
+
+This pass focuses on making the app feel cleaner, less noisy, and more reliable
+without removing core functionality.
+
+### Interface Cleanup
+
+- Removed duplicate top-bar shortcuts for Advanced Report and Debug Info.
+- Kept the top bar focused on live state: Safe, Prefix, Compatibility, Theme,
+  and History.
+- Replaced four secondary buttons with a compact Tools window.
+- Renamed the output-folder button from Open to Folder for clarity.
+- Kept Mapping visible because it is part of the conversion workflow.
+- Reordered the left panel so Preview and Generate are visible in the first
+  viewport at the default window size.
+- Removed duplicated compatibility/prefix controls from the Output panel because
+  those states already live in the top toolbar.
+
+### Tools Window
+
+- Added one place for support and maintenance actions:
+  - OrcaSlicer guide
+  - Check updates
+  - Bug report export
+  - Copy debug info
+
+### Bug Fixes
+
+- Fixed history snapshots so they store the exact report data from the current
+  conversion, instead of depending on UI timing.
+- Removed unused imports and a dead report-formatting method.
+- Verified theme rebuild still closes and recreates secondary windows cleanly.
+
+### Validation
+
+- Python compilation passed.
+- Unit tests passed.
+- Tkinter smoke test passed for Simple Summary, Import Assistant, and Tools.
+- Windows executable was rebuilt and launched successfully.

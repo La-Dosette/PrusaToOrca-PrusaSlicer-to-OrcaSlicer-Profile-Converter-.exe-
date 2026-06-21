@@ -23,5 +23,8 @@ Copy-Item -Force (Join-Path $PSScriptRoot "dist\PrusaToOrca.exe") (Join-Path $re
 if (Test-Path (Join-Path $PSScriptRoot "CHANGELOG.md")) {
   Copy-Item -Force (Join-Path $PSScriptRoot "CHANGELOG.md") (Join-Path $releaseDir "CHANGELOG.md")
 }
+if (Test-Path (Join-Path $PSScriptRoot "PATCH_NOTES.md")) {
+  Copy-Item -Force (Join-Path $PSScriptRoot "PATCH_NOTES.md") (Join-Path $releaseDir "PATCH_NOTES.md")
+}
 
 Write-Host "Prepared release\PrusaToOrca-v0.2.0.exe"
