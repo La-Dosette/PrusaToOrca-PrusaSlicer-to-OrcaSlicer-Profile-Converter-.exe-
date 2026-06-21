@@ -1,7 +1,7 @@
 # PrusaToOrcaSlicer
 
 <p align="center">
-  <img src="logo.png" width="120" alt="Logo"/>
+  <img width="96" height="96" alt="logo_header" src="https://github.com/user-attachments/assets/f4105d2d-c46b-4e49-8309-bb7b00396e9c" />
 </p>
 
 <p align="center">
