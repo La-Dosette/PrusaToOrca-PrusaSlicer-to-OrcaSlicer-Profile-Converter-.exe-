@@ -1,12 +1,12 @@
-# PrusaToOrca
+# PrusaToOrcaSlicer
 
 <p align="center">
-  <img width="96" height="96" alt="PrusaToOrca logo" src="assets/logo_header.png" />
+  <img width="96" height="96" alt="logo_header" src="https://github.com/user-attachments/assets/f4105d2d-c46b-4e49-8309-bb7b00396e9c" />
 </p>
 
 <p align="center">
   <b>PrusaSlicer &rarr; OrcaSlicer Profile Converter</b><br/>
-  Convert PrusaSlicer <code>.ini</code> config bundles into OrcaSlicer <code>.orca_printer</code> import bundles.
+  Drag and drop your <code>.ini</code> PrusaSlicer file and get a ready-to-import <code>.orca_printer</code>.
 </p>
 
 <p align="center">
@@ -19,7 +19,7 @@
 
 ---
 
-## Update - v0.2.0
+## &#128260; Update - v0.2.0
 
 This update focuses on safety, clarity, and a cleaner interface.
 
@@ -33,71 +33,71 @@ PrusaToOrca does not directly edit existing OrcaSlicer preset files. It generate
 
 ### Main changes
 
-- Safer non-destructive conversion workflow
-- Preview before generating files
-- Prefix enabled by default to reduce name collisions
-- Strict / loose compatibility modes
-- Risk scoring for possible OrcaSlicer preset name collisions
-- Simple summary tab
-- Improved advanced report
-- Filters for converted, approximate, and ignored settings
-- Mapping editor for ignored PrusaSlicer keys
-- OrcaSlicer import assistant
-- Conversion history
-- CSV, HTML, and PDF report exports
-- Anonymized bug report export
-- Day / night theme
-- Interface languages: FR, EN, DE, ES, IT, PT, NL, PL
-- Info / Help tab
-- Improved window sizing, centering, and responsive layout
+- &#128737;&#65039; Safer non-destructive conversion workflow
+- &#128064; Preview before generating files
+- &#127991;&#65039; Prefix enabled by default to reduce name collisions
+- &#128279; Strict / loose compatibility modes
+- &#9888;&#65039; Risk scoring for possible OrcaSlicer preset name collisions
+- &#129534; Simple summary tab
+- &#128202; Improved advanced report
+- &#128269; Filters for converted, approximate, and ignored settings
+- &#129513; Mapping editor for ignored PrusaSlicer keys
+- &#128051; OrcaSlicer import assistant
+- &#128344; Conversion history
+- &#128228; CSV, HTML, and PDF report exports
+- &#128030; Anonymized bug report export
+- &#127767; Day / night theme
+- &#127757; Interface languages: FR, EN, DE, ES, IT, PT, NL, PL
+- &#8505;&#65039; Info / Help tab
+- &#129695; Improved window sizing, centering, and responsive layout
 
 ---
 
-## Features
+## &#10024; Features
 
-- Drag and drop a PrusaSlicer `.ini` file directly into the app
-- Browse for a single file or an entire folder
-- Batch conversion support
-- Converts printer, filament, and print process profiles
-- Generates ready-to-import `.orca_printer` bundles
-- Safe preview before writing files
-- Prefixes generated presets with `PrusaToOrca -` by default
-- Strict / loose compatibility modes
-- GitHub release update check from the app
+- &#128433;&#65039; Drag and drop a PrusaSlicer `.ini` file directly into the app
+- &#128193; Browse for a single file or an entire folder
+- &#128230; Batch conversion support
+- &#128424;&#65039; Converts printer, filament, and print process profiles
+- &#128051; Generates ready-to-import `.orca_printer` bundles
+- &#128064; Safe preview before writing files
+- &#127991;&#65039; Prefixes generated presets with `PrusaToOrca -` by default
+- &#128279; Strict / loose compatibility modes
+- &#128260; GitHub release update check from the app
 
 ---
 
-## Reports
+## &#128202; Reports
 
 PrusaToOrca includes several report views to help understand what was converted.
 
-- Simple summary for normal users
-- Technical summary for generated bundles
-- Advanced report with exact, approximate, and ignored settings
-- Per-section conversion coverage
-- Filters for converted, approximate, and ignored fields
-- CSV export
-- HTML export
-- Simple PDF export
-- Anonymized bug report export
+- &#129534; Simple summary for normal users
+- &#128295; Technical summary for generated bundles
+- &#128202; Advanced report with exact, approximate, and ignored settings
+- &#128200; Per-section conversion coverage
+- &#128269; Filters for converted, approximate, and ignored fields
+- &#128228; CSV export
+- &#127760; HTML export
+- &#128196; Simple PDF export
+- &#128030; Anonymized bug report export
 
 ---
 
-## Extra tools
+## &#10024; Extra tools
 
-- Light and dark theme
-- Interface languages: French, English, German, Spanish, Italian, Portuguese, Dutch, and Polish
-- OrcaSlicer import assistant after generation
-- Mapping editor for ignored PrusaSlicer keys
-- Conversion history with report snapshots
-- Open output folder button
-- Copy debug/version info
-- Info / Help tab explaining the main settings
-- Centered and resizable Windows interface
+- &#127767; Light and dark theme
+- &#127757; Interface languages: French, English, German, Spanish, Italian, Portuguese, Dutch, and Polish
+- &#128051; OrcaSlicer import assistant after generation
+- &#129513; Mapping editor for ignored PrusaSlicer keys
+- &#128344; Conversion history with report snapshots
+- &#128193; Open output folder button
+- &#129514; Copy debug/version info
+- &#8505;&#65039; Info / Help tab explaining the main settings
+- &#129695; Centered and resizable Windows interface
 
 ---
 
-## Download
+## &#128230; Download
 
 Download the latest Windows executable from:
 
@@ -113,7 +113,7 @@ No Python installation is required when using the `.exe`.
 
 ---
 
-## Recommended workflow
+## &#129517; Recommended workflow
 
 1. Back up your OrcaSlicer profiles.
 2. Export a PrusaSlicer config bundle as `.ini`.
@@ -128,7 +128,7 @@ No Python installation is required when using the `.exe`.
 
 ---
 
-## What gets converted?
+## &#128221; What gets converted?
 
 PrusaToOrca converts many common slicer profile settings, including:
 
@@ -148,7 +148,7 @@ Some PrusaSlicer-specific settings do not have a direct OrcaSlicer equivalent. T
 
 ---
 
-## Run from source
+## &#128736;&#65039; Run from source
 
 ### Requirements
 
@@ -169,7 +169,7 @@ python app.py
 
 ---
 
-## Build the executable
+## &#128296; Build the executable
 
 The easiest way on Windows is:
 
@@ -188,7 +188,7 @@ The executable will be created in `dist/`.
 
 ---
 
-## Command-line usage
+## &#128295; Command-line usage
 
 ```bash
 python convert.py profiles.ini
@@ -209,7 +209,7 @@ Use `--no-prefix` only if you are sure the generated preset names cannot collide
 
 ---
 
-## Tests
+## &#129514; Tests
 
 ```bash
 python -m unittest discover -s tests -v
@@ -219,7 +219,7 @@ The test suite covers safe import behavior, filename sanitizing, strict / loose 
 
 ---
 
-## Project structure
+## &#128193; Project structure
 
 ```text
 .
@@ -236,7 +236,7 @@ The test suite covers safe import behavior, filename sanitizing, strict / loose 
 
 ---
 
-## Contributing
+## &#129309; Contributing
 
 Pull requests are welcome.
 
@@ -251,7 +251,7 @@ Reports exported from the app are very helpful when debugging mapping issues.
 
 ---
 
-## License
+## &#128196; License
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
 
@@ -276,3 +276,4 @@ This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**
 See the full license here:
 
 https://www.gnu.org/licenses/gpl-3.0.html
+
